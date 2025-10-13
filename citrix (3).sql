@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 09, 2025 at 06:20 PM
+-- Generation Time: Oct 12, 2025 at 06:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -59,10 +59,11 @@ CREATE TABLE `doctor activities` (
 CREATE TABLE `doctors` (
   `docId` int(11) NOT NULL,
   `Doctor Name` varchar(100) NOT NULL,
-  `phone` bigint(10) NOT NULL,
-  `address` varchar(150) NOT NULL,
+  `Phone` bigint(10) NOT NULL,
+  `Address` varchar(150) NOT NULL,
   `exId` int(11) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp()
+  `Status` varchar(100) NOT NULL,
+  `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -97,7 +98,7 @@ CREATE TABLE `expenses` (
   `Paid Status` text NOT NULL,
   `Travel Bill` varchar(100) NOT NULL,
   `Stay Bill` varchar(100) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp()
+  `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -108,7 +109,7 @@ CREATE TABLE `expenses` (
 
 CREATE TABLE `extensions` (
   `exId` int(11) NOT NULL,
-  `exName` varchar(100) NOT NULL,
+  `extension Name` varchar(100) NOT NULL,
   `hqId` int(11) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -150,7 +151,7 @@ CREATE TABLE `meetings` (
   `metId` int(11) NOT NULL,
   `Meeting Link` varchar(1000) NOT NULL,
   `Count` int(10) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp()
+  `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -329,31 +330,31 @@ ALTER TABLE `boss`
 -- AUTO_INCREMENT for table `doctor activities`
 --
 ALTER TABLE `doctor activities`
-  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `doctors`
 --
 ALTER TABLE `doctors`
-  MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `extensions`
 --
 ALTER TABLE `extensions`
-  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `headquarters`
 --
 ALTER TABLE `headquarters`
-  MODIFY `hqId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `hqId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `manager`
@@ -371,13 +372,13 @@ ALTER TABLE `meetings`
 -- AUTO_INCREMENT for table `ordered products`
 --
 ALTER TABLE `ordered products`
-  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -389,7 +390,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
