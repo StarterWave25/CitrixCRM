@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Orders with expandable products</title>
+    <style>
+        body {
+            font-family: system-ui, Arial;
+            max-width: 1000px;
+            margin: 20px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            vertical-align: top
+        }
+
+        th {
+            background: #f7f7f7;
+            text-align: left
+        }
+
+        .caret {
+            cursor: pointer;
+            display: inline-block;
+            width: 20px;
+            text-align: center
+        }
+
+        .expand-row {
+            background: #fafafa
+        }
+
+        .product-list {
+            padding: 8px 16px
+        }
+
+        .product-row {
+            display: flex;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee
+        }
+
+        .product-col {
+            min-width: 120px
+        }
+
+        .badge {
+            background: #eef;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.9rem
+        }
+
+        button.linklike {
+            background: none;
+            border: 0;
+            color: var(--link, #0366d6);
+            cursor: pointer;
+            padding: 0
+        }
+
+        .small {
+            font-size: 0.9rem;
+            color: #555
+        }
+
+        .muted {
+            color: #666;
+            font-size: 0.9rem
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Orders</h2>
+    <div id="container"></div>
+
+    <script>
+        // --- Demo input: either groupedOrders (preferred) OR flatRows (older query)
+        // groupedOrders: each order has orderId and products[]
+        const groupedOrders = [
+            {
+                orderId: 101,
+                Date: "2025-10-02",
+                "Employee Name": 12,
+                "Doctor Name": "Dr A",
+                "DL Copy": "dl_123.pdf",
+                "Prescription": "presc_123.jpg",
+                products: [
+                    { "Product Name": "MedX", "Strips": 10, "Free Strips": 2 },
+                    { "Product Name": "MedY", "Strips": 5, "Free Strips": 0 },
+                    { "Product Name": "MedZ", "Strips": 20, "Free Strips": 4 }
+                ]
+            },
+            {
+                orderId: 102,
+                Date: "2025-10-02",
+                "Employee Name": 12,
+                "Doctor Name": "Dr B",
+                "DL Copy": "dl_124.pdf",
+                "Prescription": "presc_124.jpg",
+                products: [
+                    { "Product Name": "MedK", "Strips": 2, "Free Strips": 0 }
+                ]
+            }
+        ];
+
+        // flatRows: older API that returns each order-product as a separate row
+        const flatRows = [
+            { orderId: 201, Date: "2025-10-03", "Employee Name": 12, "Doctor Name": "Dr X", "DL Copy": "dl.pdf", "Prescription": "p.jpg", "Strips": 10, "Free Strips": 2, "Product Name": "P1" },
+            { orderId: 201, Date: "2025-10-03", "Employee Name": 12, "Doctor Name": "Dr X", "DL Copy": "dl.pdf", "Prescription": "p.jpg", "Strips": 5, "Free Strips": 0, "Product Name": "P2" },
+            { orderId: 202, Date: "2025-10-03", "Employee Name": 12, "Doctor Name": "Dr Y", "DL Copy": "dl2.pdf", "Prescription": "p2.jpg", "Strips": 3, "Free Strips": 1, "Product Name": "P3" }
+        ];
+
+        // Choose which input to render:
+        const useGrouped = true; // set false to simulate flatRows
+        const input = useGrouped ? groupedOrders : flatRows;
+
+        /* If input is flatRows, group by orderId -> produce groupedOrders */
+        function groupFlatRows(rows) {
+            const map = new Map();
+            for (const r of rows) {
+                const id = r.orderId;
+                if (!map.has(id)) {
+                    map.set(id, {
+                        orderId: id,
+                        Date: r.Date,
+                        "Employee Name": r["Employee Name"],
+                        "Doctor Name": r["Doctor Name"],
+                        "DL Copy": r["DL Copy"],
+                        "Prescription": r["Prescription"],
+                        products: []
+                    });
+                }
+                if (r["Product Name"] != null) {
+                    map.get(id).products.push({
+                        "Product Name": r["Product Name"],
+                        "Strips": r["Strips"],
+                        "Free Strips": r["Free Strips"]
+                    });
+                }
+            }
+            return Array.from(map.values());
+        }
+
+        /* Render table with expandable rows */
+        function renderOrders(rawInput) {
+            const orders = Array.isArray(rawInput) && rawInput.length && rawInput[0].products !== undefined
+                ? rawInput
+                : groupFlatRows(rawInput);
+
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            thead.innerHTML = `<tr>
+    <th></th>
+    <th>Order ID</th>
+    <th>Date</th>
+    <th>Doctor</th>
+    <th>Employee</th>
+    <th>Prescription</th>
+  </tr>`;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+
+            orders.forEach((order, idx) => {
+                const rid = `r${order.orderId}`;
+
+                // Parent row
+                const tr = document.createElement('tr');
+                tr.dataset.orderId = order.orderId;
+
+                // caret cell
+                const tdCaret = document.createElement('td');
+                const btn = document.createElement('button');
+                btn.className = 'linklike';
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-controls', `${rid}-products`);
+                btn.title = 'Show products';
+                btn.innerHTML = `<span class="caret">▶</span>`;
+                btn.addEventListener('click', () => toggleExpand(order.orderId, btn));
+                tdCaret.appendChild(btn);
+                tr.appendChild(tdCaret);
+
+                // orderId
+                const tdId = document.createElement('td'); tdId.textContent = order.orderId; tr.appendChild(tdId);
+                // Date
+                const tdDate = document.createElement('td'); tdDate.textContent = order.Date; tr.appendChild(tdDate);
+                // Doctor
+                const tdDoc = document.createElement('td'); tdDoc.textContent = order["Doctor Name"]; tr.appendChild(tdDoc);
+                // Employee
+                const tdEmp = document.createElement('td'); tdEmp.textContent = order["Employee Name"]; tr.appendChild(tdEmp);
+                // Prescription
+                const tdPres = document.createElement('td');
+                tdPres.innerHTML = `<span class="muted">${order["Prescription"] || '—'}</span>`; tr.appendChild(tdPres);
+
+                tbody.appendChild(tr);
+
+                // Expanded row (hidden by default)
+                const expTr = document.createElement('tr');
+                expTr.className = 'expand-row';
+                expTr.style.display = 'none';
+                expTr.id = `${rid}-products`;
+                const expTd = document.createElement('td');
+                expTd.colSpan = 6;
+                expTd.className = 'product-list';
+
+                // summary line
+                const summary = document.createElement('div');
+                summary.innerHTML = `<div class="small"><strong>${order.products.length}</strong> product(s)</div>`;
+                expTd.appendChild(summary);
+
+                // product header
+                const header = document.createElement('div');
+                header.style.display = 'flex'; header.style.gap = '12px'; header.style.marginTop = '8px';
+                header.innerHTML = `<div class="product-col"><strong>Product</strong></div><div class="product-col"><strong>Strips</strong></div><div class="product-col"><strong>Free</strong></div>`;
+                expTd.appendChild(header);
+
+                // product rows
+                order.products.forEach(p => {
+                    const prow = document.createElement('div');
+                    prow.className = 'product-row';
+                    prow.innerHTML = `<div class="product-col">${escapeHtml(p["Product Name"] || '—')}</div>
+                        <div class="product-col">${p["Strips"] ?? 0}</div>
+                        <div class="product-col">${p["Free Strips"] ?? 0}</div>`;
+                    expTd.appendChild(prow);
+                });
+
+                // optionally "show all" for long lists (example)
+                if (order.products.length > 10) {
+                    const moreBtn = document.createElement('button');
+                    moreBtn.className = 'linklike';
+                    moreBtn.textContent = 'Show all products';
+                    moreBtn.addEventListener('click', () => {
+                        // could fetch remaining items or reveal hidden ones
+                        alert('Load more products (implement server side paging if needed)');
+                    });
+                    expTd.appendChild(moreBtn);
+                }
+
+                expTr.appendChild(expTd);
+                tbody.appendChild(expTr);
+            });
+
+            table.appendChild(tbody);
+            container.appendChild(table);
+
+            // toggle function closure
+            function toggleExpand(orderId, btn) {
+                const rid = `r${orderId}`;
+                const row = document.getElementById(`${rid}-products`);
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                const caret = btn.querySelector('.caret');
+                if (expanded) {
+                    caret.textContent = '▶';
+                    row.style.display = 'none';
+                } else {
+                    caret.textContent = '▼';
+                    row.style.display = '';
+                }
+            }
+        }
+
+        // utility: escape HTML to avoid injection
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
+        // initial render
+        renderOrders(input);
+    </script>
+    <script>
+        async function har() {
+            const req = await fetch('http://localhost:3000/api/employee/show-my-data', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    empId: 12,
+                    exId: 3,
+                    fromDate: "2025-10-01",
+                    toDate: "2025-10-03"
+                })
+            });
+            const res = await req.json();
+            console.log(res);
+        }
+        har();
+    </script>
+</body>
+
+</html>

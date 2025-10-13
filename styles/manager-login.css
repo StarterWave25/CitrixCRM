@@ -1,0 +1,229 @@
+:root {
+    --blue: #00535d;
+    --lblue: #fbf2e5;
+    --llblue: #fffbf5;
+    --white: #ffffff;
+    --black: #000000;
+    --gray-text: #666;
+    --border-color: #e0e0e0;
+    --error-red: #d9534f;
+    --border-radius: 10px;
+}
+
+html {
+    scrollbar-color: var(--blue) var(--llblue);
+    scrollbar-width: thin;
+}
+
+/* Base Styles & Typography */
+@font-face {
+    font-family: 'Ivymode';
+    src: url('../ivy-mode-regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'avenir';
+    src: url('../AvenirLTStd-Book.otf');
+}
+
+* {   -webkit-tap-highlight-color: transparent;
+font-family: 'avenir', sans-serif;
+}
+
+body {
+    background-color: var(--llblue);
+    color: var(--blue);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Layout & Structure */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+    padding: 32px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-header {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin-bottom: auto;
+    padding-top: 32px;
+}
+
+.citrix-logo {
+    height: 50px;
+}
+
+.login-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.login-card {
+    background-color: var(--white);
+    padding: 48px 40px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.login-heading {
+    font-family: 'Ivymode', serif;
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 24px;
+    font-weight: normal;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    position: relative;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--blue);
+    background-color: var(--llblue);
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.1);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    color: var(--gray-text);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+    color: var(--blue);
+}
+
+.login-btn {
+    padding: 16px;
+    background-color: var(--blue);
+    color: var(--white);
+    font-size: 1.1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.3s ease-in-out;
+    font-family: 'Avenir';
+}
+
+.login-btn:hover {
+    background-color: #003e46;
+}
+
+.validation-message {
+    font-size: 0.8rem;
+    color: var(--error-red);
+    height: 16px;
+    margin-top: 4px;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.validation-message.show {
+    opacity: 1;
+}
+
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-bottom: 32px;
+}
+
+.footer-text {
+    color: var(--black);
+    font-size: 1rem;
+}
+
+.starterwave-logo {
+    width: 150px;
+}
+
+/* Responsiveness */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    .login-container {
+        padding: 16px;
+    }
+
+    .login-header,
+    .login-footer {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .login-card {
+        padding: 32px 24px;
+    }
+
+    .login-heading {
+        font-size: 2rem;
+    }
+}

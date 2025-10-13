@@ -1,0 +1,205 @@
+:root {
+    --blue: #00535d;
+    --lblue: #fbf2e5;
+    --llblue: #fffbf5;
+    --white: #ffffff;
+    --black: #000000;
+    --gray-text: #666;
+    --border-color: #e0e0e0;
+    --border-radius: 20px;
+    --transition-speed: 0.3s;
+}
+
+/* --- Base Styles & Typography --- */
+@font-face {
+    font-family: 'Ivymode';
+    src: url('../ivy-mode-regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Avenir';
+    src: url('../AvenirLTStd-Book.otf');
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) var(--llblue);
+}
+
+body {
+    font-family: 'Avenir', sans-serif;
+    background-color: var(--white);
+    color: var(--blue);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* --- Layout & Structure --- */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    width: 100%;
+    padding: 32px;
+}
+
+.header {
+    width: 100%;
+    text-align: center;
+    /* Changed from left to center */
+    margin-bottom: auto;
+    padding: 16px 0;
+}
+
+.citrix-logo {
+    height: 50px;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.role-selection-card {
+    padding: 64px 40px;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 600px;
+    /* Increased from 500px to 600px */
+    text-align: center;
+}
+
+.heading-primary {
+    font-family: 'Ivymode', serif;
+    font-size: 2.5rem;
+    color: var(--black);
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+.sub-heading {
+    font-size: 1rem;
+    color: var(--gray-text);
+    margin-bottom: 40px;
+}
+
+.role-options {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .role-options {
+        flex-direction: row;
+    }
+}
+
+.role-btn {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 32px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    transition: all var(--transition-speed) ease;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.employee-btn {
+    background-color: var(--lblue);
+    color: var(--blue);
+}
+
+.manager-btn {
+    background-color: var(--blue);
+    color: var(--white);
+    border: 2px solid transparent;
+}
+
+.role-btn:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #b7abab;
+}
+
+.employee-btn:hover {
+    border-color: var(--blue);
+}
+
+.role-name {
+    font-size: 1.5rem;
+    font-family: 'Ivymode', serif;
+    font-weight: normal;
+    margin-bottom: 8px;
+}
+
+.role-description {
+    font-size: 0.9rem;
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 32px 0;
+}
+
+.footer-text {
+    color: var(--black);
+    font-size: 1rem;
+}
+
+.starterwave-logo {
+    width: 150px;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    .page-container {
+        padding: 16px;
+    }
+
+    .role-selection-card {
+        padding: 32px 24px;
+    }
+
+    .heading-primary {
+        font-size: 2rem;
+    }
+
+    .role-options {
+        gap: 16px;
+    }
+
+    .role-btn {
+        padding: 24px;
+    }
+
+    .role-name {
+        font-size: 1.3rem;
+    }
+}

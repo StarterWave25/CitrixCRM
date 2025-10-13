@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team</title>
+    <link rel="stylesheet" href="../styles/employees.css">
+    <link rel="shortcut icon" href="../../img/Citrix logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Check for cookie on page load
+        const checkCookie = () => {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith('citrix_user=')) {
+                    const username = cookie.substring('citrix_user='.length);
+                    if (username === 'citrixboss') {
+                        return; // Cookie is valid, allow page to load
+                    }
+                }
+            }
+            // If loop finishes without finding a valid cookie, redirect
+            window.location.href = 'manager-login.html';
+        };
+
+        checkCookie();
+    </script>
+</head>
+
+<body>
+    <div class="employees-container">
+        <header class="page-header">
+            <a href="https://citrixltd.com/" class="logo-link">
+                <img src="../../img/Citrix-blue.png" alt="Citrix Ltd Logo" class="citrix-logo">
+            </a>
+        </header>
+
+        <main class="employees-main">
+            <h1 class="page-heading">Our Team</h1>
+            <section class="employee-grid">
+            </section>
+        </main>
+    </div>
+
+    <div id="employeeModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header-top">
+                <h2 id="modalEmployeeName" class="modal-title"></h2>
+                <div class="date-input-container">
+                    <label for="modalDateInput" class="sr-only">Select Date</label>
+                    <input type="date" id="modalDateInput" class="date-input">
+                </div>
+                <button class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-tabs">
+            </div>
+            <div class="tab-content-container">
+            </div>
+        </div>
+    </div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+    <footer class="login-footer">
+        <span class="footer-text">Built by</span>
+        <a href="http://starterwave.xyz" target="_blank"><img src="../../img/starterwave.png" alt="Starterwave Logo"
+                class="starterwave-logo">
+        </a>
+    </footer>
+
+    <div class="meeting-btn-container">
+        <button id="joinMeetingBtn" class="join-meeting-btn">
+            <i class="fas fa-video"></i> Join Meeting
+        </button>
+        <button id="startMeetingBtn" class="meeting-btn">
+            <i class="fas fa-plus"></i> Start Meeting
+        </button>
+    </div>
+
+    <div id="meetingModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+
+            <div id="meetingFormContainer" class="form-container">
+                <h2 class="modal-title">Create New Meeting</h2>
+                <form id="meetingForm" class="meeting-form">
+                    <div class="form-group">
+                        <label for="startTime">Starting Time</label>
+                        <input type="time" id="startTime" name="startTime" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">Ending Time</label>
+                        <input type="time" id="endTime" name="endTime" class="form-input" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Start Meeting</button>
+                </form>
+            </div>
+
+            <div id="loadingState" class="modal-state loading-state">
+                <div class="spinner"></div>
+                <p>Creating meeting...</p>
+            </div>
+
+            <div id="successState" class="modal-state success-state">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>Meeting is Created!</h3>
+                <a href="" class="join-btn" target="_blank">Join Now</a>
+            </div>
+
+            <div id="gettingLinkState" class="modal-state loading-state">
+                <div class="spinner"></div>
+                <p>Checking for active meeting...</p>
+            </div>
+
+            <div id="noMeetingState" class="modal-state no-meeting-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3 class="modal-title">No Active Meetings Found</h3>
+                <p>The meeting link is not yet available.</p>
+            </div>
+
+            <div id="meetingReadyState" class="modal-state meeting-ready-state">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>Meeting is Ready!</h3>
+                <a id="joinNowBtn" href="" class="join-btn" target="_blank">Join Now</a>
+            </div>
+
+        </div>
+    </div>
+    <script src="../scripts/employees.js"></script>
+</body>
+
+</html>

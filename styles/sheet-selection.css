@@ -1,0 +1,669 @@
+:root {
+    --blue: #00535d;
+    --lblue: #fbf2e5;
+    --llblue: #fffbf5;
+    --white: #ffffff;
+    --black: #000000;
+    --gray-text: #666;
+    --border-radius: 20px;
+}
+
+/* --- Base Styles & Typography --- */
+@font-face {
+    font-family: 'Ivymode';
+    src: url('../ivy-mode-regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Avenir';
+    src: url('../AvenirLTStd-Book.otf');
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) var(--llblue);
+}
+
+body {
+    font-family: 'Avenir', sans-serif;
+    background-color: var(--llblue);
+    color: var(--blue);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* --- Layout & Structure --- */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    width: 100%;
+    padding: 32px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: auto;
+    padding: 16px 32px;
+    /* Add horizontal padding for a professional feel */
+}
+
+.citrix-logo {
+    height: 50px;
+}
+
+.show-data-btn {
+    padding: 16px 24px;
+    font-size: 1rem;
+    font-family: 'Avenir', sans-serif;
+    color: var(--white);
+    background-color: var(--blue);
+    border: 1px solid var(--lblue);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0px 16px rgba(0, 0, 0, 0.1);
+}
+
+.show-data-btn:hover {
+    background-color: #003e46;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1.5;
+    width: 100%;
+    padding: 0 16px;
+}
+
+.selection-card {
+    padding: 64px 40px;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+.heading-primary {
+    font-family: 'Ivymode', serif;
+    font-size: 2.5rem;
+    color: var(--black);
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+.sub-heading {
+    font-size: 1rem;
+    color: var(--gray-text);
+    margin-bottom: 40px;
+}
+
+.selection-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.selection-btn {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(150deg, var(--blue) 50%, #a39888);
+    color: var(--white);
+}
+
+.selection-btn:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    filter: brightness(1.2);
+}
+
+.option-name {
+    font-size: 1.5rem;
+    font-family: 'Ivymode', serif;
+    font-weight: normal;
+    margin: 0;
+}
+
+/* New Code for Join Button and Modal */
+.join-btn-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 500;
+}
+
+.join-meeting-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-family: 'Avenir', sans-serif;
+    color: var(--white);
+    background-color: var(--blue);
+    border: 1px solid var(--lblue);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.join-meeting-btn:hover {
+    background-color: #003e46;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.join-meeting-btn .fas {
+    font-size: 1rem;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    max-width: 90%;
+    width: 400px;
+    height: auto;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: rgb(180, 180, 180);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:active {
+    background-color: rgb(240, 240, 240);
+}
+
+.modal-title {
+    font-family: 'Ivymode', serif;
+    font-size: 2rem;
+    color: var(--blue);
+    font-weight: normal;
+    margin: 0;
+}
+
+.modal-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.modal-state.active {
+    display: flex;
+}
+
+.spinner {
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--blue);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.join-now-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--white);
+    background-color: var(--blue);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.join-now-btn:hover {
+    background-color: #003e46;
+}
+
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 32px 0;
+}
+
+.footer-text {
+    color: var(--black);
+    font-size: 1rem;
+}
+
+.starterwave-logo {
+    width: 150px;
+}
+
+
+/* NEW CODE FOR DATA VIEWER MODAL - REVISED */
+
+.data-viewer-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.data-viewer-content {
+    max-width: 95%;
+    width: 1200px;
+    height: 90vh;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    overflow: hidden;
+}
+
+.data-viewer-close-btn {
+    z-index: 10;
+}
+
+/* Data States (Loading/Error/Display) */
+.data-state {
+    display: none;
+    flex-direction: column;
+    /* Aligned to top-left to fix header centering issue */
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: left;
+    width: 100%;
+}
+
+.data-state.active {
+    display: flex;
+}
+
+/* Ensure the LOADING and ERROR states remain CENTERED */
+#dataLoadingState,
+#dataErrorState {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#dataDisplayState {
+    padding-top: 24px;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Header and Controls */
+.data-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 24px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+    /* Allow wrap on mobile */
+    gap: 16px;
+}
+
+.date-picker-container,
+.sheet-select-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-label {
+    font-size: 1rem;
+    color: var(--blue);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.date-input,
+.sheet-dropdown {
+    padding: 8px 12px;
+    border: 1px solid var(--blue);
+    border-radius: 5px;
+    font-family: 'Avenir', sans-serif;
+    color: var(--blue);
+    background-color: var(--llblue);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300535d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+
+.date-input:focus,
+.sheet-dropdown:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.2);
+}
+
+/* Data Sheets Container (Scrollable Area Fix) */
+.data-sheets-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* FIX: Enable scrolling for data content */
+    padding: 0 16px 16px;
+    /* Increased side padding for visual breathing room */
+}
+
+.sheet-content {
+    display: none;
+    padding: 8px;
+}
+
+.sheet-content.active {
+    display: block;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray-text);
+    font-style: italic;
+    font-size: 1.2rem;
+}
+
+/* Mobile-First Card Table Structure - ENHANCED UX */
+.data-table-card-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    /* Retaining the 320px card width */
+    gap: 24px;
+    /* Consistent spacing (8-point system: 24px) */
+    padding-bottom: 16px;
+}
+
+.data-card {
+    background-color: var(--white);
+    border: 2px solid var(--lblue);
+    /* Stronger border */
+    border-radius: 16px;
+    /* Slightly rounder */
+    padding: 20px;
+    /* More padding */
+    /* More premium shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.data-card:before {
+    /* Accent stripe for visual appeal */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background-color: var(--blue);
+    border-radius: 16px 0 0 16px;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    /* Subtle separator */
+}
+
+.data-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.data-label {
+    font-size: 0.95rem;
+    color: var(--gray-text);
+    font-weight: 500;
+    flex-basis: 45%;
+    /* Adjusted basis for better alignment */
+    line-height: 1.3;
+}
+
+.data-value {
+    font-size: 1rem;
+    color: var(--blue);
+    font-weight: bold;
+    text-align: right;
+    flex-basis: 55%;
+    /* Adjusted basis */
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+/* NEW: Style for Not Paid Total Footer */
+.expense-total-footer {
+    padding: 24px;
+    /* 24px padding (multiple of 8) */
+    margin-top: 32px;
+    /* 32px separation from cards (multiple of 8) */
+    margin-bottom: 16px;
+    background-color: var(--lblue);
+    /* Light blue background for emphasis */
+    border-radius: 12px;
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Ivymode', serif;
+    font-size: 1.6rem;
+    /* Slightly larger for prominence */
+    border: 1px solid var(--blue);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.expense-total-label {
+    color: var(--black);
+    font-weight: normal;
+}
+
+.expense-total-amount {
+    color: #cc0000;
+    /* Strong red for attention (high contrast) */
+    font-weight: bold;
+    /* Ensure currency symbol is not wrapped */
+    white-space: nowrap;
+}
+
+/* NEW: Highlight for 'Not Paid' text inside cards (for visual anchoring) */
+.data-value-highlight {
+    color: #cc0000;
+    font-weight: bold;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 1024px) {
+    .selection-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .data-viewer-content {
+        padding: 16px;
+        height: 100vh;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+
+    .data-viewer-close-btn {
+        /* Align close button properly */
+        top: 8px;
+        right: 8px;
+    }
+
+    .data-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .date-picker-container,
+    .sheet-select-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .data-sheets-container {
+        padding: 0 0 16px;
+    }
+
+    .data-card {
+        grid-template-columns: 320px;
+        padding: 16px;
+    }
+
+    .data-table-card-view {
+        grid-template-columns: 320px;
+        /* Revert to 1fr for full width on smaller mobiles */
+        gap: 16px;
+    }
+
+    .expense-total-footer {
+        font-size: 1rem;
+        padding: 16px;
+        margin-top: 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    .header {
+        padding: 4px;
+    }
+
+    .show-data-btn {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    .page-container {
+        padding: 16px;
+    }
+
+    .selection-card {
+        padding: 32px 0;
+    }
+
+    .heading-primary {
+        font-size: 2rem;
+    }
+
+    .selection-options {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .selection-btn {
+        padding: 24px;
+    }
+
+    .option-name {
+        font-size: 1.3rem;
+    }
+
+    .join-meeting-btn {
+        padding: 12px 20px;
+    }
+}
