@@ -1,74 +1,42 @@
-import { google } from 'googleapis';
+// quick_oauth_server.js
+import express from 'express';
+import open from 'open';
 import dotenv from 'dotenv';
-import readline from 'readline';
-
+import { google } from 'googleapis';
+import fs from 'fs/promises';
 dotenv.config();
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI; // Must match the value you set in the Console
+const {
+    GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI
+} = process.env;
 
-if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
-    console.error("Please set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI in your .env file.");
-    process.exit(1);
+const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const TOKEN_FILE = './new_refresh_token.json';
+
+const app = express();
+
+function createClient() {
+    return new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI);
 }
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar.events'];
+app.get('/auth', async (req, res) => {
+    const oauth2 = createClient();
+    const url = oauth2.generateAuthUrl({ access_type: 'offline', prompt: 'consent', scope: SCOPES });
+    await open(url);
+    res.send(`Opened consent page. After consenting you'll be redirected to ${GOOGLE_REDIRECT_URI}`);
+});
 
-const oAuth2Client = new google.auth.OAuth2(
-    CLIENT_ID,
-    CLIENT_SECRET,
-    REDIRECT_URI
-);
-
-/**
- * Step A: Generates the consent URL and prompts the user to visit it.
- */
-function generateAuthUrl() {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline', // THIS IS CRITICAL: It tells Google you need a Refresh Token.
-        scope: SCOPES,
-        prompt: 'consent' // Forces consent, ensuring you get a new Refresh Token.
-    });
-    
-    console.log('--- STEP A: Visit this URL to grant access ---');
-    console.log('1. Open this URL in your browser and approve access (log in as the dedicated Google user):');
-    console.log(authUrl);
-}
-
-/**
- * Step B: Takes the code from the redirected URL and exchanges it for tokens.
- * @param {string} code - The code parameter returned by Google.
- */
-async function getTokensFromCode(code) {
+app.get('/oauth2callback', async (req, res) => {
     try {
-        const { tokens } = await oAuth2Client.getToken(code);
-        
-        console.log('\n--- STEP B: SUCCESS ---');
-        console.log('The following Refresh Token MUST be saved securely:');
-        
-        // This is the value you need to save in your .env file.
-        console.log('YOUR REFRESH TOKEN:', tokens.refresh_token); 
-        
-        console.log('\n--- IMPORTANT ---');
-        console.log('Copy this REFRESH TOKEN and place it in your .env file:');
-        console.log(`GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}`);
-        console.log('You can now remove this temporary script.');
-
-    } catch (error) {
-        console.error('Error retrieving token:', error);
+        const code = req.query.code;
+        const oauth2 = createClient();
+        const { tokens } = await oauth2.getToken(code);
+        await fs.writeFile(TOKEN_FILE, JSON.stringify(tokens, null, 2), 'utf8');
+        res.send('Tokens saved to ' + TOKEN_FILE + '. Look inside for refresh_token.');
+    } catch (err) {
+        console.error('Exchange error:', err.response?.data || err.message || err);
+        res.status(500).send('Error exchanging code. Check server logs.');
     }
-}
-
-// --- Main execution ---
-generateAuthUrl();
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
 });
 
-rl.question('\n2. Paste the URL code fragment received after consent (e.g., 4/AbCdE...): ', (code) => {
-    rl.close();
-    getTokensFromCode(code.trim());
-});
+app.listen(3000, () => console.log('Open http://localhost:3000/auth to re-authorize'));

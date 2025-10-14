@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2025 at 06:07 PM
+-- Generation Time: Oct 14, 2025 at 07:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `boss` (
   `bossId` int(11) NOT NULL,
   `bossName` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
   `password` varchar(8) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -154,6 +155,16 @@ CREATE TABLE `meetings` (
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `meetings`
+--
+
+INSERT INTO `meetings` (`metId`, `Meeting Link`, `Count`, `Date`) VALUES
+(1, 'lksdajfkslfjlalklasjflk', 1, '2025-10-13'),
+(2, 'sdfsafasfas', 2, '2025-10-13'),
+(3, 'https://meet.google.com/ona-gjkd-kpy', 1, '2025-10-14'),
+(4, 'https://meet.google.com/vmq-vqpk-efy', 2, '2025-10-14');
+
 -- --------------------------------------------------------
 
 --
@@ -183,6 +194,7 @@ CREATE TABLE `orders` (
   `exId` int(11) NOT NULL,
   `DL Copy` text NOT NULL,
   `Prescription` varchar(100) NOT NULL,
+  `Total` int(11) NOT NULL,
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -195,6 +207,7 @@ CREATE TABLE `orders` (
 CREATE TABLE `products` (
   `pId` int(11) NOT NULL,
   `Product Name` int(11) NOT NULL,
+  `Price` int(11) NOT NULL,
   `Date` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -342,7 +355,7 @@ ALTER TABLE `doctors`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `extensions`
@@ -366,7 +379,7 @@ ALTER TABLE `manager`
 -- AUTO_INCREMENT for table `meetings`
 --
 ALTER TABLE `meetings`
-  MODIFY `metId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `metId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `ordered products`
