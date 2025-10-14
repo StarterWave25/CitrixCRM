@@ -3,6 +3,29 @@ import { generateToken } from "../lib/utils.js";
 
 // NOTE: This assumes 'pool' (for database connection) and 'generateToken' (for JWT)
 // are defined and available in this scope.
+/* 
+Example Request Body for login -boss:
+{
+    "email": "prudvi@gmail.com",
+    "password": "password",
+    "role": "boss"
+} 
+
+Example Request Body for login -manager:
+{
+    "email": "prudvi@gmail.com",
+    "password": "password",
+    "role": "manager"
+}
+
+Example Request Body for login -user:
+{
+    "email": "prudvi@gmail.com",
+    "password": "password",
+    "role": "user"
+}
+    
+*/
 
 export const login = async (req, res) => {
   try {
