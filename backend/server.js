@@ -12,8 +12,12 @@ const server = express();
 
 dotEnv.config();
 
-server.use(express.json());
+//server.use(express.json());
 server.use(cookieParser());
+server.use(express.json({ limit: '100mb' }));
+
+// If you also use urlencoded middleware, update it too
+server.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 server.use(cors({
     origin: '*',

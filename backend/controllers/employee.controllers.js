@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats'; // 1. Import the formats package
 import { pool } from '../database/db.js';
+import cloudinary from '../lib/cloudinary.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -169,4 +170,18 @@ export const sendMessage = async (req, res) => {
             message: "Internal server error during message sending process."
         });
     }
+};
+
+export const uploadImage = async (req, res) => {
+    console.log('uploadImage handler called')
+    try {
+        const { image } = req.body;
+        if (!image) return res.status(400).json({ message: "Image is required" });
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        return res.status(200).json({ message: "Image uploaded successfully", url: uploadResponse.secure_url });
+    } catch (error) {
+        console.log("Error in upload-image-route:", error);
+        res.status(500).json({ message: "Internal Server Error", ok: false });
+    }
+
 };

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="file" id="profilePicInput" accept="image/*">
+  <button id="uploadButton">Upload Profile Picture</button>
+
+  <script>
+    // Get elements
+    const fileInput = document.getElementById('profilePicInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const apiUrl = "http://localhost:3000/api/employee/upload-image"; // The path to your backend endpoint
+
+    uploadButton.addEventListener('click', () => {
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select a file first.");
+        return;
+      }
+
+      // Use FileReader to convert the File object to a Base64 string
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        const base64String = event.target.result; // This is the Base64 string (data URL)
+        sendImageToBackend(base64String);
+      };
+
+      // Read the file as a Data URL (which is a Base64 string)
+      reader.readAsDataURL(file);
+    });
+
+
+    async function sendImageToBackend(profilePicBase64) {
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST', // Or 'POST', depending on your route setup
+          headers: {
+            'Content-Type': 'application/json',
+            // You will also need to include your Authentication token (e.g., Bearer Token) here
+            // 'Authorization': `Bearer ${yourAuthToken}`
+          },
+          // Send the Base64 string in the 'profilePic' field of the request body
+          body: JSON.stringify({ image: profilePicBase64 })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('Upload successful! Updated User:', data);
+          alert("Profile picture updated successfully!");
+        } else {
+          console.error('Upload failed:', data.message);
+          alert(`Upload failed: ${data.message}`);
+        }
+
+      } catch (error) {
+        console.error('Network or server error:', error);
+        alert("An internal error occurred during upload.");
+      }
+    }
+  </script>
+</body>
+
+</html>
