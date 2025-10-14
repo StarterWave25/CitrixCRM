@@ -83,3 +83,90 @@ export const submitForm = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+/**
+ * Controller function to send whatsapp message to a number.
+ * Request body: { phone:'', message:'' }
+ */
+
+// It's best practice to import the API key from a secure config or env setup
+const WHATSAPP_API_URL = 'https://wasenderapi.com/api/send-message';
+
+export const sendMessage = async (req, res) => {
+    // 1. Destructure required data from the request body
+    // The original code used req.phone and req.message, but typically this data comes from req.body
+    const { phone, message } = req.body;
+
+    const WHATSAPP_API_KEY = process.env.WHATSAPP_API_KEY;
+
+    // 2. Initial input and configuration validation
+    if (!WHATSAPP_API_KEY) {
+        console.error("WHATSAPP_API_KEY is not defined in environment variables.");
+        // Use 500 status for configuration error
+        return res.status(500).json({
+            success: false,
+            message: "Server configuration error: WhatsApp API key missing."
+        });
+    }
+
+    if (!phone || !message) {
+        // Use 400 status for bad user input
+        return res.status(400).json({
+            success: false,
+            message: "Missing required fields: 'phone' and 'message' must be provided."
+        });
+    }
+
+    let wprequest;
+    let wpresponse;
+
+    try {
+        // 3. Construct and execute the external API request with necessary headers
+        wprequest = await fetch(WHATSAPP_API_URL, {
+            method: 'POST',
+            headers: {
+                // Ensure proper authorization header format (often 'Bearer YOUR_KEY')
+                // Assuming wasenderapi uses the key directly as the value:
+                'Authorization': WHATSAPP_API_KEY,
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                to: phone, // Use destructured variable 'phone' from req.body
+                text: message // Use destructured variable 'message' from req.body
+            })
+        });
+
+        // 4. Handle non-200 HTTP response status from the external API
+        if (!wprequest.ok) {
+            // Attempt to parse the error response body if available
+            const errorBody = await wprequest.json().catch(() => ({}));
+            const errorMessage = errorBody.message || `External API responded with status ${wprequest.status}.`;
+
+            // Log the external error for server-side debugging
+            console.error(`WhatsApp API Error (Status ${wprequest.status}):`, errorMessage, errorBody);
+
+            // Respond to the client with a generic failure message to avoid exposing internal errors
+            return res.status(502).json({
+                success: false,
+                message: "Failed to send message: External service returned an error."
+            });
+        }
+
+        // 5. Parse the successful JSON response
+        wpresponse = await wprequest.json();
+
+        // 6. Return the external API's response to the client
+        // Use 200/202 status for success
+        return res.status(200).json(wpresponse);
+
+    } catch (error) {
+        // 7. Catch network, DNS, or JSON parsing errors
+        console.error("Network or internal error during WhatsApp API call:", error);
+
+        // Respond to the client with a generic server error
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error during message sending process."
+        });
+    }
+};
