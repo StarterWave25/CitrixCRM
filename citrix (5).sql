@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 14, 2025 at 07:53 AM
+-- Generation Time: Oct 15, 2025 at 09:49 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,6 +82,16 @@ CREATE TABLE `employees` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`empId`, `email`, `empName`, `hqId`, `password`, `date`) VALUES
+(1, 'harsha@gmail.com', 'Harsha Vardhan', 3, '$2b$10$k', '2025-10-15'),
+(2, 'prudvi@gmail.com', 'Prudvi', 4, '$2b$10$s', '2025-10-15'),
+(3, 'jasu@gmail.com', 'Jasu', 5, '$2b$10$c', '2025-10-15'),
+(4, 'ramu@gmail.com', 'Ram', 5, '$2b$10$q', '2025-10-15');
+
 -- --------------------------------------------------------
 
 --
@@ -112,6 +122,7 @@ CREATE TABLE `extensions` (
   `exId` int(11) NOT NULL,
   `extension Name` varchar(100) NOT NULL,
   `hqId` int(11) NOT NULL,
+  `stockId` int(11) DEFAULT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -124,9 +135,18 @@ CREATE TABLE `extensions` (
 CREATE TABLE `headquarters` (
   `hqId` int(11) NOT NULL,
   `hqName` varchar(100) NOT NULL,
-  `empId` int(11) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `headquarters`
+--
+
+INSERT INTO `headquarters` (`hqId`, `hqName`, `date`) VALUES
+(3, 'Tirupati', '2025-10-15'),
+(4, 'Kadapa', '2025-10-15'),
+(5, 'Kurnool', '2025-10-15'),
+(6, 'Anantapur', '2025-10-15');
 
 -- --------------------------------------------------------
 
@@ -214,6 +234,19 @@ CREATE TABLE `products` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `stockists`
+--
+
+CREATE TABLE `stockists` (
+  `stockId` int(11) NOT NULL,
+  `Stockist Name` varchar(100) NOT NULL,
+  `Phone` bigint(10) NOT NULL,
+  `Date` date NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tourplan`
 --
 
@@ -275,7 +308,8 @@ ALTER TABLE `expenses`
 --
 ALTER TABLE `extensions`
   ADD PRIMARY KEY (`exId`),
-  ADD KEY `exTohq` (`hqId`);
+  ADD KEY `exTohq` (`hqId`),
+  ADD KEY `extoStock` (`stockId`);
 
 --
 -- Indexes for table `headquarters`
@@ -321,6 +355,12 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`pId`);
 
 --
+-- Indexes for table `stockists`
+--
+ALTER TABLE `stockists`
+  ADD PRIMARY KEY (`stockId`);
+
+--
 -- Indexes for table `tourplan`
 --
 ALTER TABLE `tourplan`
@@ -352,6 +392,12 @@ ALTER TABLE `doctors`
   MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT for table `employees`
+--
+ALTER TABLE `employees`
+  MODIFY `empId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
@@ -361,13 +407,13 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `extensions`
 --
 ALTER TABLE `extensions`
-  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `headquarters`
 --
 ALTER TABLE `headquarters`
-  MODIFY `hqId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `hqId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `manager`
@@ -398,6 +444,12 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `products`
   MODIFY `pId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `stockists`
+--
+ALTER TABLE `stockists`
+  MODIFY `stockId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tourplan`
@@ -433,7 +485,8 @@ ALTER TABLE `expenses`
 -- Constraints for table `extensions`
 --
 ALTER TABLE `extensions`
-  ADD CONSTRAINT `exTohq` FOREIGN KEY (`hqId`) REFERENCES `headquarters` (`hqId`);
+  ADD CONSTRAINT `exTohq` FOREIGN KEY (`hqId`) REFERENCES `headquarters` (`hqId`),
+  ADD CONSTRAINT `extoStock` FOREIGN KEY (`stockId`) REFERENCES `stockists` (`stockId`);
 
 --
 -- Constraints for table `ordered products`
