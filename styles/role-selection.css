@@ -57,7 +57,6 @@ body {
 .header {
     width: 100%;
     text-align: center;
-    /* Changed from left to center */
     margin-bottom: auto;
     padding: 16px 0;
 }
@@ -75,11 +74,12 @@ body {
 }
 
 .role-selection-card {
-    padding: 64px 40px;
+    /* Reduced vertical padding for decreased height */
+    padding: 40px 40px; 
     border-radius: var(--border-radius);
     width: 100%;
-    max-width: 600px;
-    /* Increased from 500px to 600px */
+    /* Max width is 800px */
+    max-width: 800px; 
     text-align: center;
 }
 
@@ -103,9 +103,14 @@ body {
     gap: 24px;
 }
 
+/* Desktop: 3-Column Layout */
 @media (min-width: 768px) {
     .role-options {
         flex-direction: row;
+        justify-content: space-between;
+    }
+    .role-btn {
+        flex-basis: calc(33.33% - 16px); 
     }
 }
 
@@ -114,39 +119,83 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 32px;
+    /* Reduced padding for decreased height */
+    padding: 24px; 
     border-radius: 16px;
     border: 2px solid transparent;
-    transition: all var(--transition-speed) ease;
+    /* Modern Transition: added transform */
+    transition: all var(--transition-speed) ease, transform var(--transition-speed) ease;
     text-align: left;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+/* --- Color Scheme (Light, Dark, Light) --- */
+
+/* 1. Employee: Light Background */
 .employee-btn {
     background-color: var(--lblue);
     color: var(--blue);
 }
 
-.manager-btn {
+/* 2. MD Login: Dark Background (Prioritized for seniority/contrast) */
+.md-btn {
     background-color: var(--blue);
     color: var(--white);
     border: 2px solid transparent;
 }
 
-.role-btn:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border: 2px solid #b7abab;
+/* 3. Manager: Light Background (Alternating pattern) */
+.manager-btn {
+    background-color: var(--lblue);
+    color: var(--blue);
+    border: 2px solid transparent;
 }
 
-.employee-btn:hover {
-    border-color: var(--blue);
+/* --- Modern Interactivity --- */
+.role-btn:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+    transform: translateY(-5px); /* Subtle lift effect */
 }
+
+/* Dark Button Hover (MD) */
+.md-btn:hover {
+    background-color: #00424a; /* Slightly darker blue on hover */
+    border-color: #00424a;
+}
+
+/* Light Button Hover (Employee, Manager) */
+.employee-btn:hover,
+.manager-btn:hover {
+    border-color: var(--blue);
+    background-color: var(--lblue); /* Ensure background stays light */
+}
+
 
 .role-name {
     font-size: 1.5rem;
     font-family: 'Ivymode', serif;
     font-weight: normal;
     margin-bottom: 8px;
+    /* Spacing for Icon */
+    display: flex;
+    align-items: center;
+}
+
+/* Icon Styling */
+.role-name i {
+    margin-right: 12px;
+    font-size: 1.25em; 
+}
+
+/* Icon color for dark buttons (MD) */
+.md-btn .role-name i {
+    color: var(--white);
+}
+
+/* Icon color for light buttons (Employee, Manager) */
+.employee-btn .role-name i,
+.manager-btn .role-name i {
+    color: var(--blue);
 }
 
 .role-description {
@@ -196,7 +245,7 @@ body {
     }
 
     .role-btn {
-        padding: 24px;
+        padding: 20px;
     }
 
     .role-name {
