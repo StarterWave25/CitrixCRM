@@ -4,7 +4,7 @@ import { viewData, getExpenses, joinMeeting, createGoogleMeet } from '../control
 
 const router = express.Router();
 
-router.post('/show-my-data', viewData);
+router.post('/view-data', viewData);
 router.post('/get-expenses', getExpenses);
 router.get('/join-meeting', joinMeeting);
 router.post('/create-meeting', createGoogleMeet);

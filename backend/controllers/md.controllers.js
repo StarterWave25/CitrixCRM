@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { pool } from '../database/db.js';
 import bcrypt from 'bcryptjs';
+import { decryptMetadata } from "../lib/encrypt.js";
 
 dotenv.config();
 
@@ -199,5 +200,118 @@ export const payExpenses = async (req, res) => {
     } catch (err) {
         console.error(`Pay Expenses error for empId ${empId}:`, err);
         return res.status(500).json({ error: 'Internal server error during expense payment update.' });
+    }
+};
+
+/**
+ * Dynamically updates a single column (cell) in a specified database table using encrypted metadata.
+ * * Request body structure:
+ * @param {string} encryptedMetadata - Base64-encoded string containing { table, idName, idValue, columnName }.
+ * @param {any} columnValue   - The new value for the specified column.
+ */
+export const editCell = async (req, res) => {
+    const { encryptedMetadata, columnValue } = req.body;
+
+    // 1. Initial Input Validation
+    if (!encryptedMetadata || columnValue === undefined) {
+        return res.status(400).json({
+            ok: false,
+            message: "Missing required fields: encryptedMetadata and columnValue must be provided."
+        });
+    }
+
+    let tableName, IdName, IdValue, columnName;
+
+    try {
+        // 2. Decrypt Metadata and extract variables
+        const decrypted = decryptMetadata(encryptedMetadata);
+        // Map decrypted keys to local variables
+        tableName = decrypted.table;
+        IdName = decrypted.idName;
+        IdValue = decrypted.idValue;
+        columnName = decrypted.columnName;
+    } catch (e) {
+        // Handle errors thrown during decryption (e.g., corrupted token, invalid JSON)
+        console.error('Decryption failed on request:', e.message);
+        return res.status(401).json({
+            ok: false,
+            message: "Authentication failure: Invalid or corrupted access token (metadata)."
+        });
+    }
+
+    // 3. Security Check (Prevent updating reserved system columns like 'date')
+    const disallowedColumns = ['date', 'created_at', 'updated_at'];
+    if (disallowedColumns.includes(columnName.toLowerCase()) && columnName.toLowerCase() !== 'password') {
+        return res.status(403).json({
+            ok: false,
+            // FIXED: Used template literal backticks for the message string
+            message: `Updating column '${columnName}' is restricted via this endpoint.`
+        });
+    }
+
+    try {
+        // 5. Construct the Dynamic SQL Query
+        // FIXED: Used backticks (`) for the template literal and correctly interpolated variables, 
+        // while also enclosing dynamic table and column names in SQL backticks (`).
+        const query = `
+            UPDATE \`${tableName}\`
+            SET \`${columnName}\` = ?
+            WHERE \`${IdName}\` = ?
+        `;
+
+        const values = [columnValue, IdValue];
+
+        // 6. Execute the Query
+        const [result] = await pool.query(query, values);
+
+        // 7. Handle Response
+        if (result.affectedRows === 0) {
+            // Check if the ID exists but the row wasn't modified, or if the ID simply doesn't exist
+            // FIXED: Corrected syntax for the second query (checkRows)
+            const [checkRows] = await pool.query(`SELECT 1 FROM \`${tableName}\` WHERE \`${IdName}\` = ?`, [IdValue]);
+
+            if (checkRows.length === 0) {
+                return res.status(404).json({
+                    ok: false,
+                    // FIXED: Used template literal backticks for the message string
+                    message: `Row not found in table '${tableName}' with ${IdName} = ${IdValue}.`
+                });
+            } else {
+                return res.status(200).json({
+                    ok: true,
+                    message: "Update successful, but the new value was the same as the old value (0 rows affected)."
+                });
+            }
+        }
+
+        return res.status(200).json({
+            ok: true,
+            // FIXED: Used template literal backticks for the message string
+            message: `${result.affectedRows} row(s) updated successfully in table '${tableName}'.`,
+            info: {
+                updatedColumn: columnName,
+                newValue: columnValue, // Now correctly defined
+            }
+        });
+
+    } catch (error) {
+        // FIXED: Used template literal backticks for error logging
+        console.error(`Database Error during editCell operation on table ${tableName}:`, error);
+
+        // Check for specific database errors
+        if (error.code === 'ER_NO_SUCH_TABLE') {
+            // FIXED: Used template literal backticks for the message string
+            return res.status(404).json({ ok: false, message: `Table '${tableName}' does not exist.` });
+        }
+        if (error.code === 'ER_BAD_FIELD_ERROR') {
+            // FIXED: Used template literal backticks for the message string
+            return res.status(400).json({ ok: false, message: `Column '${columnName}' or identifier '${IdName}' does not exist in table '${tableName}'.` });
+        }
+
+        // Generic internal error
+        return res.status(500).json({
+            ok: false,
+            message: "Internal Server Error during data update."
+        });
     }
 };

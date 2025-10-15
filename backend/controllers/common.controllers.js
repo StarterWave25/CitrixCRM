@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { google } from 'googleapis';
 import { pool } from '../database/db.js'; // Adjust path to your DB pool (mysql2/promise expected)
+import { encryptMetadata } from '../lib/encrypt.js';
 
 dotenv.config();
 
@@ -212,7 +213,6 @@ export async function createGoogleMeet(req, res) {
   }
 }
 
-
 /**
  * Controller function to view the data.
  * Expected Request Body: { empId, exId, fromDate, toDate }
@@ -226,13 +226,60 @@ export const viewData = async (req, res) => {
   }
 
   function buildDateFilterSingle(fieldName, date) {
-    // returns SQL fragment and params
     return { sql: `\`${fieldName}\` = ?`, params: [date] };
   }
 
   function buildDateFilterRange(fieldName, from, to) {
     return { sql: `\`${fieldName}\` BETWEEN ? AND ?`, params: [from, to] };
   }
+
+  // --- NEW: Data Transformation Helper ---
+  /**
+   * Transforms a single row of data into the cell metadata format.
+   * @param {Object} row - The database row object.
+   * @param {string} tableName - The name of the primary table for this row.
+   * @param {string} idName - The name of the primary key column in the row.
+   * @param {Array<string>} columnsToEncrypt - Array of column names to apply metadata to.
+   * @returns {Object} The transformed row with cell metadata.
+   */
+  const transformDataForCellMetadata = (row, tableName, idName, columnsToEncrypt) => {
+    const transformedRow = {};
+    const idValue = row[idName];
+
+    for (const key in row) {
+      if (key === idName) {
+        // Skip the primary key itself, or keep it if needed
+        transformedRow[idName] = idValue;
+        continue;
+      }
+
+      const columnValue = row[key];
+
+      if (columnsToEncrypt.includes(key)) {
+        // Encrypt the metadata (table, idName, key)
+        const metadata = {
+          table: tableName,
+          idName: idName,
+          idValue: idValue,
+          columnName: key,
+          columnValue: columnValue // Keep columnValue unencrypted for display
+        };
+        // The table, idName, and columnName are combined and encrypted for security.
+        const encryptedMeta = encryptMetadata(metadata);
+
+        transformedRow[key] = {
+          meta: encryptedMeta, // Encrypted metadata string
+          value: columnValue   // Original value for display
+        };
+
+      } else {
+        // Columns like 'Date', 'Employee Name' (non-editable or already safe)
+        transformedRow[key] = columnValue;
+      }
+    }
+    return transformedRow;
+  };
+  // ----------------------------------------
 
   try {
     if (!pool) return res.status(500).json({ error: 'DB pool not configured' });
@@ -260,24 +307,6 @@ export const viewData = async (req, res) => {
     if (fProvided && !isValidDateString(fromDate)) return res.status(400).json({ error: 'Invalid fromDate format' });
     if (tProvided && !isValidDateString(toDate)) return res.status(400).json({ error: 'Invalid toDate format' });
 
-    // Determine date filter strategy per-table (some tables use `Date` capitalized, some `date`)
-    // We'll build per-query fragments below
-    // For single-date case: use that date as equality; for range: between inclusive
-
-    // Helper to assemble WHERE clauses safely
-    const addFilters = (baseFieldName, dateSqlObj) => {
-      // baseFieldName is the column name for date (`Date` or `date`)
-      const where = [];
-      const params = [];
-
-      if (dateSqlObj) {
-        where.push(dateSqlObj.sql.replace('`field`', `\`${baseFieldName}\``)); // not used, but keep structure
-      }
-
-      // we'll push the actual date clause separately (constructed properly)
-      return { where, params };
-    };
-
     // Build date clause generator for a given date column name
     function dateClauseFor(columnName) {
       if (fProvided && tProvided) {
@@ -302,108 +331,160 @@ export const viewData = async (req, res) => {
       commonParams.push(exIdNum);
     }
 
-    // -- 1) tourplan: columns needed -> Date, Extension Name, Out Station, Joint Work
-    const tourDateClause = dateClauseFor('Date'); // tourplan uses `Date` column
-    const tourWhere = [];
-    const tourParams = [];
-    tourWhere.push(tourDateClause.sql.replace('`Date`', '`Date`')); // already correct
-    tourParams.push(...tourDateClause.params);
-    // add empId/exId filters
-    if (commonWhereClauses.length) {
-      tourWhere.push(...commonWhereClauses);
-      tourParams.push(...commonParams);
-    }
-    const tourSql = `
-      SELECT \`Date\`, \`Extension Name\`, \`Out Station\`, \`Joint Work\`
-      FROM \`tourplan\`
-      WHERE ${tourWhere.join(' AND ')}
-      ORDER BY \`Date\` ASC
-    `;
+    // --- QUERY CONFIGURATION (Robust and Scalable) ---
+    const queryConfigurations = [
+      {
+        key: 'tourplan',
+        tableName: 'tourplan',
+        idName: 'tId',
+        dateColumn: 'Date',
+        columnsToEncrypt: ['Out Station', 'Joint Work'],
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const tourWhere = [];
+          const tourParams = [];
 
-    // -- 2) doctorsList (doctor activities joined with doctors)
-    // doctor activities has `date` (lowercase), doctors has `Doctor Name`, `Phone`, `Address`
-    const docActDateClause = dateClauseFor('date'); // doctor activities uses `date`
-    const docWhere = [];
-    const docParams = [];
-    docWhere.push(docActDateClause.sql.replace('`date`', '`doctor activities`.`date`'));
-    docParams.push(...docActDateClause.params);
-    if (commonWhereClauses.length) {
-      // empId filter is on doctor activities.empId, exId filter should be on doctor activities.exId? doctor activities table doesn't have exId; doc table has exId
-      // We'll apply empId filter to doctor activities and exId filter to doctors table via JOIN condition
-      // But to keep things simple: empId filter applied to doctor activities; exId filter applied to doctors.exId
-      // Append empId clause (if present)
-      if (empIdNum) {
-        docWhere.push('`doctor activities`.`empId` = ?');
-        docParams.push(empIdNum);
+          tourWhere.push(dateClause.sql.replace('`Date`', '`Date`')); // Already correct
+          tourParams.push(...dateClause.params);
+
+          if (commonClauses.length) {
+            tourWhere.push(...commonClauses);
+            tourParams.push(...commonParams);
+          }
+
+          return {
+            sql: `
+              SELECT \`tId\`, \`Date\`, \`Extension Name\`, \`Out Station\`, \`Joint Work\`
+              FROM \`tourplan\`
+              WHERE ${tourWhere.join(' AND ')}
+              ORDER BY \`Date\` ASC
+            `,
+            params: tourParams
+          };
+        }
+      },
+      {
+        key: 'doctorsList',
+        tableName: 'doctors', // Primary table for updates (doctors)
+        idName: 'docId',
+        dateColumn: 'date',
+        columnsToEncrypt: ['Feedback', 'Order Status'],
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const docWhere = [];
+          const docParams = [];
+
+          docWhere.push(dateClause.sql.replace('`date`', '`doctor activities`.`date`'));
+          docParams.push(...dateClause.params);
+
+          // Separate empId and exId filters for this join structure
+          if (empIdNum) {
+            docWhere.push('`doctor activities`.`empId` = ?');
+            docParams.push(empIdNum);
+          }
+          if (exIdNum) {
+            docWhere.push('`doctors`.`exId` = ?');
+            docParams.push(exIdNum);
+          }
+
+          return {
+            sql: `
+              SELECT
+                \`doctors\`.\`docId\`,
+                \`doctor activities\`.\`date\` AS \`Date\`,
+                \`doctor activities\`.\`Employee Name\` AS \`Employee Name\`,
+                \`doctor activities\`.\`Feedback\` AS \`Feedback\`,
+                \`doctor activities\`.\`Order Status\` AS \`Order Status\`,
+                \`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
+                \`doctors\`.\`Phone\` AS \`Phone\`,
+                \`doctors\`.\`Address\` AS \`Address\`
+              FROM \`doctor activities\`
+              LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
+              WHERE ${docWhere.join(' AND ')}
+              ORDER BY \`doctor activities\`.\`date\` ASC
+            `,
+            params: docParams
+          };
+        }
+      },
+      {
+        key: 'orders',
+        tableName: 'orders',
+        idName: 'orderId',
+        dateColumn: 'Date',
+        columnsToEncrypt: ['Strips', 'Free Strips', 'Total'],
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const ordersWhere = [];
+          const ordersParams = [];
+
+          ordersWhere.push(dateClause.sql.replace('`Date`', 'o.`Date`'));
+          ordersParams.push(...dateClause.params);
+
+          if (empIdNum) {
+            ordersWhere.push('`o`.`empId` = ?');
+            ordersParams.push(empIdNum);
+          }
+          if (exIdNum) {
+            ordersWhere.push('`o`.`exId` = ?');
+            ordersParams.push(exIdNum);
+          }
+
+          return {
+            sql: `
+              SELECT
+                o.\`orderId\`,
+                o.\`Date\` AS \`Date\`,
+                o.\`Employee Name\` AS \`Employee Name\`,
+                o.\`Doctor Name\` AS \`Doctor Name\`,
+                o.\`DL Copy\` AS \`DL Copy\`,
+                o.\`Prescription\` AS \`Prescription\`,
+                p.\`Product Name\` AS \`Product Name\`
+                op.\`Strips\` AS \`Strips\`,
+                op.\`Free Strips\` AS \`Free Strips\`,
+                o.\`Total\` AS \`Total\`
+              FROM \`orders\` o
+              LEFT JOIN \`ordered products\` op ON op.\`orderId\` = o.\`orderId\`
+              LEFT JOIN \`products\` p ON p.\`pId\` = op.\`pId\`
+              WHERE ${ordersWhere.join(' AND ')}
+              ORDER BY o.\`Date\` ASC
+            `,
+            params: ordersParams
+          };
+        }
       }
-      if (exIdNum) {
-        docWhere.push('`doctors`.`exId` = ?');
-        docParams.push(exIdNum);
-      }
-    }
-    const doctorsListSql = `
-      SELECT
-        \`doctor activities\`.\`date\` AS \`Date\`,
-        \`doctor activities\`.\`Employee Name\` AS \`Employee Name\`,
-        \`doctor activities\`.\`Feedback\` AS \`Feedback\`,
-        \`doctor activities\`.\`Order Status\` AS \`Order Status\`,
-        \`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
-        \`doctors\`.\`Phone\` AS \`Phone\`,
-        \`doctors\`.\`Address\` AS \`Address\`
-      FROM \`doctor activities\`
-      LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
-      WHERE ${docWhere.join(' AND ')}
-      ORDER BY \`doctor activities\`.\`date\` ASC
-    `;
-
-    // -- 3) orders: orders JOIN ordered products JOIN products
-    // orders uses `Date` column
-    const ordersDateClause = dateClauseFor('Date');
-    const ordersWhere = [];
-    const ordersParams = [];
-    ordersWhere.push(ordersDateClause.sql.replace('`Date`', 'o.`Date`')); ordersParams.push(...ordersDateClause.params);
-    // empId filter on orders.empId, exId filter on orders.exId
-    if (empIdNum) {
-      ordersWhere.push('`o`.`empId` = ?');
-      ordersParams.push(empIdNum);
-    }
-    if (exIdNum) {
-      ordersWhere.push('`o`.`exId` = ?');
-      ordersParams.push(exIdNum);
-    }
-
-    const ordersSql = `
-      SELECT
-        o.\`Date\` AS \`Date\`,
-        o.\`Employee Name\` AS \`Employee Name\`,
-        o.\`Doctor Name\` AS \`Doctor Name\`,
-        o.\`DL Copy\` AS \`DL Copy\`,
-        o.\`Prescription\` AS \`Prescription\`,
-        op.\`Strips\` AS \`Strips\`,
-        op.\`Free Strips\` AS \`Free Strips\`,
-        p.\`Product Name\` AS \`Product Name\`
-      FROM \`orders\` o
-      LEFT JOIN \`ordered products\` op ON op.\`orderId\` = o.\`orderId\`
-      LEFT JOIN \`products\` p ON p.\`pId\` = op.\`pId\`
-      WHERE ${ordersWhere.join(' AND ')}
-      ORDER BY o.\`Date\` ASC
-    `;
-
-    // Execute queries in parallel
-    const queries = [
-      pool.execute(tourSql, tourParams),
-      pool.execute(doctorsListSql, docParams),
-      pool.execute(ordersSql, ordersParams)
     ];
 
-    const [[tourRows], [docRows], [orderRows]] = await Promise.all(queries);
+    // Build all SQL queries and parameters
+    const queryPromises = [];
+    const resultsMap = {};
+
+    for (const config of queryConfigurations) {
+      const dateClause = dateClauseFor(config.dateColumn);
+      const { sql, params } = config.sqlBuilder(dateClause, commonWhereClauses, commonParams);
+
+      queryPromises.push(
+        pool.execute(sql, params).then(([rows]) => ({
+          key: config.key,
+          rows: rows,
+          tableName: config.tableName,
+          idName: config.idName,
+          columnsToEncrypt: config.columnsToEncrypt
+        }))
+      );
+    }
+
+    // Execute queries in parallel
+    const queryResults = await Promise.all(queryPromises);
+
+    // Transform and store results
+    for (const result of queryResults) {
+      const transformedRows = (result.rows || []).map(row =>
+        transformDataForCellMetadata(row, result.tableName, result.idName, result.columnsToEncrypt)
+      );
+      resultsMap[result.key] = transformedRows;
+    }
 
     // Return response with exact keys required
-    return res.json({
-      tourplan: tourRows || [],
-      doctorsList: docRows || [],
-      orders: orderRows || []
-    });
+    return res.json(resultsMap);
+
   } catch (err) {
     console.error('show-my-data error', err);
     return res.status(500).json({ error: 'Internal server error' });
