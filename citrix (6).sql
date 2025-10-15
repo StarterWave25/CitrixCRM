@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 15, 2025 at 09:49 AM
+-- Generation Time: Oct 15, 2025 at 06:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -126,6 +126,13 @@ CREATE TABLE `extensions` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `extensions`
+--
+
+INSERT INTO `extensions` (`exId`, `extension Name`, `hqId`, `stockId`, `date`) VALUES
+(3, 'Pileru', 3, NULL, '2025-10-15');
+
 -- --------------------------------------------------------
 
 --
@@ -247,6 +254,19 @@ CREATE TABLE `stockists` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `stocks`
+--
+
+CREATE TABLE `stocks` (
+  `Invoice` varchar(100) NOT NULL,
+  `stockId` int(11) NOT NULL,
+  `Amount` int(11) NOT NULL,
+  `Date` date NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tourplan`
 --
 
@@ -260,6 +280,15 @@ CREATE TABLE `tourplan` (
   `Joint Work` varchar(100) NOT NULL,
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tourplan`
+--
+
+INSERT INTO `tourplan` (`tId`, `empId`, `hqId`, `exId`, `Extension Name`, `Out Station`, `Joint Work`, `Date`) VALUES
+(8, 2, 3, 3, 'Pileru', 'No', 'Yes with Harsha', '2025-10-15'),
+(10, 2, 3, 3, 'Pileru', 'Yes', 'No', '2025-10-15'),
+(11, 2, 3, 3, 'Pileru', 'No', 'No', '2025-10-14');
 
 --
 -- Indexes for dumped tables
@@ -361,6 +390,13 @@ ALTER TABLE `stockists`
   ADD PRIMARY KEY (`stockId`);
 
 --
+-- Indexes for table `stocks`
+--
+ALTER TABLE `stocks`
+  ADD PRIMARY KEY (`Invoice`),
+  ADD KEY `rectosto` (`stockId`);
+
+--
 -- Indexes for table `tourplan`
 --
 ALTER TABLE `tourplan`
@@ -407,7 +443,7 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `extensions`
 --
 ALTER TABLE `extensions`
-  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `headquarters`
@@ -455,7 +491,7 @@ ALTER TABLE `stockists`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
@@ -502,6 +538,12 @@ ALTER TABLE `orders`
   ADD CONSTRAINT `ordTodoc` FOREIGN KEY (`docId`) REFERENCES `doctors` (`docId`),
   ADD CONSTRAINT `ordToemp` FOREIGN KEY (`empId`) REFERENCES `employees` (`empId`),
   ADD CONSTRAINT `ordToex` FOREIGN KEY (`exId`) REFERENCES `extensions` (`exId`);
+
+--
+-- Constraints for table `stocks`
+--
+ALTER TABLE `stocks`
+  ADD CONSTRAINT `rectosto` FOREIGN KEY (`stockId`) REFERENCES `stockists` (`stockId`);
 
 --
 -- Constraints for table `tourplan`
