@@ -1,0 +1,368 @@
+/*
+ * ----------------------------------------------------
+ * CITRIX LTD PHARMA CRM - GLOBAL STYLESHEET (global.css)
+ * ----------------------------------------------------
+ * This file defines all shared, reusable, and foundational styles
+ * based strictly on the Design System Specifications (Section 5, 6, 8).
+ * Imported in all role-specific pages (Section 8.2).
+ */
+
+/* === 1. DESIGN SYSTEM VARIABLES (Section 5.1) === */
+:root {
+    --blue: #00535d;
+    /* Primary brand color, CTAs [cite: 223, 235] */
+    --lblue: #fbf2e5;
+    /* Secondary backgrounds, light accents [cite: 224, 236] */
+    --llblue: #fffbf5;
+    /* Tertiary backgrounds, subtle highlights [cite: 226, 237] */
+    --white: #ffffff;
+    /* Card backgrounds, text on dark backgrounds [cite: 227, 237] */
+    --black: #000000;
+    /* Primary text color [cite: 228, 238] */
+    --gray-text: #666;
+    /* Secondary text, captions, placeholders [cite: 229, 239] */
+    --border-color: #e0e0e0;
+    /* Input borders, dividers, card outlines [cite: 230, 240] */
+    --border-radius: 20px;
+    /* Standard border radius [cite: 231, 291] */
+    --error-red: #d9534f;
+    /* Error messages, validation feedback [cite: 232, 241] */
+    --transition-speed: 0.3s;
+    /* Standard transition duration [cite: 233, 281] */
+}
+
+
+/* === 2. TYPOGRAPHY SYSTEM (Section 5.2) === */
+
+/* Font-Face Declarations [cite: 247] */
+@font-face {
+    font-family: 'Avenir';
+    src: url('../fonts/AvenirLTStd-Book.otf') format('opentype');
+    /* Body/Paragraph Font [cite: 244] */
+}
+
+@font-face {
+    font-family: 'Ivymode';
+    src: url('../fonts/ivy-mode-regular.woff') format('woff');
+    /* Heading Font [cite: 245] */
+}
+
+/* Global Typography Application */
+html {
+    /* Base for responsive units. Minimum mobile body size is 16px equivalent [cite: 263] */
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Avenir', sans-serif;
+    /* Body font [cite: 257] */
+    color: var(--black);
+    line-height: 1.5;
+    /* Responsive body font size [cite: 260, 310] */
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    min-height: 100vh;
+    /* Ensure full viewport coverage */
+    display: flex;
+    flex-direction: column;
+    /* For proper footer placement */
+}
+
+/* Headings Application [cite: 258] */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Ivymode', serif;
+    color: var(--blue);
+    /* Primary color for headers [cite: 235] */
+    line-height: 1.2;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-weight: normal;
+    /* Ivymode usually relies on size for hierarchy */
+}
+
+/* Fluid Typography Examples (Section 9.2) */
+h1 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    /* Responsive H1 [cite: 309] */
+}
+
+h2 {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+
+h3 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+
+/* === 3. CORE LAYOUT & BEHAVIOR === */
+
+/* Tap Highlight Removal (Section 6.4) */
+* {
+    -webkit-tap-highlight-color: transparent;
+    /* Disable mobile tap highlight [cite: 299] */
+}
+
+/* Standard Border Radius (Section 5.5) */
+.card,
+.button,
+input,
+select,
+textarea {
+    border-radius: var(--border-radius);
+    /* Apply standard 20px radius [cite: 290] */
+}
+
+/* Transition Standards (Section 5.4) */
+.button,
+a,
+input,
+select,
+textarea,
+.card,
+.component-transition {
+    /* Apply standard 0.3s ease-in-out transition to interactive elements [cite: 280, 281] */
+    transition: all var(--transition-speed) ease-in-out;
+}
+
+/* CRITICAL CONSTRAINT: DO NOT use transform-based hover effects (Section 5.4 & 19.2) */
+.button:hover,
+a:hover {
+    /* Only allowed hover effects: color, opacity, border, shadow [cite: 351] */
+    opacity: 0.9;
+    /* Example hover effect: background, border color, shadow */
+}
+
+
+/* === 4. GRADIENT BACKGROUND (Section 5.3) === */
+body {
+    background: linear-gradient(60deg,
+            rgba(0, 83, 93, 0.6) 0%,
+            /* --blue opacity [cite: 269] */
+            var(--llblue) 33%,
+            /* --llblue [cite: 270] */
+            var(--lblue) 66%,
+            /* --lblue [cite: 271] */
+            rgba(0, 83, 93, 0.6) 100%
+            /* --blue opacity [cite: 272] */
+        );
+    background-attachment: fixed;
+    /* Must be fixed for scroll effect [cite: 276] */
+    background-size: cover;
+    /* Should cover entire viewport height [cite: 277] */
+    background-repeat: no-repeat;
+    /* No repeat [cite: 278] */
+}
+
+
+/* === 5. SCROLLBAR STYLING (Section 6.3) === */
+* {
+    scrollbar-width: thin;
+    /* Firefox scrollbar styling [cite: 296] */
+    scrollbar-color: var(--blue) var(--llblue);
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--llblue);
+    /* Light track [cite: 297] */
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--blue);
+    /* Primary color thumb [cite: 298] */
+    border-radius: 4px;
+}
+
+
+/* === 6. UNIVERSAL HEADER STYLING (Structural) === */
+.header {
+    width: 100%;
+    padding: 16px 32px;
+    /* 8-point system spacing */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Space for logo left, nav right */
+    background-color: var(--white);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header__logo-container {
+    display: flex;
+    align-items: center;
+    /* Logo aligned left by default */
+}
+
+.header__logo {
+    height: 40px;
+    /* Adjust size for professional appearance */
+    max-width: 100%;
+}
+
+/* Mobile adjustments (Section 9.1) */
+@media (max-width: 767px) {
+    .header {
+        padding: 12px 16px;
+    }
+}
+
+
+/* === 7. UNIVERSAL FOOTER COMPONENT (Section 6.2) === */
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    /* 8-point spacing [cite: 294] */
+    margin-top: auto;
+    /* Pushes the footer to the bottom */
+    padding-bottom: 32px;
+}
+
+.footer-text {
+    color: var(--black);
+    font-size: 1rem;
+    font-family: 'Avenir', sans-serif;
+}
+
+.starterwave-logo {
+    width: 150px;
+    /* Specified width [cite: 295] */
+    height: auto;
+}
+
+.starterwave-logo:hover {
+    opacity: 0.8;
+    /* Allowed hover effect [cite: 351] */
+}
+
+
+/* === 8. UTILITY CLASSES (BEM Naming Convention) === */
+
+/* Button Styles (Section 8.1) */
+.btn {
+    padding: 12px 24px;
+    font-family: 'Avenir', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease-in-out;
+}
+
+.btn--primary {
+    background-color: var(--blue);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.3);
+    /* Subtle shadow using primary color */
+}
+
+.btn--primary:hover {
+    background-color: color-mix(in srgb, var(--blue) 85%, var(--black));
+    /* Slightly darker on hover */
+    box-shadow: 0 6px 16px rgba(0, 83, 93, 0.4);
+}
+
+.btn--secondary {
+    background-color: var(--lblue);
+    color: var(--blue);
+    border: 1px solid var(--blue);
+}
+
+.btn--secondary:hover {
+    background-color: var(--llblue);
+}
+
+.btn--danger {
+    background-color: var(--error-red);
+    color: var(--white);
+}
+
+.btn--danger:hover {
+    opacity: 0.85;
+}
+
+/* Card Layouts (Section 8.1) */
+.card {
+    background-color: var(--white);
+    padding: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* Input Styles (Section 8.1) */
+.form-field {
+    margin-bottom: 16px;
+}
+
+.form-field__label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--gray-text);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-field__input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--llblue);
+    border-radius: var(--border-radius);
+    color: var(--black);
+    font-size: 1rem;
+}
+
+.form-field__input:focus {
+    outline: 2px solid var(--blue);
+    border-color: var(--blue);
+    background-color: var(--white);
+}
+
+/* Error State Modifier (Section 7.2) */
+.form-field__input--error {
+    border-color: var(--error-red);
+    outline: 2px solid var(--error-red);
+}
+
+.form-field__error-message {
+    color: var(--error-red);
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* Responsive Overrides (Section 9.3) - Applied to global elements */
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) {
+
+    /* Increase section padding */
+    .section {
+        padding: 80px 48px;
+    }
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+
+    /* Further increase padding */
+    .section {
+        padding: 96px 64px;
+    }
+}

@@ -228,7 +228,7 @@ export const uploadImage = async (req, res) => {
  * @param {string} req.body.formName - Identifier for the form ('tourPlan' or 'doctor activities').
  * @param {number} [req.body.hqId] - Headquarters ID, required for 'tourPlan' form.
  * @param {number} [req.body.exId] - Extension ID, required for 'doctor activities' form.
- * @returns {object} JSON response with the fetched data or an error message.
+ * @returns {object} JSON response with the fetched data or an error message.   
  */
 export const fetchFormDependencies = async (req, res) => {
     const { formName, hqId, exId } = req.body;

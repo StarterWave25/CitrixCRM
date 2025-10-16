@@ -1,0 +1,108 @@
+
+Complete Frontend Integration and Dynamic Form Generation Prompt (for any AI developer)
+You will implement a robust, scalable, and maintainable dynamic form system for the Citrix Ltd CRM project’s employee-side interface with the following key requirements and protocols:
+
+Dynamic Form Rendering Approach
+All employee business forms (e.g. Tour Plan, Doctors List, Expenses, and more to come) must be generated on a single page, using a universal renderer powered by configurable JSON schemas.
+
+All form submission will use a single endpoint:
+apiFetch('employee/forms-submit', 'POST', { form: '<formName>', data: { ... } })
+
+Each form’s configuration will include fields, conditional logic, validation, label, type, and JSON schema as shown below.
+
+Two additional form structures will be provided to you later and must be integrated in this same way, extending the renderer’s schema collection and logic.
+
+Tour Plan Form: Schema, Data Dependency, and Submission Logic
+Before rendering Tour Plan form, fetch all relevant extension details from the backend with:
+
+apiFetch('employee/fetch-form-dependencies', 'POST', { formName: 'tourPlan', hqId: <from localStorage: userDetails.hqId> })
+
+Populate Extension Name dropdown using the returned list.
+
+Each dropdown option displays the extension name, holds exId as a data-attribute.
+
+On selection, save exId to localStorage with key exId for future reference and submission.
+
+Required Input Fields:
+
+Extension Name (dropdown, options/attributes from backend)
+
+Out Station (checkbox) - if checked take value as 'Yes' otherwise 'No'
+
+Joint Work (text)
+
+empId, hqId (from localStorage: userDetails.empId and userDetails.hqId)
+
+exId (from dropdown selection’s data-attribute/localStorage)
+
+Form Submission:
+
+Submit payload in this format:
+
+js
+{
+  form: 'tourPlan',
+  data: {
+    empId: <integer>,
+    hqId: <integer>,
+    exId: <integer>,
+    extensionName: <string>,
+    outStation: <string>,
+    jointWork: <string>
+  }
+}
+Use POST to the route: 'employee/forms-submit'
+
+**Store submission results/notification and exId to localStorage as directed.
+
+JSON Schema for Tour Plan
+json
+{
+  "type": "object",
+  "properties": {
+    "empId":      { "type": "integer" },
+    "hqId":       { "type": "integer" },
+    "exId":       { "type": "integer" },
+    "extensionName": { "type": "string", "maxLength": 100 },
+    "outStation": { "type": "string" },
+    "jointWork":  { "type": "string", "maxLength": 100 }
+  },
+  "required": ["empId", "hqId", "exId", "extensionName", "outStation", "jointWork"],
+  "additionalProperties": false
+}
+Validations
+empId: integer, required (autofilled from localStorage)
+
+hqId: integer, required (autofilled from localStorage)
+
+exId: integer, required
+
+extensionName: string, maxLength 100, required
+
+outStation: string, required
+
+jointWork: string, maxLength 100, required
+
+Integration Instructions/Prompt (for your AI Developer)
+Implement a single universal form-rendering component/class, which takes any form schema/config and dynamically generates HTML inputs, drop-downs, and conditional fields.
+
+Before rendering forms where dependencies are needed (such as Tour Plan), fetch external data from their designated route using the provided instructions; render only after fetch completes.
+
+All form submissions must POST to 'employee/forms-submit' with a body containing { form, data } as explained—never a different route.
+
+EmpId, hqId, and exId must be passed from localStorage as described, not from user input.
+
+For Tour Plan, the Extension Name dropdown holds exId as a data-attribute, and this is the value sent.
+
+Enforce validations defined by the JSON schema—required fields, types, and maxLength.
+
+Show notifications on success/error after POST, and store exId in localStorage as instructed.
+
+When future form structures are provided, merge them into your schema collection and extend renderer/features without duplicating logic or styles.
+
+Keep code consistent, high-quality, and optimized for production.
+
+You will be provided at least 2 more structures in this format. Add them to your system exactly as above, using the universal HTML generator.
+Extend the schema and renderer so all forms are handled by this system, maximizing reusability and flexibility.
+
+Use the above JSON schema for code validation. Wait for further forms and instructions to update the implementation.
