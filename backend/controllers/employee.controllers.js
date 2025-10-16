@@ -215,3 +215,105 @@ export const uploadImage = async (req, res) => {
     }
 
 };
+
+/**
+ * Fetches dependent data required to pre-fill parts of various forms.
+ *
+ * It handles two primary use cases based on the 'formName':
+ * 1. 'tourPlan': Fetches extension names based on hqId.
+ * 2. 'doctor activities': Fetches active doctor details based on exId.
+ *
+ * @param {object} req - The request object.
+ * @param {object} req.body - The request body.
+ * @param {string} req.body.formName - Identifier for the form ('tourPlan' or 'doctor activities').
+ * @param {number} [req.body.hqId] - Headquarters ID, required for 'tourPlan' form.
+ * @param {number} [req.body.exId] - Extension ID, required for 'doctor activities' form.
+ * @returns {object} JSON response with the fetched data or an error message.
+ */
+export const fetchFormDependencies = async (req, res) => {
+    const { formName, hqId, exId } = req.body;
+
+    // 1. Initial Input Validation
+    if (!formName) {
+        return res.status(400).json({ success: false, message: "The 'formName' field is required." });
+    }
+
+    try {
+        let query;
+        let values;
+        let dataKey; // To label the data array within the 'data' object
+
+        // --- Use Case 1: Tour Plan (Extensions based on HQ) ---
+        if (formName.toLowerCase() === 'tourplan') {
+            if (!hqId) {
+                return res.status(400).json({ success: false, message: "For 'tourPlan', the 'hqId' is required." });
+            }
+            
+            // Query: Select all extension names associated with the given hqId.
+            query = `
+                SELECT 
+                    \`exId\`, 
+                    \`extensionName\` 
+                FROM \`extensions\` 
+                WHERE \`hqId\` = ?
+            `;
+            values = [hqId];
+            dataKey = 'extensions';
+
+        // --- Use Case 2: Doctor Activities (Doctors based on Extension and Status) ---
+        } else if (formName.toLowerCase() === 'doctor activities') {
+            if (!exId) {
+                return res.status(400).json({ success: false, message: "For 'doctor activities', the 'exId' is required." });
+            }
+
+            // Status is assumed 'Active' to fetch doctors currently being worked on.
+            const requiredStatus = 'Active'; 
+
+            // Query: Select all required doctor details from the `doctors` table.
+            query = `
+                SELECT 
+                    \`docId\`,
+                    \`Doctor Name\` AS doctorName,
+                    \`Address\` AS address,
+                    \`Phone\` AS phone
+                FROM \`doctors\` 
+                WHERE \`exId\` = ? AND \`Status\` = ?
+            `;
+            values = [exId, requiredStatus];
+            dataKey = 'doctors'; 
+
+        } else {
+            // Handle unknown form name
+            return res.status(400).json({ success: false, message: `Unknown form name: '${formName}'.` });
+        }
+
+        // 3. Execute the Query
+        const [results] = await pool.query(query, values);
+
+        if (results.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: `No ${dataKey} found for the given criteria.`,
+                data: {
+                    [dataKey]: [] // Return an empty array within the data object
+                } 
+            });
+        }
+
+        // 4. Return the results in the new format
+        return res.status(200).json({
+            success: true,
+            message: `${results.length} ${dataKey} successfully fetched.`,
+            data: {
+                [dataKey]: results // Wrap results in a key named after dataKey
+            }
+        });
+
+    } catch (error) {
+        console.error(`Database Error during pre-fetch for form '${formName}':`, error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error during data fetching." 
+        });
+    }
+};
