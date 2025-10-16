@@ -512,7 +512,7 @@ export const getExpenses = async (req, res) => {
     const sql = `
             SELECT
                 expenses.\`Date\`,
-                extensions.\`Extension Name\`,
+                extensions.\`extensionName\`,
                 expenses.\`Normal Expense\`,
                 expenses.\`Extension Expense\`,
                 expenses.\`Outstation Expense\`,
