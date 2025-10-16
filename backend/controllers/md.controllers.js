@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { pool } from '../database/db.js';
 import bcrypt from 'bcryptjs';
-import { decryptMetadata } from "../lib/encrypt.js";
+import { encryptMetadata, decryptMetadata } from "../lib/encrypt.js";
 
 dotenv.config();
 
@@ -45,7 +45,7 @@ const validateData = (data, schema) => {
  * based on the FORM_REGISTRY configuration.
  * * Request body structure: { form: "entityKey", data: { field1: value1, ... } }
  */
-export const addEntities = async (req, res) => {
+export const addEntity = async (req, res) => {
     const { form, data } = req.body;
 
     // 1. Initial Request Validation
@@ -133,6 +133,242 @@ export const addEntities = async (req, res) => {
             ok: false,
             message: "Internal Server Error during data insertion."
         });
+    }
+};
+
+/**
+ * Controller function to view various entities for the MD role.
+ * Expected Request Body: { entity: string, hqId?: number, exId?: number }
+ */
+
+export const viewEntity = async (req, res) => {
+    // Helper to send standardized response
+    const sendResponse = (success, message, data = {}) => {
+        return res.status(success ? 200 : 400).json({ success, message, data });
+    };
+
+    // --- Data Transformation Helper (Assume it's imported or defined) ---
+    // This is the core logic from the previous answer, tailored slightly for clarity.
+    const transformDataForCellMetadata = (row, tableName, idName, columnsToEncrypt) => {
+        const transformedRow = {};
+        const idValue = row[idName];
+
+        for (const key in row) {
+            const columnValue = row[key];
+
+            if (columnsToEncrypt.includes(key)) {
+                // Encrypt the metadata (table, idName, key)
+                const metadata = {
+                    table: tableName,
+                    idName: idName,
+                    idValue: idValue,
+                    columnName: key,
+                };
+                // The encryption function is assumed to be imported (encryptMetadata)
+                const encryptedMeta = encryptMetadata(metadata);
+
+                transformedRow[key] = {
+                    meta: encryptedMeta, // Encrypted metadata string
+                    value: columnValue   // Original value for display
+                };
+
+            } else {
+                // Columns like IDs, Date, or non-editable fields (hqName, extensionName in certain views)
+                transformedRow[key] = columnValue;
+            }
+        }
+        return transformedRow;
+    };
+    // ----------------------------------------------------------------------
+
+    try {
+        if (!pool) return res.status(500).json({ success: false, message: 'DB pool not configured' });
+
+        const { entity, hqId, exId } = req.body || {};
+
+        if (!entity) {
+            return sendResponse(false, 'Missing required entity parameter.');
+        }
+
+        let sql = '';
+        let params = [];
+        let tableName = '';
+        let idName = '';
+        let columnsToEncrypt = [];
+        let resultKey = entity;
+
+        // --- CORE LOGIC: Entity-specific configuration ---
+        switch (entity.toLowerCase()) {
+            case 'employees':
+                // 1. Employees View (MD Selects employees)
+                tableName = 'employees';
+                idName = 'empId';
+                columnsToEncrypt = ['empName', 'hqName']; // hqName is from JOIN
+                resultKey = 'employeesList';
+
+                sql = `
+                    SELECT
+                        e.\`empId\`,
+                        e.\`empName\`,
+                        h.\`hqName\`
+                    FROM \`employees\` e
+                    INNER JOIN \`headquarters\` h ON e.\`hqId\` = h.\`hqId\`
+                    ORDER BY e.\`empName\` ASC
+                `;
+                break;
+
+            case 'extensions':
+                // 1. Employees (Extensions by hqId) OR 4. Doctors (Extensions by hqId)
+                if (!hqId || !Number.isInteger(Number(hqId))) {
+                    return sendResponse(false, 'Missing or invalid hqId for extensions view.');
+                }
+                tableName = 'extensions';
+                idName = 'exId';
+                // Only generate meta data if it's for the 'Employees' scenario (based on the user's explicit request)
+                columnsToEncrypt = req.body.origin === 'employees' ? ['extensionName'] : [];
+                params.push(Number(hqId));
+                resultKey = 'extensionsList';
+
+                sql = `
+                    SELECT 
+                        \`exId\`, 
+                        \`extensionName\`
+                    FROM \`extensions\`
+                    WHERE \`hqId\` = ?
+                    ORDER BY \`extensionName\` ASC
+                `;
+                break;
+
+            case 'stockists':
+                // 2. Stockists View
+                tableName = 'stockists';
+                idName = 'stockId';
+                columnsToEncrypt = ['Stockist Name', 'Phone']; // extensionName should NOT have meta data
+                resultKey = 'stockistsList';
+
+                sql = `
+                    SELECT 
+                        s.\`stockId\`, 
+                        s.\`Stockist Name\`, 
+                        s.\`Phone\`,
+                        GROUP_CONCAT(e.\`extensionName\` SEPARATOR ', ') AS \`extensionName\`
+                    FROM \`stockists\` s
+                    LEFT JOIN \`extensions\` e ON e.\`stockId\` = s.\`stockId\`
+                    GROUP BY s.\`stockId\`, s.\`Stockist Name\`, s.\`Phone\`
+                    ORDER BY s.\`Stockist Name\` ASC
+                `;
+                break;
+
+            case 'products':
+                // 3. Products View
+                tableName = 'products';
+                idName = 'pId';
+                // Note: The schema has Product Name and Date as INT. Assuming they should be VARCHAR/DATE for editing.
+                columnsToEncrypt = ['Product Name', 'Price'];
+                resultKey = 'productsList';
+
+                sql = `
+                    SELECT 
+                        \`pId\`, 
+                        \`Product Name\`, 
+                        \`Price\`
+                    FROM \`products\`
+                    ORDER BY \`Product Name\` ASC
+                `;
+                break;
+
+            case 'headquarters':
+                // 4. Doctors (First step)
+                tableName = 'headquarters';
+                idName = 'hqId';
+                columnsToEncrypt = []; // hqName - Don't generate meta data
+                resultKey = 'headquartersList';
+
+                sql = `
+                    SELECT 
+                        \`hqId\`, 
+                        \`hqName\`
+                    FROM \`headquarters\`
+                    ORDER BY \`hqName\` ASC
+                `;
+                break;
+
+            case 'doctors':
+                // 4. Doctors (Final step)
+                if (!exId || !Number.isInteger(Number(exId))) {
+                    return sendResponse(false, 'Missing or invalid exId for doctors view.');
+                }
+                tableName = 'doctors';
+                idName = 'docId';
+                columnsToEncrypt = ['Doctor Name', 'Phone', 'Address', 'Status'];
+                params.push(Number(exId));
+                resultKey = 'doctorsList';
+
+                sql = `
+                    SELECT
+                        \`docId\`,
+                        \`Doctor Name\`,
+                        \`Phone\`,
+                        \`Address\`,
+                        \`Status\`
+                    FROM \`doctors\`
+                    WHERE \`exId\` = ?
+                    ORDER BY \`Doctor Name\` ASC
+                `;
+                break;
+
+            case 'manager':
+                // 5. Managers View
+                tableName = 'manager';
+                idName = 'manId';
+                columnsToEncrypt = ['manName', 'email'];
+                resultKey = 'managersList';
+
+                sql = `
+                    SELECT 
+                        \`manId\`, 
+                        \`manName\`, 
+                        \`email\`
+                    FROM \`manager\`
+                    ORDER BY \`manName\` ASC
+                `;
+                break;
+
+            case 'md':
+            case 'boss': // Use 'boss' table name from schema for MDs
+                // 6. MDs View (boss table)
+                tableName = 'boss';
+                idName = 'bossId';
+                columnsToEncrypt = ['bossName', 'email'];
+                resultKey = 'mdsList';
+
+                sql = `
+                    SELECT 
+                        \`bossId\`, 
+                        \`bossName\`, 
+                        \`email\`
+                    FROM \`boss\`
+                    ORDER BY \`bossName\` ASC
+                `;
+                break;
+
+            default:
+                return sendResponse(false, `Invalid entity: ${entity}.`);
+        }
+
+        // --- Execution and Transformation ---
+        const [rows] = await pool.execute(sql, params);
+
+        const transformedData = (rows || []).map(row =>
+            transformDataForCellMetadata(row, tableName, idName, columnsToEncrypt)
+        );
+
+        return sendResponse(true, `${resultKey} fetched successfully.`, { [resultKey]: transformedData });
+
+    } catch (err) {
+        console.error('viewMDData error', err);
+        // Use 500 status code for internal server errors
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 

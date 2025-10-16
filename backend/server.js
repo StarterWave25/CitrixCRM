@@ -1,4 +1,4 @@
-import dotEnv from 'dotenv';
+import dotenv from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,7 +10,7 @@ import mdRoutes from './routes/md.routes.js';
 
 const server = express();
 
-dotEnv.config();
+dotenv.config();
 
 //server.use(express.json());
 server.use(cookieParser());
