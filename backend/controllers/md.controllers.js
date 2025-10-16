@@ -174,7 +174,9 @@ export const viewEntity = async (req, res) => {
 
             } else {
                 // Columns like IDs, Date, or non-editable fields (hqName, extensionName in certain views)
-                transformedRow[key] = columnValue;
+                transformedRow[key] = {
+                    value: columnValue
+                };
             }
         }
         return transformedRow;

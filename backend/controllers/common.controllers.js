@@ -274,7 +274,9 @@ export const viewData = async (req, res) => {
 
       } else {
         // Columns like 'Date', 'Employee Name' (non-editable or already safe)
-        transformedRow[key] = columnValue;
+        transformedRow[key] = {
+          value: columnValue
+        };
       }
     }
     return transformedRow;
