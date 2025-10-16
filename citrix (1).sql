@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 15, 2025 at 06:20 PM
+-- Generation Time: Oct 16, 2025 at 07:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -120,7 +120,7 @@ CREATE TABLE `expenses` (
 
 CREATE TABLE `extensions` (
   `exId` int(11) NOT NULL,
-  `extension Name` varchar(100) NOT NULL,
+  `extensionName` varchar(100) NOT NULL,
   `hqId` int(11) NOT NULL,
   `stockId` int(11) DEFAULT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
@@ -130,7 +130,7 @@ CREATE TABLE `extensions` (
 -- Dumping data for table `extensions`
 --
 
-INSERT INTO `extensions` (`exId`, `extension Name`, `hqId`, `stockId`, `date`) VALUES
+INSERT INTO `extensions` (`exId`, `extensionName`, `hqId`, `stockId`, `date`) VALUES
 (3, 'Pileru', 3, NULL, '2025-10-15');
 
 -- --------------------------------------------------------
