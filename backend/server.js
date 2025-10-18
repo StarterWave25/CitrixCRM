@@ -20,8 +20,9 @@ server.use(express.json({ limit: '100mb' }));
 server.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 server.use(cors({
-    origin: '*',
+    origin: 'http://127.0.0.1:5500', //Keep Citrix domain here
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204
 }));

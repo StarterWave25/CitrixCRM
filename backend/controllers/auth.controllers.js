@@ -33,7 +33,7 @@ export const login = async (req, res) => {
 
     // 1️⃣ Check if email, password, and role exist
     if (!email || !password || !role) {
-      return res.status(400).json({ message: "Please enter email, password, and role", ok: false });
+      return res.status(400).json({ message: "Please enter email, password, and role", success: false });
     }
 
     let tableName;
@@ -44,7 +44,7 @@ export const login = async (req, res) => {
 
     // 2️⃣ Determine table and column names based on the provided role
     switch (userRole) {
-      case 'user':
+      case 'employee':
         tableName = 'employees';
         idColumn = 'empId';
         nameColumn = 'empName';
@@ -60,7 +60,7 @@ export const login = async (req, res) => {
         nameColumn = 'bossName';
         break;
       default:
-        return res.status(400).json({ message: "Invalid role provided", ok: false });
+        return res.status(400).json({ message: "Invalid role provided", success: false });
     }
 
     // 3️⃣ Check if user exists in the appropriate MySQL table
@@ -70,14 +70,14 @@ export const login = async (req, res) => {
 
     if (rows.length === 0) {
       // Use a generic error message for security (prevents user enumeration)
-      return res.status(400).json({ message: "Invalid email or password", ok: false });
+      return res.status(400).json({ message: "Invalid email or password", success: false });
     }
 
     const user = rows[0];
-
+    
     // 4️⃣ Verify Password (!!! IMPORTANT: Implement password hashing (e.g., bcrypt) in a real application !!!)
     if (password !== user.password) {
-      return res.status(400).json({ message: "Invalid email or password", ok: false });
+      return res.status(400).json({ message: "Invalid email or password", success: false });
     }
 
     // 5️⃣ Consolidate user details for response and token generation
@@ -100,15 +100,15 @@ export const login = async (req, res) => {
 
     // 7️⃣ Respond with success and user info (no password)
     res.status(200).json({
-      ok: true,
+      success: true,
       message: `${userRole} login successful`,
-      user: userDetails,
+      data: userDetails,
     });
 
   } catch (error) {
     console.log("Error in login controller:", error);
     // Send a generic error response
-    res.status(500).json({ error: "Internal Server Error", ok: false });
+    res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
 

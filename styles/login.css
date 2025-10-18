@@ -1,0 +1,99 @@
+/* ------------------------------------------------------------------------- */
+/* EMPLOYEE LOGIN SPECIFIC STYLES - login.css */
+/* ------------------------------------------------------------------------- */
+
+/* Center the login card and ensure main content takes up remaining vertical space */
+.login-main-container {
+    flex-grow: 1;
+    /* Allows main to push footer down */
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    padding: 64px 16px;
+    /* 8-point system padding for mobile devices */
+}
+
+/* Base Login Card Aesthetics */
+.login-card--employee {
+    width: 100%;
+    max-width: 420px;
+    /* Optimal reading width for form (320px + padding) */
+    padding: 40px;
+    /* Increased padding for a premium, spacious feel */
+    text-align: center;
+    /* Elevated shadow for premium feel */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--border-color);
+}
+
+.card-heading {
+    color: var(--blue);
+    margin-top: 0;
+    margin-bottom: 32px;
+    /* Large space after heading for visual weight */
+    font-size: 2.2rem;
+    position: relative;
+}
+
+/* Form Styles */
+.login-form {
+    margin-top: 24px;
+}
+
+/* Login Button Specifics */
+.login-btn {
+    width: 100%;
+    margin-top: 32px;
+    /* Push button away from inputs */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    /* Space between icon and text */
+    /* Enhance the CTA to be psychologically persuasive */
+    transform: translateY(0);
+}
+
+.login-btn:hover:not(:disabled) {
+    /* Subtle lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 83, 93, 0.1);
+}
+
+/* Disable state UX: Trust & Clarity */
+.login-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--gray-text);
+    /* Mute the color when not clickable */
+    box-shadow: none;
+    transform: none;
+    border-color: var(--gray-text);
+}
+
+/* Password Eye Container */
+.password-input-wrapper {
+    position: relative;
+    /* Ensure the wrapper covers the input for click area */
+    display: block;
+}
+
+/* The Eye Icon itself */
+.password-toggle-icon {
+    width: 20px;
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    /* 16px from the right edge */
+    transform: translateY(-50%);
+    /* Subtle default color */
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.5;
+    /* Ensure it's above the input field */
+}
+
+.password-toggle-icon:hover {
+    opacity: 1;
+    /* Highlight blue on hover for clear clickability (psychology) */
+}

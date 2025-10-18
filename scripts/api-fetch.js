@@ -7,11 +7,11 @@ const isLocalhost =
 const BASE_URL = isLocalhost
     ? "http://localhost:3000/api/"
     : "/api/"; // use relative path in production
-
 // --- The universal fetch wrapper ---
-export default async function doFetch(url, type = "GET", data = {}) {
+async function apiFetch(url, type = "GET", data = {}) {
     try {
         const endpoint = `${BASE_URL}${url}`;
+
         const options = {
             method: type.toUpperCase(),
             headers: { "Content-Type": "application/json" },

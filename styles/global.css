@@ -1,73 +1,134 @@
-/*
- * ----------------------------------------------------
- * CITRIX LTD PHARMA CRM - GLOBAL STYLESHEET (global.css)
- * ----------------------------------------------------
- * This file defines all shared, reusable, and foundational styles
- * based strictly on the Design System Specifications (Section 5, 6, 8).
- * Imported in all role-specific pages (Section 8.2).
- */
-
-/* === 1. DESIGN SYSTEM VARIABLES (Section 5.1) === */
+/* ------------------------------------------------------------------------- */
+/* 0. ROOT DESIGN SYSTEM VARIABLES (5.1 Color Palette) [cite: 178] */
+/* ------------------------------------------------------------------------- */
 :root {
+    /* Brand Colors */
     --blue: #00535d;
-    /* Primary brand color, CTAs [cite: 223, 235] */
+    /* Primary brand color [cite: 181] */
     --lblue: #fbf2e5;
-    /* Secondary backgrounds, light accents [cite: 224, 236] */
+    /* Secondary backgrounds/light accents [cite: 182] */
     --llblue: #fffbf5;
-    /* Tertiary backgrounds, subtle highlights [cite: 226, 237] */
+    /* Tertiary backgrounds/subtle highlights [cite: 183] */
+
+    /* Neutrals */
     --white: #ffffff;
-    /* Card backgrounds, text on dark backgrounds [cite: 227, 237] */
+    /* Card backgrounds, text on dark [cite: 184] */
     --black: #000000;
-    /* Primary text color [cite: 228, 238] */
+    /* Primary text color [cite: 185] */
     --gray-text: #666;
-    /* Secondary text, captions, placeholders [cite: 229, 239] */
+    /* Secondary text, captions [cite: 187] */
     --border-color: #e0e0e0;
-    /* Input borders, dividers, card outlines [cite: 230, 240] */
-    --border-radius: 20px;
-    /* Standard border radius [cite: 231, 291] */
+    /* Input borders, dividers [cite: 188] */
+
+    /* System Colors */
     --error-red: #d9534f;
-    /* Error messages, validation feedback [cite: 232, 241] */
+    /* Error messages [cite: 190] */
+
+    /* Layout/Effect Variables */
+    --border-radius: 5px;
+    /* Standard radius [cite: 189, 222] */
     --transition-speed: 0.3s;
-    /* Standard transition duration [cite: 233, 281] */
+    /* Standard transition time [cite: 192, 219] */
+    --cards-bg-color: linear-gradient(var(--blue) 50%, #a39888);
+    /* Card gradient [cite: 191] */
+    --spacing-unit: 8px;
+    /* 8-point spacing system [cite: 294] */
+
+    /* Glass Morphism Variables */
+    --glass-blur: 12px;
+    --glass-bg-color: rgba(255, 255, 255, 0.15);
+    /* Subtle transparent white */
+    --glass-border-color: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* ------------------------------------------------------------------------- */
+/* 1. BASE STYLES & TYPOGRAPHY (5.2) [cite: 203] */
+/* ------------------------------------------------------------------------- */
 
-/* === 2. TYPOGRAPHY SYSTEM (Section 5.2) === */
-
-/* Font-Face Declarations [cite: 247] */
+/* Font-Face Declarations [cite: 207] */
 @font-face {
     font-family: 'Avenir';
     src: url('../fonts/AvenirLTStd-Book.otf') format('opentype');
-    /* Body/Paragraph Font [cite: 244] */
+    font-style: normal;
 }
 
 @font-face {
     font-family: 'Ivymode';
     src: url('../fonts/ivy-mode-regular.woff') format('woff');
-    /* Heading Font [cite: 245] */
+    font-style: normal;
 }
 
-/* Global Typography Application */
+/* Universal Reset and Default Application */
+*,
+*::before,
+*::after {
+    font-family: 'Avenir';
+    box-sizing: border-box;
+    /* Disable mobile tap highlight for cleaner touch interactions [cite: 232] */
+    -webkit-tap-highlight-color: transparent;
+    /* Set standard transition for interactive elements [cite: 219] */
+    transition: all var(--transition-speed) ease-in-out;
+}
+
 html {
-    /* Base for responsive units. Minimum mobile body size is 16px equivalent [cite: 263] */
-    font-size: 16px;
+    /* Base font size for 'rem' calculation */
+    font-size: 100%;
+}
+
+/* Scrollbar Styling (6.3) [cite: 229] */
+* {
+    font-family: 'Avenir', sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue) var(--llblue);
+}
+
+*::-webkit-scrollbar {
+    width: var(--spacing-unit);
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--llblue);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--blue);
+    border-radius: calc(var(--spacing-unit) / 2);
+    /* 4px */
 }
 
 body {
-    font-family: 'Avenir', sans-serif;
-    /* Body font [cite: 257] */
+    min-height: 100vh;
+    display: flex;
+    /* For pushing footer to bottom */
+    flex-direction: column;
+    margin: 0;
+    /* Body font [cite: 216] */
     color: var(--black);
     line-height: 1.5;
-    /* Responsive body font size [cite: 260, 310] */
+    /* Good readability [cite: 299] */
+
+    /* Responsive Fluid Body Font Size (9.2) [cite: 241] */
     font-size: clamp(0.875rem, 1.5vw, 1rem);
-    min-height: 100vh;
-    /* Ensure full viewport coverage */
-    display: flex;
-    flex-direction: column;
-    /* For proper footer placement */
+
+    /* Gradient Background (5.3)  */
+    background: linear-gradient(60deg,
+            rgba(0, 83, 93, 0.2) 0%,
+            /* var(--blue) with opacity */
+            var(--llblue) 33%,
+            /* #fffbf5 */
+            var(--lblue) 66%,
+            /* #fbf2e5 */
+            rgba(0, 83, 93, 0.2) 100%);
+    background-attachment: fixed;
+    /* Must be fixed for scroll effect [cite: 219] */
+    background-size: cover;
+    /* Must cover entire viewport [cite: 219] */
+    background-repeat: no-repeat;
+    /* No background repeat [cite: 219] */
 }
 
-/* Headings Application [cite: 258] */
+/* Headings (5.2 & 9.2) [cite: 217, 240] */
 h1,
 h2,
 h3,
@@ -75,294 +136,289 @@ h4,
 h5,
 h6 {
     font-family: 'Ivymode', serif;
-    color: var(--blue);
-    /* Primary color for headers [cite: 235] */
+    /* Heading font [cite: 217] */
     line-height: 1.2;
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    font-weight: normal;
-    /* Ivymode usually relies on size for hierarchy */
+    /* Tighter line height for headings [cite: 299] */
+    margin-top: calc(var(--spacing-unit) * 4);
+    /* 32px */
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    /* 16px */
+    color: var(--blue);
+    font-weight: 500;
 }
 
-/* Fluid Typography Examples (Section 9.2) */
 h1 {
     font-size: clamp(1.75rem, 4vw, 3rem);
-    /* Responsive H1 [cite: 309] */
 }
 
+/* Fluid H1 [cite: 240] */
 h2 {
     font-size: clamp(1.5rem, 3.5vw, 2.5rem);
 }
 
 h3 {
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-size: clamp(1.25rem, 3vw, 2rem);
 }
 
-
-/* === 3. CORE LAYOUT & BEHAVIOR === */
-
-/* Tap Highlight Removal (Section 6.4) */
-* {
-    -webkit-tap-highlight-color: transparent;
-    /* Disable mobile tap highlight [cite: 299] */
+h4 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
 }
 
-/* Standard Border Radius (Section 5.5) */
-.card,
-.button,
-input,
-select,
-textarea {
-    border-radius: var(--border-radius);
-    /* Apply standard 20px radius [cite: 290] */
+/* Images (9.4) [cite: 243] */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
-/* Transition Standards (Section 5.4) */
-.button,
-a,
-input,
-select,
-textarea,
-.card,
-.component-transition {
-    /* Apply standard 0.3s ease-in-out transition to interactive elements [cite: 280, 281] */
-    transition: all var(--transition-speed) ease-in-out;
+/* Links */
+a {
+    text-decoration: none;
+    color: var(--blue);
+    cursor: pointer;
 }
 
-/* CRITICAL CONSTRAINT: DO NOT use transform-based hover effects (Section 5.4 & 19.2) */
-.button:hover,
 a:hover {
-    /* Only allowed hover effects: color, opacity, border, shadow [cite: 351] */
-    opacity: 0.9;
-    /* Example hover effect: background, border color, shadow */
+    color: var(--black);
 }
 
+/* ------------------------------------------------------------------------- */
+/* 2. UNIVERSAL COMPONENTS (Header & Footer) */
+/* ------------------------------------------------------------------------- */
 
-/* === 4. GRADIENT BACKGROUND (Section 5.3) === */
-body {
-    background: linear-gradient(60deg,
-            rgba(0, 83, 93, 0.6) 0%,
-            /* --blue opacity [cite: 269] */
-            var(--llblue) 33%,
-            /* --llblue [cite: 270] */
-            var(--lblue) 66%,
-            /* --lblue [cite: 271] */
-            rgba(0, 83, 93, 0.6) 100%
-            /* --blue opacity [cite: 272] */
-        );
-    background-attachment: fixed;
-    /* Must be fixed for scroll effect [cite: 276] */
-    background-size: cover;
-    /* Should cover entire viewport height [cite: 277] */
-    background-repeat: no-repeat;
-    /* No repeat [cite: 278] */
-}
-
-
-/* === 5. SCROLLBAR STYLING (Section 6.3) === */
-* {
-    scrollbar-width: thin;
-    /* Firefox scrollbar styling [cite: 296] */
-    scrollbar-color: var(--blue) var(--llblue);
-}
-
-*::-webkit-scrollbar {
-    width: 8px;
-}
-
-*::-webkit-scrollbar-track {
-    background: var(--llblue);
-    /* Light track [cite: 297] */
-}
-
-*::-webkit-scrollbar-thumb {
-    background: var(--blue);
-    /* Primary color thumb [cite: 298] */
-    border-radius: 4px;
-}
-
-
-/* === 6. UNIVERSAL HEADER STYLING (Structural) === */
-.header {
-    width: 100%;
-    padding: 16px 32px;
-    /* 8-point system spacing */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /* Space for logo left, nav right */
-    background-color: var(--white);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+/* HEADER (Glass Morphism Effect) */
+.global-header {
+    /* Position fixed to stay on top while scrolling */
     position: sticky;
     top: 0;
-    z-index: 1000;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    /* Ensure it's above other content */
+    padding: calc(var(--spacing-unit) * 2) 0;
+    /* 16px vertical padding */
+
+    /* ✨ The GOD-LEVEL Glass Morphism Effect ✨ */
+    background-color: var(--glass-bg-color);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--glass-border-color);
 }
 
-.header__logo-container {
+.header-content-wrapper {
+    max-width: 1440px;
+    /* Large Desktop max width [cite: 239] */
+    width: 90%;
+    margin: 0 auto;
     display: flex;
+    justify-content: space-between;
+    /* Space logo and navigation */
     align-items: center;
-    /* Logo aligned left by default */
 }
 
-.header__logo {
+.header-logo {
     height: 40px;
-    /* Adjust size for professional appearance */
-    max-width: 100%;
+    /* Set a standard height for the logo */
+    width: auto;
+    object-fit: contain;
 }
 
-/* Mobile adjustments (Section 9.1) */
-@media (max-width: 767px) {
-    .header {
-        padding: 12px 16px;
-    }
-}
-
-
-/* === 7. UNIVERSAL FOOTER COMPONENT (Section 6.2) === */
+/* Universal Footer Styles (6.2) [cite: 225] */
 .login-footer {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 8px;
-    /* 8-point spacing [cite: 294] */
+    gap: var(--spacing-unit);
+    /* 8px [cite: 226] */
     margin-top: auto;
-    /* Pushes the footer to the bottom */
-    padding-bottom: 32px;
+    /* Pushes footer to the bottom of the page [cite: 226] */
+    padding-bottom: calc(var(--spacing-unit) * 4);
+    /* 32px [cite: 226] */
+    padding-top: calc(var(--spacing-unit) * 4);
+    /* Add padding to separate from content */
 }
 
 .footer-text {
-    color: var(--black);
-    font-size: 1rem;
+    color: var(--gray-text);
+    /* Use secondary text color */
+    font-size: 0.9rem;
+    /* Slightly smaller text */
     font-family: 'Avenir', sans-serif;
 }
 
 .starterwave-logo {
-    width: 150px;
-    /* Specified width [cite: 295] */
+    width: 120px;
+    /* Slightly smaller and more refined [cite: 228] */
     height: auto;
+    opacity: 0.7;
+    /* Subtle branding */
 }
 
 .starterwave-logo:hover {
-    opacity: 0.8;
-    /* Allowed hover effect [cite: 351] */
+    opacity: 1;
 }
 
+/* ------------------------------------------------------------------------- */
+/* 3. REUSABLE UTILITIES & STANDARDS (8.1, 5.4, 5.5) */
+/* ------------------------------------------------------------------------- */
 
-/* === 8. UTILITY CLASSES (BEM Naming Convention) === */
+/* --- CHANGED SNIPPET for global.css: Buttons & CTAs --- */
 
-/* Button Styles (Section 8.1) */
-.btn {
-    padding: 12px 24px;
-    font-family: 'Avenir', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    border: none;
-    border-radius: var(--border-radius);
-    transition: all var(--transition-speed) ease-in-out;
-}
-
-.btn--primary {
+/* Buttons & CTAs (Standard Primary Button) */
+.btn-primary {
     background-color: var(--blue);
     color: var(--white);
-    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.3);
-    /* Subtle shadow using primary color */
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    /* 12px 24px */
+    border: 1px solid var(--lblue);
+    /* 🚨 ADDED BORDER as requested */
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 83, 93, 0.2);
+    /* Soft shadow for depth */
+    letter-spacing: 0.5px;
+    /* transition is inherited from '*' */
 }
 
-.btn--primary:hover {
-    background-color: color-mix(in srgb, var(--blue) 85%, var(--black));
-    /* Slightly darker on hover */
-    box-shadow: 0 6px 16px rgba(0, 83, 93, 0.4);
+/* Button Hover State (Color change only, NO transform) */
+.btn-primary:hover {
+    /* Subtle darkening on hover, keeping the border visible */
+    background-color: color-mix(in srgb, var(--blue), var(--black) 10%);
+    /* Slightly more pronounced shadow on hover */
+    box-shadow: 0 6px 15px rgba(0, 83, 93, 0.4);
+    /* Border color shifts slightly for a dynamic feel */
+    border-color: color-mix(in srgb, var(--lblue), var(--white) 50%);
 }
 
-.btn--secondary {
-    background-color: var(--lblue);
-    color: var(--blue);
-    border: 1px solid var(--blue);
-}
+/* --- END CHANGED SNIPPET --- */
 
-.btn--secondary:hover {
-    background-color: var(--llblue);
-}
-
-.btn--danger {
-    background-color: var(--error-red);
-    color: var(--white);
-}
-
-.btn--danger:hover {
-    opacity: 0.85;
-}
-
-/* Card Layouts (Section 8.1) */
+/* Card Block - Base for all data containers */
 .card {
     background-color: var(--white);
-    padding: 24px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 4);
+    /* 32px internal padding */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    /* Modern, lifted shadow */
+    /* Subtle card outline */
 }
 
-/* Input Styles (Section 8.1) */
-.form-field {
-    margin-bottom: 16px;
+/* Form Styling - BEM Methodology (8.1) [cite: 237] */
+.form-group {
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    /* 24px spacing */
 }
 
-.form-field__label {
+.form-label {
     display: block;
-    margin-bottom: 8px;
-    color: var(--gray-text);
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-.form-field__input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    background-color: var(--llblue);
-    border-radius: var(--border-radius);
+    margin-bottom: calc(var(--spacing-unit) * 1);
+    /* 8px */
+    font-weight: 500;
     color: var(--black);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: calc(var(--spacing-unit) * 2);
+    /* 16px padding for touch-friendly size */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 1rem;
+    color: var(--black);
+    font-family: 'Avenir', sans-serif;
 }
 
-.form-field__input:focus {
-    outline: 2px solid var(--blue);
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
     border-color: var(--blue);
-    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue), transparent 70%);
+    /* Modern focus ring */
 }
 
-/* Error State Modifier (Section 7.2) */
-.form-field__input--error {
+/* Form Error States (7.2) [cite: 234] */
+.form-group--error .form-input,
+.form-group--error .form-select,
+.form-group--error .form-textarea {
     border-color: var(--error-red);
-    outline: 2px solid var(--error-red);
+    /* Red border on error [cite: 234] */
 }
 
-.form-field__error-message {
+.form-error-message {
+    display: inline-block;
+    text-align: left;
+}
+
+.form-group--error .form-label,
+.form-error-message {
     color: var(--error-red);
+    /* Error text color [cite: 234] */
     font-size: 0.85rem;
-    margin-top: 4px;
+    margin-top: calc(var(--spacing-unit)/2);
+    /* 4px */
 }
 
-/* Responsive Overrides (Section 9.3) - Applied to global elements */
+/* ------------------------------------------------------------------------- */
+/* GOD-LEVEL NOTIFICATION SYSTEM (To stand out and attract attention) */
+/* ------------------------------------------------------------------------- */
 
-/* Tablet (768px - 1023px) */
-@media (min-width: 768px) {
-
-    /* Increase section padding */
-    .section {
-        padding: 80px 48px;
-    }
+.notification-area {
+    position: fixed;
+    top: 96px;
+    /* Position below the header */
+    right: 24px;
+    z-index: 200;
+    /* Ensure it's above everything */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 90%;
+    max-width: 380px;
 }
 
-/* Desktop (1024px+) */
-@media (min-width: 1024px) {
+.notification {
+    background-color: var(--white);
+    padding: 16px 24px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    /* Start hidden for smooth animation */
+    transform: translateX(100%);
+    /* Start off-screen */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-left: 5px solid;
+    /* Color-coded left border */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    /* Springy, modern animation */
+}
 
-    /* Further increase padding */
-    .section {
-        padding: 96px 64px;
-    }
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification--error {
+    border-left-color: var(--error-red);
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+    color: var(--error-red);
+    /* Icon matches border for error */
+}
+
+.notification-message {
+    color: var(--black);
+    font-weight: 500;
 }
