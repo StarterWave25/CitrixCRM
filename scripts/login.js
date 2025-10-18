@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 // If already logged in, redirect to the main role landing page
                 console.log('User already authenticated. Redirecting...');
-                window.location.href = '../index.html';
+                window.location.href = 'dashboard.html';
             }
         } catch (error) {
             // Ignore if check fails (user not logged in), stay on login page
@@ -153,6 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Display success notification (UX Principle)
                 showNotification(`Welcome, ${response.data.name}!`, 'success');
 
+                const token = response.token; // from backend response
+
+                // Store it as a browser cookie (client-side)
+                setCookie('jwt', token, 7, { path: '/', sameSite: 'Lax', secure: false });
+
                 // Redirect to Employee Dashboard
                 setTimeout(() => {
                     window.location.href = './dashboard.html';
@@ -172,6 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.innerHTML = 'Login';
         }
     });
+
+    function setCookie(name, value, days = 7, options = {}) {
+        // options: { path, domain, sameSite, secure }
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        let cookieStr = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; Expires=${expires}; Path=${options.path || '/'}`;
+
+        if (options.domain) cookieStr += `; Domain=${options.domain}`;
+        // sameSite values: 'Lax' (default), 'Strict', 'None'
+        if (options.sameSite) cookieStr += `; SameSite=${options.sameSite}`;
+        if (options.secure) cookieStr += `; Secure`; // only set in https contexts
+        // HttpOnly cannot be set via JS
+
+        document.cookie = cookieStr;
+    }
 
     // Run the initial check
     checkAuthStatus();

@@ -1,3 +1,10 @@
+
+
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
 // --- Auto-detect mode based on where the code is running ---
 const isLocalhost =
     window.location.hostname === "localhost" ||
@@ -20,6 +27,10 @@ async function apiFetch(url, type = "GET", data = {}) {
 
         if (type.toUpperCase() !== "GET") {
             options.body = JSON.stringify(data);
+        }
+        const tokenFromCookie = getCookie('jwt');
+        if (tokenFromCookie) {
+            options.headers['Authorization'] = `Bearer ${tokenFromCookie}`;
         }
 
         const response = await fetch(endpoint, options);

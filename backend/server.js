@@ -13,8 +13,8 @@ const server = express();
 dotenv.config();
 
 //server.use(express.json());
-server.use(cookieParser());
 server.use(express.json({ limit: '100mb' }));
+server.use(cookieParser());
 
 // If you also use urlencoded middleware, update it too
 server.use(express.urlencoded({ limit: '100mb', extended: true }));

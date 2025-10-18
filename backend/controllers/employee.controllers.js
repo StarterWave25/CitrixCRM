@@ -203,7 +203,6 @@ export const sendMessage = async (req, res) => {
 
 
 export const uploadImage = async (req, res) => {
-    console.log('uploadImage handler called')
     try {
         const { image } = req.body;
         if (!image) return res.status(400).json({ message: "Image is required" });

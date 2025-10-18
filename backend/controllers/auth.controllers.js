@@ -31,7 +31,7 @@ Example Request Body for login -user:
 export const login = async (req, res) => {
   try {
     // Standard response format: { success: boolean, message: string, data: object }
-    
+
     const { email, password, role } = req.body;
 
     // 1️⃣ Check if email, password, and role exist
@@ -77,7 +77,7 @@ export const login = async (req, res) => {
     }
 
     const user = rows[0];
-    
+
     // 4️⃣ Verify Password using bcrypt.compare()
     // Compare the plain text password from the request (password) with the hashed password from the DB (user.password)
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -86,8 +86,8 @@ export const login = async (req, res) => {
     }
 
     // 5️⃣ Consolidate user details for response and token generation
-    userDetails.id = user[idColumn];         
-    userDetails.name = user[nameColumn];     
+    userDetails.id = user[idColumn];
+    userDetails.name = user[nameColumn];
     userDetails.email = user.email;
     userDetails.role = userRole;
 
@@ -100,13 +100,14 @@ export const login = async (req, res) => {
     }
 
     // 6️⃣ Generate JWT + send cookie
-    generateToken(userDetails.id, userDetails.email, res);
+    const token = generateToken(userDetails.id, userDetails.email, userDetails.role);
 
     // 7️⃣ Respond with success and user info (no password)
     res.status(200).json({
       success: true,
       message: `${userRole} login successful`,
       data: userDetails,
+      token: token
     });
 
   } catch (error) {
