@@ -5,7 +5,7 @@ import express from 'express'
 const router = express.Router();
 
 router.post("/login", login);
-router.post("/logout", logout);
+router.get("/logout", logout);
 router.get("/check", checkUser, (req, res) => res.status(200).json({ success: true }));
 
 export default router;

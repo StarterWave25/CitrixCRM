@@ -3,16 +3,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const generateToken = (userId, email, res) => {
-  const token = jwt.sign({ userId, email }, process.env.JWT_SECRET, {
-    expiresIn: "7d"
-  });
-
-  res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    httpOnly: true,
-    secure: true
-  });
-
+export const generateToken = (userId, email, role) => {
+  // include role so middleware can decide which table to query
+  const payload = { userId, email, role };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
   return token;
 };
