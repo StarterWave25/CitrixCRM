@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 07:43 AM
+-- Generation Time: Oct 18, 2025 at 04:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,7 +31,7 @@ CREATE TABLE `boss` (
   `bossId` int(11) NOT NULL,
   `bossName` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password` varchar(8) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -78,7 +78,7 @@ CREATE TABLE `employees` (
   `email` varchar(100) NOT NULL,
   `empName` varchar(100) NOT NULL,
   `hqId` int(11) NOT NULL,
-  `password` varchar(8) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -90,7 +90,8 @@ INSERT INTO `employees` (`empId`, `email`, `empName`, `hqId`, `password`, `date`
 (1, 'harsha@gmail.com', 'Harsha Vardhan', 3, '$2b$10$k', '2025-10-15'),
 (2, 'prudvi@gmail.com', 'Prudvi', 4, '$2b$10$s', '2025-10-15'),
 (3, 'jasu@gmail.com', 'Jasu', 5, '$2b$10$c', '2025-10-15'),
-(4, 'ramu@gmail.com', 'Ram', 5, '$2b$10$q', '2025-10-15');
+(4, 'ramu@gmail.com', 'Ram', 5, '$2b$10$q', '2025-10-15'),
+(8, 'prudvi2@gmail.com', 'Prudvi', 3, '$2b$10$Yj3ZAEPZNUp3r1yOZzJ5ledKbAUgoVDc.XKtf7QzUkGDT1G.Bs6NS', '2025-10-18');
 
 -- --------------------------------------------------------
 
@@ -163,7 +164,7 @@ INSERT INTO `headquarters` (`hqId`, `hqName`, `date`) VALUES
 
 CREATE TABLE `manager` (
   `manId` int(11) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `manName` varchar(100) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp()
@@ -431,7 +432,7 @@ ALTER TABLE `doctors`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `empId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `empId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `expenses`
