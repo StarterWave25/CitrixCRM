@@ -29,7 +29,7 @@
     /* Standard radius [cite: 189, 222] */
     --transition-speed: 0.3s;
     /* Standard transition time [cite: 192, 219] */
-    --cards-bg-color: linear-gradient(var(--blue) 50%, #a39888);
+    --cards-bg-color: linear-gradient(130deg, var(--blue) 50%, #a39888);
     /* Card gradient [cite: 191] */
     --spacing-unit: 8px;
     /* 8-point spacing system [cite: 294] */
@@ -50,13 +50,11 @@
 @font-face {
     font-family: 'Avenir';
     src: url('../fonts/AvenirLTStd-Book.otf') format('opentype');
-    font-style: normal;
 }
 
 @font-face {
     font-family: 'Ivymode';
     src: url('../fonts/ivy-mode-regular.woff') format('woff');
-    font-style: normal;
 }
 
 /* Universal Reset and Default Application */
@@ -386,7 +384,7 @@ a:hover {
 }
 
 .notification {
-    background-color: var(--white);
+    background: var(--cards-bg-color);
     padding: 16px 24px;
     border-radius: var(--border-radius);
     display: flex;
@@ -397,7 +395,6 @@ a:hover {
     transform: translateX(100%);
     /* Start off-screen */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-left: 5px solid;
     /* Color-coded left border */
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.27);
     /* Springy, modern animation */
@@ -419,6 +416,6 @@ a:hover {
 }
 
 .notification-message {
-    color: var(--black);
+    color: var(--white);
     font-weight: 500;
 }

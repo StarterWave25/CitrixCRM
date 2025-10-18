@@ -13,12 +13,12 @@
 /* --- Base Styles & Typography --- */
 @font-face {
     font-family: 'Ivymode';
-    src: url('../ivy-mode-regular.woff') format('woff');
+    src: url('../fonts/ivy-mode-regular.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Avenir';
-    src: url('../AvenirLTStd-Book.otf');
+    src: url('../fonts/AvenirLTStd-Book.otf');
 }
 
 * {
@@ -154,7 +154,6 @@ body {
 /* --- Modern Interactivity --- */
 .role-btn:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger shadow */
-    transform: translateY(-5px); /* Subtle lift effect */
 }
 
 /* Dark Button Hover (MD) */

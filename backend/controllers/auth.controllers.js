@@ -1,5 +1,6 @@
 import { pool } from "../database/db.js";
 import { generateToken } from "../lib/utils.js";
+import bcrypt from 'bcryptjs';
 
 // NOTE: This assumes 'pool' (for database connection) and 'generateToken' (for JWT)
 // are defined and available in this scope.
@@ -29,6 +30,8 @@ Example Request Body for login -user:
 
 export const login = async (req, res) => {
   try {
+    // Standard response format: { success: boolean, message: string, data: object }
+    
     const { email, password, role } = req.body;
 
     // 1️⃣ Check if email, password, and role exist
@@ -39,12 +42,13 @@ export const login = async (req, res) => {
     let tableName;
     let idColumn;
     let nameColumn;
-    let userRole = role.toLowerCase();
+    // Ensure case-insensitivity for role comparison
+    const userRole = role.toLowerCase();
     let userDetails = {};
 
     // 2️⃣ Determine table and column names based on the provided role
     switch (userRole) {
-      case 'employee':
+      case 'employee': // Note: Changed 'user' to 'employee' to match your switch case label
         tableName = 'employees';
         idColumn = 'empId';
         nameColumn = 'empName';
@@ -64,38 +68,38 @@ export const login = async (req, res) => {
     }
 
     // 3️⃣ Check if user exists in the appropriate MySQL table
-    // Note: We select the password for comparison, but will exclude it from the final response.
-    const query = `SELECT * FROM ${tableName} WHERE email = ?`;
+    const query = `SELECT * FROM \`${tableName}\` WHERE email = ?`;
     const [rows] = await pool.query(query, [email]);
 
     if (rows.length === 0) {
-      // Use a generic error message for security (prevents user enumeration)
+      // Generic error message for security (prevents user enumeration)
       return res.status(400).json({ message: "Invalid email or password", success: false });
     }
 
     const user = rows[0];
     
-    // 4️⃣ Verify Password (!!! IMPORTANT: Implement password hashing (e.g., bcrypt) in a real application !!!)
-    if (password !== user.password) {
+    // 4️⃣ Verify Password using bcrypt.compare()
+    // Compare the plain text password from the request (password) with the hashed password from the DB (user.password)
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid email or password", success: false });
     }
 
     // 5️⃣ Consolidate user details for response and token generation
-    userDetails.id = user[idColumn];         // Mapped to empId, manId, or bossId
-    userDetails.name = user[nameColumn];     // Mapped to empName, manName, or bossName
+    userDetails.id = user[idColumn];         
+    userDetails.name = user[nameColumn];     
     userDetails.email = user.email;
     userDetails.role = userRole;
 
-    // Add headquarter_id only if it exists (relevant only for 'user' / employees table)
-    if (userRole === 'user' && user.hqId) {
+    // Add headquarter ID only if it exists (relevant only for 'employee' table)
+    // NOTE: If you use 'user' in the request, change the switch case from 'employee' to 'user'
+    if (userRole === 'employee' && user.hqId) {
       userDetails.hqId = user.hqId; // Mapped to hqId for employees
     } else {
       userDetails.hqId = null;
     }
 
-
     // 6️⃣ Generate JWT + send cookie
-    // Assuming generateToken uses userDetails.id and userDetails.email
     generateToken(userDetails.id, userDetails.email, res);
 
     // 7️⃣ Respond with success and user info (no password)
@@ -106,7 +110,7 @@ export const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("Error in login controller:", error);
+    console.error("Error in login controller:", error);
     // Send a generic error response
     res.status(500).json({ message: "Internal Server Error", success: false });
   }
