@@ -1,0 +1,227 @@
+/* ------------------------------------------------------------------------- */
+/* EMPLOYEE INDEX (MENU) STYLES - index.css */
+/* ------------------------------------------------------------------------- */
+
+/* Main Container Layout */
+.main-selection-container {
+    flex-grow: 1; 
+    max-width: 1200px; /* Wider container for the main menu */
+    width: 90%;
+    margin: 48px auto 64px auto; /* Generous top/bottom margin (8-point system) */
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Space between hero and grid */
+}
+
+/* Hero Section (Greeting) */
+.hero-selection {
+    text-align: center;
+    padding: 32px 0;
+}
+
+.hero-greeting {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Large, impactful dynamic heading */
+    color: var(--black); /* Default text color for better contrast */
+}
+
+.hero-greeting .placeholder-name {
+    color: var(--blue); /* Highlight the employee name */
+    font-weight: 500;
+}
+
+.hero-subtext {
+    color: var(--gray-text);
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+/* Card Grid Layout (3 Columns for Desktop) */
+.card-grid {
+    display: grid;
+    /* 3-column layout on large screens */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 32px; /* Large gap for visual breathing room */
+}
+
+/* Action Card Styling (Premium Aesthetic) */
+.action-card {
+    /* Uses .card base class for shadow/padding */
+    padding: 40px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    
+    /* REQUIRED STYLE: Use the custom gradient background */
+    background: var(--cards-bg-color); 
+    color: var(--white); /* White text on the dark gradient background */
+    
+    /* Remove default card shadow/border for this stylized card type */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    border: none;
+    
+    /* Animation base for the premium hover effect */
+    transform: none; /* Removed scale transform */
+    filter: brightness(100%); /* Set initial filter state */
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, filter 0.4s ease;
+}
+
+/* Action Card Hover Effect (Brightness Filter Added) */
+.action-card:hover {
+    filter: brightness(115%); /* Brighter glow effect */
+    /* Stronger, floating shadow */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35); 
+    z-index: 2;
+}
+
+/* Icon Styling */
+.card-icon {
+    font-size: 3rem; /* Large icon for visual anchor */
+    margin-bottom: 16px;
+    color: var(--lblue); /* Use light secondary color for contrast */
+}
+
+/* Title Styling */
+.card-title {
+    font-family: 'Ivymode', serif;
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--white); /* White on dark background */
+}
+
+/* Description Styling */
+.card-description {
+    color: rgba(255, 255, 255, 0.8); /* Slightly transparent white for subtext */
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* HEADER & FIXED BUTTONS */
+/* ------------------------------------------------------------------------- */
+
+/* Header Slot Layout Adjustment for multiple buttons */
+.header-main-nav-slot {
+    display: flex;
+    gap: 12px; /* Space between the two header buttons */
+    align-items: center;
+}
+
+/* Style for the Header Logout Button (Primary look) */
+/* --- CHANGED SNIPPET for employee/index.css (Header Buttons) --- */
+
+/* Style for the Header Logout Button (Primary look) */
+.btn-header-logout {
+    padding: 12px 19px; /* INCREASED SIZE */
+    font-size: 1rem; /* INCREASED SIZE */
+    font-weight: normal; 
+    background-color: var(--blue);
+    border-color: var(--lblue);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-header-logout:hover {
+    background-color: var(--error-red); 
+    border-color: var(--error-red);
+    box-shadow: 0 4px 10px rgba(217, 83, 79, 0.4);
+}
+
+/* Style for the View Data Button (Secondary look) */
+.btn-header-view-data {
+    padding: 12px 19px; /* INCREASED SIZE */
+    font-size: 1rem; /* INCREASED SIZE */
+    font-weight: normal; 
+    
+    /* Secondary Style: White background, blue text */
+    background-color: var(--white);
+    color: var(--blue);
+    border: 1px solid var(--blue);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-header-view-data:hover {
+    background-color: var(--llblue);
+    color: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --- END CHANGED SNIPPET --- */
+
+/* FIXED BUTTON - Join Meeting (Bottom Left) */
+.fixed-action-btn {
+    position: fixed;
+    bottom: 32px; /* 8-point system spacing from bottom */
+    right: 32px;  /* 8-point system spacing from left */
+    z-index: 50; /* Ensure it stays above content */
+    
+    /* Styling based on btn-primary for prominence */
+    background-color: var(--blue); 
+    color: var(--white);
+    padding: 16px 24px; /* Generous padding for fixed CTA */
+    border-radius: var(--border-radius); /* Uses the updated 5px radius */
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    /* High-impact floating shadow */
+    box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4); 
+    
+    /* Animation: Subtle perpetual breathing/trust animation */
+    animation: pulse-shadow 2s infinite ease-in-out;
+}
+
+.fixed-action-btn:hover {
+    color: var(--lblue);
+    filter: brightness(115%);
+    box-shadow: 0 15px 30px rgba(0, 83, 93, 0.6);
+    animation: none; /* Stop pulsing on hover to acknowledge click intent */
+}
+
+/* Keyframe for the subtle breathing animation - World-class UI/UX */
+@keyframes pulse-shadow {
+    0% {
+        box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4);
+    }
+    50% {
+        box-shadow: 0 15px 30px rgba(0, 83, 93, 0.6);
+    }
+    100% {
+        box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4);
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVENESS */
+/* ------------------------------------------------------------------------- */
+
+/* Tablet/Mobile Adjustments */
+@media (max-width: 768px) {
+    .main-selection-container {
+        width: 95%;
+        margin: 32px auto 40px auto;
+    }
+    
+    .card-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+    }
+}
+
+/* Mobile Adjustments for Fixed Button */
+@media (max-width: 600px) {
+    .fixed-action-btn {
+        bottom: 16px; 
+        left: 16px;
+        font-size: 0.9rem;
+        padding: 12px 18px;
+    }
+}
