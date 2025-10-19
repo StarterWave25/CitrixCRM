@@ -121,8 +121,8 @@ body {
     align-items: flex-start;
     /* Reduced padding for decreased height */
     padding: 24px; 
-    border-radius: 16px;
-    border: 2px solid transparent;
+    border-radius: 5px;
+    border: 1px solid transparent;
     /* Modern Transition: added transform */
     transition: all var(--transition-speed) ease, transform var(--transition-speed) ease;
     text-align: left;
@@ -141,14 +141,14 @@ body {
 .md-btn {
     background-color: var(--blue);
     color: var(--white);
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 }
 
 /* 3. Manager: Light Background (Alternating pattern) */
 .manager-btn {
     background-color: var(--lblue);
     color: var(--blue);
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 }
 
 /* --- Modern Interactivity --- */

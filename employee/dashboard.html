@@ -4,32 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Tour Plan - Citrix CRM</title>
+    <title>Employee Menu - Citrix CRM</title>
+    <link rel="shortcut icon" href="../img/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/employee/dashboard.css">
+    <link rel="stylesheet" href="../styles/employee/form-selection.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9kYVwDvsBqM1Q0WRA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<body class="gradient-background">
-    <header>
-    </header>
-    <main class="main-content">
-        <section class="form-section">
-            <h1 class="section-heading">Tour Plan Creation</h1>
-            <div id="dynamic-form-container" class="form-container">
-                <p>Loading form dependencies...</p>
+<body>
+
+    <header class="global-header">
+        <div class="header-content-wrapper">
+            <a href="./index.html" class="logo-link">
+                <img src="../img/Citrix-blue.png" alt="Citrix Ltd Pharma CRM Logo" class="header-logo">
+            </a>
+
+            <div class="header-main-nav-slot">
+                <button class="btn-primary btn-header-view-data" id="view-data-btn">
+                    <i class="fa-solid fa-chart-simple"></i> View Data
+                </button>
+                <button class="btn-primary btn-header-logout" id="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
             </div>
+        </div>
+    </header>
+
+    <main class="main-selection-container">
+        <section class="hero-selection">
+            <h1 class="hero-greeting" id="employee-greeting">Hello! <span class="placeholder-name">Loading...</span>
+            </h1>
+            <p class="hero-subtext">Choose a module to begin your daily tasks.</p>
         </section>
+
+        <div class="card-grid">
+
+            <a href="./tour-plan.html" class="action-card card" data-module="tour-plan">
+                <div class="card-icon"><i class="fa-solid fa-route"></i></div>
+                <h2 class="card-title">Tour Plan</h2>
+                <p class="card-description">Schedule daily visits and manage your itinerary efficiently.</p>
+            </a>
+
+            <a href="./doctors-list.html" class="action-card card" data-module="doctors-list">
+                <div class="card-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                <h2 class="card-title">Doctors List</h2>
+                <p class="card-description">Search, view, and update customer profiles and details.</p>
+            </a>
+
+            <a href="./expenses.html" class="action-card card" data-module="expenses">
+                <div class="card-icon"><i class="fa-solid fa-receipt"></i></div>
+                <h2 class="card-title">Expenses</h2>
+                <p class="card-description">Submit and track your expenditure reports effortlessly.</p>
+            </a>
+
+        </div>
     </main>
+
+    <a href="./join-meeting.html" class="fixed-action-btn fixed-action-btn--primary" id="join-meeting-btn">
+        <i class="fa-solid fa-video"></i> Join Meeting
+    </a>
+
     <footer class="login-footer">
         <span class="footer-text">Built by</span>
         <a href="http://starterwave.xyz" target="_blank">
-            <img src="../../img/starterwave.png" alt="Starterwave Logo" class="starterwave-logo">
+            <img src="../img/starterwave.png" alt="Starterwave Logo" class="starterwave-logo">
         </a>
     </footer>
 
-    <script type="module" src="../scripts/api-fetch.js"></script>
-    <script type="module" src="../scripts/employee/form-renderer.js"></script>
-    <script type="module" src="../scripts/employee/tour-plan.js"></script>
+    <script src="../scripts/api-fetch.js"></script>
+    <script src="../scripts/employee/form-selection.js"></script>
 </body>
 
 </html>

@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post("/login", login);
 router.get("/logout", logout);
-router.get("/check", checkUser, (req, res) => res.status(200).json({ success: true }));
+router.post("/check", checkUser, (req, res) => res.status(200).json({ success: true }));
 
 export default router;

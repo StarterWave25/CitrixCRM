@@ -352,7 +352,7 @@ a:hover {
 }
 
 .form-error-message {
-    display: inline-block;
+    display: block;
     text-align: left;
 }
 
