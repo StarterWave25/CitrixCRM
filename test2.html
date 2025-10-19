@@ -1,212 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Dynamic Forms Demo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-:root {
-    --blue: #00535d;
-    --lblue: #fbf2e5;
-    --llblue: #fffbf5;
-    --white: #ffffff;
-    --black: #000000;
-    --gray-text: #666;
-    --border-color: #e0e0e0;
-    --border-radius: 20px;
-    --error-red: #d9534f;
-    --transition-speed: 0.3s;
-}
-body {
-    font-family: 'Avenir', Arial, sans-serif;
-    background: linear-gradient(60deg, rgba(0, 83, 93, 0.6) 0%, #fffbf5 33%, #fbf2e5 66%, rgba(0, 83, 93, 0.6) 100%);
-    min-height: 100vh;
-    margin: 0;
-    padding: 24px;
-}
-.form-selector {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-.form-selector button {
-    padding: 8px 24px;
-    background: var(--blue);
-    color: var(--white);
-    border: none;
-    border-radius: var(--border-radius);
-    transition: background var(--transition-speed) ease-in-out;
-    cursor: pointer;
-}
-.form-selector button:hover, .form-selector button:focus {
-    background: #02606f;
-}
-.dynamic-form {
-    background: var(--llblue);
-    padding: 32px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 20px #0001;
-    max-width: 500px;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.dynamic-form h2 {
-    margin-top: 0;
-    font-family: 'Ivymode', serif;
-}
-.form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-label {
-    font-weight: 600;
-    color: var(--blue);
-}
-input, textarea, select {
-    padding: 8px 12px;
-    border: 1.5px solid var(--border-color);
-    border-radius: var(--border-radius);
-    outline: none;
-    font-size: 1rem;
-    transition: border var(--transition-speed) ease-in-out;
-}
-input:focus, textarea:focus, select:focus {
-    border-color: var(--blue);
-}
-input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--blue);
-}
-textarea {
-    resize: vertical;
-    min-height: 60px;
-}
-.submit-btn {
-    padding: 10px 28px;
-    background: var(--blue);
-    color: var(--white);
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 1.1rem;
-    margin-top: 12px;
-    cursor: pointer;
-    transition: background var(--transition-speed) ease-in-out;
-}
-.submit-btn:hover, .submit-btn:focus {
-    background: #02606f;
-}
-#notification {
-    position: fixed;
-    top: 40px;
-    right: 40px;
-    min-width: 220px;
-    z-index: 200;
-    display: none;
-    background: var(--llblue);
-    color: var(--black);
-    border: 1.5px solid var(--blue);
-    border-radius: var(--border-radius);
-    padding: 1.3em 1.5em;
-    box-shadow: 0 4px 16px #0002;
-}
-@media (max-width: 700px) {
+  <meta charset="UTF-8">
+  <title>Dynamic Forms Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --blue: #00535d;
+      --lblue: #fbf2e5;
+      --llblue: #fffbf5;
+      --white: #ffffff;
+      --black: #000000;
+      --gray-text: #666;
+      --border-color: #e0e0e0;
+      --border-radius: 20px;
+      --error-red: #d9534f;
+      --transition-speed: 0.3s;
+    }
+
+    body {
+      font-family: 'Avenir', Arial, sans-serif;
+      background: linear-gradient(60deg, rgba(0, 83, 93, 0.6) 0%, #fffbf5 33%, #fbf2e5 66%, rgba(0, 83, 93, 0.6) 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .form-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .form-selector button {
+      padding: 8px 24px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: var(--border-radius);
+      transition: background var(--transition-speed) ease-in-out;
+      cursor: pointer;
+    }
+
+    .form-selector button:hover,
+    .form-selector button:focus {
+      background: #02606f;
+    }
+
     .dynamic-form {
+      background: var(--llblue);
+      padding: 32px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px #0001;
+      max-width: 500px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .dynamic-form h2 {
+      margin-top: 0;
+      font-family: 'Ivymode', serif;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    input,
+    textarea,
+    select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--border-radius);
+      outline: none;
+      font-size: 1rem;
+      transition: border var(--transition-speed) ease-in-out;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--blue);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .submit-btn {
+      padding: 10px 28px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: background var(--transition-speed) ease-in-out;
+    }
+
+    .submit-btn:hover,
+    .submit-btn:focus {
+      background: #02606f;
+    }
+
+    #notification {
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      min-width: 220px;
+      z-index: 200;
+      display: none;
+      background: var(--llblue);
+      color: var(--black);
+      border: 1.5px solid var(--blue);
+      border-radius: var(--border-radius);
+      padding: 1.3em 1.5em;
+      box-shadow: 0 4px 16px #0002;
+    }
+
+    @media (max-width: 700px) {
+      .dynamic-form {
         padding: 18px;
         max-width: 99vw;
-    }
-    #notification {
+      }
+
+      #notification {
         top: 10px;
         right: 14px;
         min-width: 125px;
         font-size: 0.95em;
+      }
     }
-}
-    </style>
+  </style>
 </head>
+
 <body>
-    <div class="form-selector">
-        <button data-form="tourPlan">Tour Plan</button>
-        <button data-form="doctorsList">Doctors List</button>
-        <button data-form="expenses">Expenses</button>
-    </div>
-    <div id="form-container"></div>
-    <div id="notification"></div>
-    <script>
-const formSchemas = {
-    tourPlan: {
+  <div class="form-selector">
+    <button data-form="tourPlan">Tour Plan</button>
+    <button data-form="doctorsList">Doctors List</button>
+    <button data-form="expenses">Expenses</button>
+  </div>
+  <div id="form-container"></div>
+  <div id="notification"></div>
+  <script>
+    const formSchemas = {
+      tourPlan: {
         formId: 'tour-plan-form',
         title: 'Tour Plan',
         fields: [
-            { name: 'extensionName', type: 'text', label: 'Extension Name', required: true },
-            { name: 'outStation', type: 'checkbox', label: 'Out Station', required: false },
-            { name: 'jointWork', type: 'text', label: 'Joint Work', required: false, conditional: { field: 'outStation', value: true } },
-            { name: 'date', type: 'date', label: 'Date', required: true }
+          { name: 'extensionName', type: 'text', label: 'Extension Name', required: true },
+          { name: 'outStation', type: 'checkbox', label: 'Out Station', required: false },
+          { name: 'jointWork', type: 'text', label: 'Joint Work', required: false, conditional: { field: 'outStation', value: true } },
+          { name: 'date', type: 'date', label: 'Date', required: true }
         ]
-    },
-    doctorsList: {
+      },
+      doctorsList: {
         formId: 'doctors-list-form',
         title: 'Doctors List',
         fields: [
-            { name: 'doctorName', type: 'text', label: 'Doctor Name', required: true },
-            { name: 'phone', type: 'tel', label: 'Phone Number', required: true },
-            { name: 'orderStatus', type: 'checkbox', label: 'Order Placed', required: false },
-            {
-                name: 'products',
-                type: 'section',
-                label: 'Products Ordered',
-                conditional: { field: 'orderStatus', value: true },
-                subFields: [
-                    { name: 'productName', type: 'text', label: 'Product Name', required: true },
-                    { name: 'strips', type: 'number', label: 'Strips', required: true }
-                ]
-            },
-            { name: 'feedback', type: 'textarea', label: 'Feedback', required: true }
+          { name: 'doctorName', type: 'text', label: 'Doctor Name', required: true },
+          { name: 'phone', type: 'tel', label: 'Phone Number', required: true },
+          { name: 'orderStatus', type: 'checkbox', label: 'Order Placed', required: false },
+          {
+            name: 'products',
+            type: 'section',
+            label: 'Products Ordered',
+            conditional: { field: 'orderStatus', value: true },
+            subFields: [
+              { name: 'productName', type: 'text', label: 'Product Name', required: true },
+              { name: 'strips', type: 'number', label: 'Strips', required: true }
+            ]
+          },
+          { name: 'feedback', type: 'textarea', label: 'Feedback', required: true }
         ]
-    },
-    expenses: {
+      },
+      expenses: {
         formId: 'expenses-form',
         title: 'Expenses',
         fields: [
-            { name: 'normalExpense', type: 'number', label: 'Normal Expense', required: false },
-            { name: 'extensionExpense', type: 'number', label: 'Extension Expense', required: false },
-            { name: 'outstationExpense', type: 'number', label: 'Outstation Expense', required: false }
+          { name: 'normalExpense', type: 'number', label: 'Normal Expense', required: false },
+          { name: 'extensionExpense', type: 'number', label: 'Extension Expense', required: false },
+          { name: 'outstationExpense', type: 'number', label: 'Outstation Expense', required: false }
         ]
+      }
+    };
+    function showNotification(title, message, type = "info") {
+      const notif = document.getElementById("notification");
+      notif.innerHTML = `<strong>${title}</strong><br>${message}`;
+      notif.style.display = "block";
+      notif.style.borderColor = type === "error" ? "var(--error-red)" : "var(--blue)";
+      setTimeout(() => notif.style.display = "none", 3000);
     }
-};
-function showNotification(title, message, type = "info") {
-    const notif = document.getElementById("notification");
-    notif.innerHTML = `<strong>${title}</strong><br>${message}`;
-    notif.style.display = "block";
-    notif.style.borderColor = type === "error" ? "var(--error-red)" : "var(--blue)";
-    setTimeout(() => notif.style.display = "none", 3000);
-}
-class FormRenderer {
-    constructor(containerId, schema) {
+    class FormRenderer {
+      constructor(containerId, schema) {
         this.container = document.getElementById(containerId);
         this.schema = schema;
         this.formData = {};
         this.conditionalFields = new Map();
-    }
-    render() {
+      }
+      render() {
         this.container.innerHTML = '';
         const form = document.createElement('form');
         form.id = this.schema.formId;
         form.className = 'dynamic-form';
         if (this.schema.title) {
-            const title = document.createElement('h2');
-            title.textContent = this.schema.title;
-            form.appendChild(title);
+          const title = document.createElement('h2');
+          title.textContent = this.schema.title;
+          form.appendChild(title);
         }
         this.schema.fields.forEach(fieldConfig => {
-            const fieldWrapper = this.createField(fieldConfig);
-            form.appendChild(fieldWrapper);
-            if (fieldConfig.conditional) {
-                this.conditionalFields.set(fieldConfig.name, fieldConfig.conditional);
-            }
+          const fieldWrapper = this.createField(fieldConfig);
+          form.appendChild(fieldWrapper);
+          if (fieldConfig.conditional) {
+            this.conditionalFields.set(fieldConfig.name, fieldConfig.conditional);
+          }
         });
         const submitBtn = document.createElement('button');
         submitBtn.type = 'submit';
@@ -216,8 +241,8 @@ class FormRenderer {
         this.attachEventListeners(form);
         this.container.appendChild(form);
         this.evaluateConditionals();
-    }
-    createField(config) {
+      }
+      createField(config) {
         const wrapper = document.createElement('div');
         wrapper.className = 'form-field';
         wrapper.dataset.fieldName = config.name;
@@ -228,66 +253,67 @@ class FormRenderer {
         wrapper.appendChild(label);
         let input;
         if (config.type === "section") {
-            input = document.createElement('div');
-            input.className = 'section-fields';
-            config.subFields.forEach(subField => {
-                const subInput = this.createField(subField);
-                input.appendChild(subInput);
-            });
+          input = document.createElement('div');
+          input.className = 'section-fields';
+          config.subFields.forEach(subField => {
+            const subInput = this.createField(subField);
+            input.appendChild(subInput);
+          });
         } else if (config.type === "textarea") {
-            input = document.createElement('textarea');
+          input = document.createElement('textarea');
         } else {
-            input = document.createElement('input');
-            input.type = config.type;
+          input = document.createElement('input');
+          input.type = config.type;
         }
         input.name = config.name;
         input.id = config.name;
         if (config.required) input.required = true;
         wrapper.appendChild(input);
         if (config.conditional) {
-            wrapper.style.display = 'none';
+          wrapper.style.display = 'none';
         }
         return wrapper;
-    }
-    attachEventListeners(form) {
+      }
+      attachEventListeners(form) {
         form.addEventListener('change', (e) => {
-            this.formData[e.target.name] =
-                e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-            this.evaluateConditionals();
+          this.formData[e.target.name] =
+            e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+          this.evaluateConditionals();
         });
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showNotification("Success", "Form submitted (Demo Only)");
-            form.reset();
+          e.preventDefault();
+          showNotification("Success", "Form submitted (Demo Only)");
+          form.reset();
         });
-    }
-    evaluateConditionals() {
+      }
+      evaluateConditionals() {
         this.conditionalFields.forEach((condition, fieldName) => {
-            const fieldWrapper = this.container.querySelector(`[data-field-name="${fieldName}"]`);
-            const conditionMet = this.formData[condition.field] === (typeof condition.value === 'boolean' ? condition.value : String(condition.value));
-            fieldWrapper.style.display = conditionMet ? 'block' : 'none';
-            if (!conditionMet) {
-                const input = fieldWrapper.querySelector('input, textarea, select');
-                if (input) input.value = '';
-            }
+          const fieldWrapper = this.container.querySelector(`[data-field-name="${fieldName}"]`);
+          const conditionMet = this.formData[condition.field] === (typeof condition.value === 'boolean' ? condition.value : String(condition.value));
+          fieldWrapper.style.display = conditionMet ? 'block' : 'none';
+          if (!conditionMet) {
+            const input = fieldWrapper.querySelector('input, textarea, select');
+            if (input) input.value = '';
+          }
         });
+      }
     }
-}
-document.addEventListener("DOMContentLoaded", () => {
-    let currentRenderer = null;
-    document.querySelectorAll('.form-selector button').forEach(btn => {
+    document.addEventListener("DOMContentLoaded", () => {
+      let currentRenderer = null;
+      document.querySelectorAll('.form-selector button').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const formType = e.target.dataset.form;
-            loadForm(formType);
+          const formType = e.target.dataset.form;
+          loadForm(formType);
         });
-    });
-    function loadForm(formType) {
+      });
+      function loadForm(formType) {
         const schema = formSchemas[formType];
         currentRenderer = new FormRenderer('form-container', schema);
         currentRenderer.render();
-    }
-    loadForm('tourPlan');
-});
-    </script>
+      }
+      loadForm('tourPlan');
+    });
+  </script>
 </body>
+
 </html>

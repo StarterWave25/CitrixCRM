@@ -8,9 +8,7 @@
     <link rel="shortcut icon" href="../img/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/employee/form-selection.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9kYVwDvsBqM1Q0WRA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -26,7 +24,7 @@
                     <i class="fa-solid fa-chart-simple"></i> View Data
                 </button>
                 <button class="btn-primary btn-header-logout" id="logout-btn">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </div>
@@ -62,9 +60,9 @@
         </div>
     </main>
 
-    <a href="./join-meeting.html" class="fixed-action-btn fixed-action-btn--primary" id="join-meeting-btn">
+    <button class="btn-primary fixed-action-btn--bottom-right" id="join-meeting-btn">
         <i class="fa-solid fa-video"></i> Join Meeting
-    </a>
+    </button>
 
     <footer class="login-footer">
         <span class="footer-text">Built by</span>
@@ -72,6 +70,22 @@
             <img src="../img/starterwave.png" alt="Starterwave Logo" class="starterwave-logo">
         </a>
     </footer>
+
+    <div id="meeting-modal" class="modal-backdrop">
+        <div class="modal-content card">
+
+            <button class="modal-close-btn" id="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+
+            <div id="modal-loading-state" class="loading-state">
+                <div class="spinner"></div>
+                <p>Checking for today's meeting schedule...</p>
+            </div>
+
+            <div id="modal-result-state" class="result-state hidden">
+            </div>
+
+        </div>
+    </div>
 
     <script src="../scripts/api-fetch.js"></script>
     <script src="../scripts/employee/form-selection.js"></script>

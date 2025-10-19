@@ -119,6 +119,23 @@ export const login = async (req, res) => {
 
 
 export const logout = (req, res) => {
-  res.cookie("jwt", "", { maxAge: 0 });
-  res.status(200).json({ error: "Logged out successfully!" });
+    // 1. Clear the cookie by setting it to an empty value and an immediate expiry time (maxAge: 0).
+    
+    // 2. CRITICAL FIX: Ensure the cookie parameters match the original parameters.
+    // Setting 'path: /' ensures the cookie is deleted across all paths on the domain.
+    // Setting 'httpOnly: true' is necessary if the original was set as httpOnly.
+    // Setting 'secure: true' is necessary if you're running over HTTPS.
+    
+    const cookieOptions = {
+        httpOnly: true, // Should match your login settings
+        secure: process.env.NODE_ENV === 'production', // Use secure: true in production (HTTPS)
+        expires: new Date(0), // Set expiry date to the past
+        path: '/', // CRITICAL: Ensure the path matches where the cookie was set
+    };
+
+    // Set the cookie with a past expiry date
+    res.cookie("jwt", "", cookieOptions);
+    
+    // Respond using the standardized format
+    res.status(200).json({ success: true, message: "Logged out successfully!" });
 }
