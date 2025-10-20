@@ -247,7 +247,7 @@ export const fetchFormDependencies = async (req, res) => {
             if (!hqId) {
                 return res.status(400).json({ success: false, message: "For 'tourPlan', the 'hqId' is required." });
             }
-            
+
             // Query: Select all extension names associated with the given hqId.
             query = `
                 SELECT 
@@ -259,14 +259,14 @@ export const fetchFormDependencies = async (req, res) => {
             values = [hqId];
             dataKey = 'extensions';
 
-        // --- Use Case 2: Doctor Activities (Doctors based on Extension and Status) ---
+            // --- Use Case 2: Doctor Activities (Doctors based on Extension and Status) ---
         } else if (formName.toLowerCase() === 'doctor activities') {
             if (!exId) {
                 return res.status(400).json({ success: false, message: "For 'doctor activities', the 'exId' is required." });
             }
 
             // Status is assumed 'Active' to fetch doctors currently being worked on.
-            const requiredStatus = 'Active'; 
+            const requiredStatus = 'Active';
 
             // Query: Select all required doctor details from the `doctors` table.
             query = `
@@ -279,7 +279,7 @@ export const fetchFormDependencies = async (req, res) => {
                 WHERE \`exId\` = ? AND \`Status\` = ?
             `;
             values = [exId, requiredStatus];
-            dataKey = 'doctors'; 
+            dataKey = 'doctors';
 
         } else {
             // Handle unknown form name
@@ -295,7 +295,7 @@ export const fetchFormDependencies = async (req, res) => {
                 message: `No ${dataKey} found for the given criteria.`,
                 data: {
                     [dataKey]: [] // Return an empty array within the data object
-                } 
+                }
             });
         }
 
@@ -310,9 +310,112 @@ export const fetchFormDependencies = async (req, res) => {
 
     } catch (error) {
         console.error(`Database Error during pre-fetch for form '${formName}':`, error);
-        return res.status(500).json({ 
-            success: false, 
-            message: "Internal Server Error during data fetching." 
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error during data fetching."
+        });
+    }
+};
+
+/**
+ * Updates an existing Tour Plan entry for an employee on a specific date.
+ * * @param {object} req - The request object.
+ * @param {object} req.body - The request body.
+ * @param {number} req.body.empId - The ID of the employee whose plan is being updated.
+ * @param {string} req.body.date - The date of the tour plan entry (YYYY-MM-DD format).
+ * @param {number} req.body.hqId - The Headquarters ID.
+ * @param {string} req.body.extensionName - The full name of the Extension (used to find exId).
+ * @param {string} req.body.outStation - The Out Station status/name.
+ * @param {string} req.body.jointWork - The Joint Work status/person.
+ */
+export const editTourPlan = async (req, res) => {
+    const { empId, date, hqId, extensionName, outStation, jointWork } = req.body;
+
+    // 1. Input Validation
+    if (!empId || !date || !hqId || !extensionName || outStation === undefined || jointWork === undefined) {
+        return res.status(400).json({
+            success: false,
+            message: "Missing required fields: empId, date, hqId, extensionName, outStation, and jointWork."
+        });
+    }
+
+    try {
+        let exId;
+
+        // 2. Fetch Extension ID (exId) from Extension Name
+        const [extensionRows] = await pool.query(
+            "SELECT `exId` FROM `extensions` WHERE `extensionName` = ?",
+            [extensionName]
+        );
+
+        if (extensionRows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: `Extension Name '${extensionName}' not found.`
+            });
+        }
+
+        exId = extensionRows[0].exId;
+
+        // 3. Construct and Execute the UPDATE Query
+        const updateQuery = `
+            UPDATE \`tourplan\`
+            SET 
+                \`hqId\` = ?, 
+                \`exId\` = ?, 
+                \`Out Station\` = ?, 
+                \`Joint Work\` = ?
+            WHERE 
+                \`empId\` = ? AND \`Date\` = ?
+        `;
+
+        const updateValues = [
+            hqId,
+            exId,
+            outStation,
+            jointWork,
+            empId,
+            date
+        ];
+
+        const [result] = await pool.query(updateQuery, updateValues);
+
+        // 4. Handle Response
+        if (result.affectedRows === 0) {
+            // Check if the plan for that date/empId doesn't exist
+            const [checkRows] = await pool.query(
+                "SELECT 1 FROM `tourplan` WHERE `empId` = ? AND `Date` = ?",
+                [empId, date]
+            );
+
+            if (checkRows.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Tour plan entry not found for employee ${empId} on date ${date}.`
+                });
+            } else {
+                return res.status(200).json({
+                    success: true,
+                    message: "Update successful, but the new values were the same as the old values (0 rows affected)."
+                });
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Tour plan for employee ${empId} on ${date} updated successfully.`,
+            data: {
+                empId,
+                date,
+                updatedFields: { hqId, exId, outStation, jointWork }
+            }
+        });
+
+    } catch (error) {
+        console.error(`Database Error during editTourPlan operation:`, error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error during tour plan update."
         });
     }
 };
