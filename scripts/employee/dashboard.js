@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Attempting API logout: auth/logout (GET)');
             
             try {
-                // Call the backend API as requested
-                await apiFetch('auth/logout', 'GET');
-                console.log('API Logout executed successfully.');
+                
+                document.cookie = "jwt=; Expires=Thu, 01 Jan 1970 00:00:00 UTC; Path=/; SameSite=Lax";
+                console.log('Client-side JWT cookie cleared.');
 
             } catch (error) {
                 // Proceed with client-side logout even if API call fails
