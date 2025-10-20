@@ -67,8 +67,15 @@ export const login = async (req, res) => {
         return res.status(400).json({ message: "Invalid role provided", success: false });
     }
 
+    let query;
     // 3️⃣ Check if user exists in the appropriate MySQL table
-    const query = `SELECT * FROM \`${tableName}\` WHERE email = ?`;
+    if (userRole === 'employee') {
+      query = `SELECT \`${tableName}\`.*, headquarters.hqName FROM \`${tableName}\` JOIN headquarters ON \`${tableName}\`.hqId = headquarters.hqId WHERE email = ?`;
+    }
+    else {
+      query = `SELECT * FROM \`${tableName}\` WHERE email = ?`;
+
+    }
     const [rows] = await pool.query(query, [email]);
 
     if (rows.length === 0) {
@@ -93,8 +100,9 @@ export const login = async (req, res) => {
 
     // Add headquarter ID only if it exists (relevant only for 'employee' table)
     // NOTE: If you use 'user' in the request, change the switch case from 'employee' to 'user'
-    if (userRole === 'employee' && user.hqId) {
+    if (userRole === 'employee' && user.hqId && user.hqName) {
       userDetails.hqId = user.hqId; // Mapped to hqId for employees
+      userDetails.hqName = user.hqName;
     } else {
       userDetails.hqId = null;
     }

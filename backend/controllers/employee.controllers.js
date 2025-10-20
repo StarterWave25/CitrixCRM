@@ -40,6 +40,7 @@ export const submitForm = async (req, res) => {
         }
 
         const entry = FORM_REGISTRY[form];
+        
         if (!entry) return res.status(400).json({ error: 'Unknown form' });
 
         // Check for compiled validator
@@ -204,6 +205,7 @@ export const sendMessage = async (req, res) => {
 
 export const uploadImage = async (req, res) => {
     try {
+        console.log("upload Image calleeeddddddddddddd\n\n\n")
         const { image } = req.body;
         if (!image) return res.status(400).json({ message: "Image is required" });
         const uploadResponse = await cloudinary.uploader.upload(image);
@@ -212,7 +214,6 @@ export const uploadImage = async (req, res) => {
         console.log("Error in upload-image-route:", error);
         res.status(500).json({ message: "Internal Server Error", ok: false });
     }
-
 };
 
 /**

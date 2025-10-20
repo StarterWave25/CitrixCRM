@@ -1,0 +1,341 @@
+/* ------------------------------------------------------------------------- */
+/* EMPLOYEE INDEX (MENU) STYLES - index.css */
+/* ------------------------------------------------------------------------- */
+
+/* Main Container Layout */
+.main-selection-container {
+    flex-grow: 1; 
+    max-width: 1200px; /* Wider container for the main menu */
+    width: 90%;
+    margin: 48px auto 64px auto; /* Generous top/bottom margin (8-point system) */
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Space between hero and grid */
+}
+
+/* Hero Section (Greeting) */
+.hero-selection {
+    text-align: center;
+    padding: 32px 0;
+}
+
+.hero-greeting {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Large, impactful dynamic heading */
+    color: var(--black); /* Default text color for better contrast */
+}
+
+.hero-greeting .placeholder-name {
+    font-weight: 500;
+    color: var(--blue);
+    font-family: 'Ivymode';
+}
+
+.hero-subtext {
+    color: var(--gray-text);
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+/* Card Grid Layout (3 Columns for Desktop) */
+.card-grid {
+    display: grid;
+    /* 3-column layout on large screens */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 32px; /* Large gap for visual breathing room */
+}
+
+/* Action Card Styling (Premium Aesthetic) */
+.action-card {
+    /* Uses .card base class for shadow/padding */
+    padding: 40px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    
+    /* REQUIRED STYLE: Use the custom gradient background */
+    background: var(--cards-bg-color); 
+    color: var(--white); /* White text on the dark gradient background */
+    
+    /* Remove default card shadow/border for this stylized card type */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    border: none;
+    
+    /* Animation base for the premium hover effect */
+    transform: none;
+    filter: brightness(100%); /* Set initial filter state */
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, filter 0.4s ease;
+}
+
+/* Action Card Hover Effect (Brightness Filter Added) */
+.action-card:hover {
+    transform: translateY(-4px); /* Subtle lift for depth */
+    filter: brightness(115%); /* Brighter glow effect */
+    /* Stronger, floating shadow */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35); 
+    z-index: 2;
+}
+
+/* Icon Styling */
+.card-icon {
+    font-size: 3rem; /* Large icon for visual anchor */
+    margin-bottom: 16px;
+    color: var(--lblue); /* Use light secondary color for contrast */
+}
+
+/* Title Styling */
+.card-title {
+    font-family: 'Ivymode', serif;
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--white); /* White on dark background */
+}
+
+/* Description Styling */
+.card-description {
+    color: rgba(255, 255, 255, 0.8); /* Slightly transparent white for subtext */
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* HEADER & FIXED BUTTONS */
+/* ------------------------------------------------------------------------- */
+
+/* Header Slot Layout Adjustment for multiple buttons */
+.header-main-nav-slot {
+    display: flex;
+    gap: 12px; /* Space between the two header buttons */
+    align-items: center;
+}
+
+/* Style for the Header Logout Button (Primary look) */
+.btn-header-logout {
+    padding: 12px 16px; /* Consistently increased size */
+    font-size: 1rem;
+    font-weight: normal; 
+    background-color: var(--blue);
+    border-color: var(--lblue);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-header-logout:hover {
+    background-color: var(--error-red); 
+    border-color: var(--error-red);
+    box-shadow: 0 4px 10px rgba(217, 83, 79, 0.4);
+}
+
+/* Style for the View Data Button (Secondary look) */
+.btn-header-view-data {
+    padding: 12px 16px; /* Consistently increased size */
+    font-size: 1rem;
+    font-weight: normal; 
+    
+    /* Secondary Style: White background, blue text */
+    background-color: var(--white);
+    color: var(--blue);
+    border: 1px solid var(--blue);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-header-view-data:hover {
+    background-color: var(--llblue);
+    color: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* FIXED BUTTON - Join Meeting (Bottom Right) */
+.fixed-action-btn--bottom-right {
+    position: fixed;
+    bottom: 32px; /* 8-point system spacing from bottom */
+    right: 32px;  /* 8-point system spacing from right */
+    left: auto; /* Ensure it stays right-aligned */
+    z-index: 50; /* Ensure it stays above content */
+    
+    /* Apply primary button styling overrides for fixed element */
+    padding: 16px 24px; /* Generous padding for a fixed CTA */
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    /* Ensure primary button hover effects still work */
+    box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4); 
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* PREMIUM MODAL STYLES (Join Meeting Popup) */
+/* ------------------------------------------------------------------------- */
+
+/* Full-screen overlay for the modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Darker, dramatic backdrop */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0; /* Start hidden */
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* State when the modal is active */
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content Box (Simple and Center-Focused) */
+.modal-content {
+    /* Uses the global .card style for shadow/border-radius */
+    position: relative; /* REQUIRED for close button positioning */
+    background-color: var(--white);
+    padding: 40px; /* Increased padding for premium feel */
+    width: 90%;
+    max-width: 450px; /* Focused popup width */
+    text-align: center;
+    
+    /* Smooth entry animation */
+    transform: translateY(-20px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s;
+    opacity: 0;
+}
+
+.modal-backdrop.active .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* Close Button (Positioned top-right) */
+.modal-close-btn {
+    position: absolute; /* Place relative to modal-content */
+    top: 15px; /* Spacing from the top edge */
+    right: 15px; /* Spacing from the right edge */
+    
+    background: none;
+    border: none;
+    color: var(--gray-text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    z-index: 10; /* Ensure it is above other content */
+}
+
+.modal-close-btn:hover {
+    color: var(--black);
+}
+
+/* Loading Spinner Animation (Initial State) */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 30px 0;
+}
+
+.loading-state p {
+    color: var(--gray-text);
+}
+
+.spinner {
+    border: 4px solid var(--lblue);
+    border-top: 4px solid var(--blue); /* Primary blue spinner */
+    border-radius: 50%;
+    width: 40px; 
+    height: 40px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Result State Styling (Success/Error) */
+.result-state.hidden, .hidden {
+    display: none;
+}
+
+/* SUCCESS STATE STYLES */
+.result-state h3.success-title {
+    color: var(--blue);
+    font-size: 1.7rem;
+    margin-bottom: 24px;
+}
+
+/* ERROR STATE STYLES */
+.result-state h3.error-title {
+    color: var(--error-red);
+    font-size: 1.7rem;
+    margin-bottom: 24px;
+}
+
+.result-state .message {
+    font-size: 1.1rem;
+    color: var(--gray-text);
+    margin-bottom: 25px;
+}
+
+.result-state .join-btn {
+    width: 100%;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVENESS */
+/* ------------------------------------------------------------------------- */
+
+/* Tablet/Mobile Adjustments */
+@media (max-width: 768px) {
+    .main-selection-container {
+        width: 95%;
+        margin: 32px auto 40px auto;
+    }
+    
+    .card-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+    }
+}
+
+/* Mobile Adjustments for Fixed Button */
+@media (max-width: 600px) {
+    .fixed-action-btn--bottom-right {
+        bottom: 16px; 
+        right: 16px; 
+        left: auto;
+        font-size: 0.9rem;
+        padding: 12px 18px;
+    }
+
+    .header-main-nav-slot {
+        /* Allow buttons to wrap onto a new line if the screen is too narrow */
+        flex-wrap: wrap; 
+        justify-content: flex-end; /* Keep them aligned to the right */
+        gap: 8px; /* Slightly tighter spacing on mobile */
+    }
+
+    /* Make buttons full width relative to their container when they wrap (optional, but good for touch) */
+    .btn-header-logout,
+    .btn-header-view-data {
+        /* Using max-width ensures they stay inline on slightly larger mobile views */
+        width: auto;
+        flex-grow: 1; /* Allow them to fill available space evenly */
+        padding: 10px 12px; /* Slightly reduce padding for compactness */
+        font-size: 0.9rem; /* Slightly smaller text */
+    }
+}

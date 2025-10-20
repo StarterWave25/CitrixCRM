@@ -1,0 +1,270 @@
+/* ------------------------------------------------------------------------- */
+/* EMPLOYEE FORM STYLES - forms.css */
+/* ------------------------------------------------------------------------- */
+
+.form-main-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 64px 16px; /* Generous vertical padding */
+}
+
+.form-card {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.card-heading {
+    margin-bottom: 32px;
+}
+
+/* Dynamic Form Layout */
+.dynamic-form {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* Spacing between form groups */
+}
+
+/* Individual Form Group (Input + Label) */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.form-group .required-mark {
+    color: var(--error-red);
+    margin-left: 4px;
+}
+
+/* ------------------------------------------- */
+/* ⭐️ INPUT BASE STYLES (Text, Date, Tel, Number, Textarea, Select) */
+/* ------------------------------------------- */
+.form-group input:not([type="checkbox"]):not([type="radio"]),
+.form-group textarea,
+.form-group select {
+    /* Base Input Styling */
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--black);
+    width: 100%;
+    background-color: var(--white);
+    
+    /* Focus and Transition */
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus:not([type="checkbox"]),
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.1); /* Subtle blue glow */
+}
+
+/* Textarea Specifics */
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ------------------------------------------- */
+/* ⭐️ SELECT DROPDOWN STYLES */
+/* ------------------------------------------- */
+.form-group select {
+    appearance: none; /* Remove default browser styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 30px; /* Space for the custom arrow */
+    
+    /* Custom SVG Arrow for premium look */
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+/* ------------------------------------------- */
+/* ⭐️ CHECKBOX STYLES (For Out Station) */
+/* ------------------------------------------- */
+
+.form-group--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-group--checkbox label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: normal; 
+    font-size: 1rem;
+    color: var(--gray-text);
+}
+
+.form-group--checkbox input[type="checkbox"] {
+    /* Custom Checkbox Styling */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0; 
+}
+
+.form-group--checkbox input[type="checkbox"]:checked {
+    background-color: var(--blue);
+    border-color: var(--blue);
+}
+
+/* Custom checkmark icon */
+.form-group--checkbox input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 4px;
+    height: 10px;
+    border: solid var(--white);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* ------------------------------------------- */
+/* CONDITIONAL FIELD & ACTION BUTTONS */
+/* ------------------------------------------- */
+
+/* Conditional Field Styling */
+.conditional-field {
+    transition: opacity 0.3s ease, height 0.3s ease; 
+    overflow: hidden;
+}
+
+.conditional-field.hidden , .hidden{
+    display: none;
+    opacity: 0;
+}
+
+.form-action-buttons {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.form-submit-btn {
+    width: 100%;
+    max-width: 200px; 
+    margin: 0 auto;
+}
+
+/* ------------------------------------------------------------------------- */
+/* FILE UPLOAD STYLES (for inputs of type='file') */
+/* ------------------------------------------------------------------------- */
+
+/* 1. Hide the native file input element completely. 
+   This makes the associated label the sole interactive element for selection. */
+.form-group input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* 2. Style the Label to act as a Button (uses :has() to target only relevant labels) */
+.form-group:has(input[type="file"]) label {
+    /* Button Layout */
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    gap: 8px; 
+    
+    /* Button Sizing and Shape */
+    padding: 12px 24px; /* Adhering to 8-point system */
+    width: 100%;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600; 
+    
+    /* Colors and Transition */
+    background-color: var(--llblue); /* Light accent background */
+    color: var(--blue); /* Primary brand color */
+    border: 1px solid var(--blue);
+    transition: all var(--transition-speed);
+}
+
+/* 3. Hover and Focus States */
+.form-group:has(input[type="file"]) label:hover {
+    background-color: var(--blue);
+    color: var(--white);
+    /* Subtle lift and shadow for premium feel */
+    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.2); 
+}
+
+/* 4. Add a visual cue (Icon) to the Button/Label */
+/* This assumes you are using Font Awesome 6 for icons, as seen in forms.js's submit spinner */
+.form-group:has(input[type="file"]) label::before {
+    content: '\f0ee'; /* Font Awesome 'cloud-arrow-up' icon */
+    font-family: 'Font Awesome 6 Free'; 
+    font-weight: 900;
+    margin-right: 4px;
+}
+
+/* ------------------------------------------- */
+/* ⭐️ RESPONSIVENESS (Attractive on Mobile) */
+/* ------------------------------------------- */
+@media (max-width: 600px) {
+    .form-main-container {
+        padding: 40px 10px; /* Tighter padding on mobile */
+    }
+
+    .form-card {
+        padding: 24px 16px; /* Reduced card padding */
+    }
+    
+    .card-heading {
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .dynamic-form {
+        gap: 16px; /* Tighter vertical spacing */
+    }
+
+    /* Reduce input padding for compactness */
+    .form-group input:not([type="checkbox"]):not([type="radio"]),
+    .form-group textarea,
+    .form-group select {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    /* Ensure submit button remains easy to tap */
+    .form-submit-btn {
+        max-width: 100%; /* Can go full width on mobile for tap targets */
+        padding: 12px 0;
+    }
+}

@@ -24,7 +24,7 @@ async function apiFetch(url, type = "GET", data = {}) {
             headers: { "Content-Type": "application/json" },
             credentials: "include"
         };
-
+        
         if (type.toUpperCase() !== "GET") {
             options.body = JSON.stringify(data);
         }

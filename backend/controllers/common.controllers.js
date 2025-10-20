@@ -570,7 +570,7 @@ export const joinMeeting = async (req, res) => {
     // - Selects only the 'meetingLink' column.
     const sql = `
             SELECT 
-                \`Meeting Link\`
+                \`Meeting Link\` as meetingLink
             FROM 
                 \`${tableName}\`
             WHERE 
