@@ -100,8 +100,9 @@ export const login = async (req, res) => {
 
     // Add headquarter ID only if it exists (relevant only for 'employee' table)
     // NOTE: If you use 'user' in the request, change the switch case from 'employee' to 'user'
-    if (userRole === 'employee' && user.hqId) {
+    if (userRole === 'employee' && user.hqId && user.hqName) {
       userDetails.hqId = user.hqId; // Mapped to hqId for employees
+      userDetails.hqName = user.hqName;
     } else {
       userDetails.hqId = null;
     }
