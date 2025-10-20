@@ -34,7 +34,7 @@ const formSchemas = {
             { name: 'outStation', type: 'checkbox', label: 'Out Station', required: false },
             { name: 'kilometers', type: 'number', label: 'Kilometers (Total Distance)', required: false, conditional: { field: 'outStation', value: false } },
             { name: 'normalExpense', type: 'number', label: 'Normal Expense (₹)', required: true, defaultValue: 200, isExpense: true },
-            { name: 'extensionExpense', type: 'number', label: 'Extension Expense (₹)', required: true, isExpense: true },
+            { name: 'extensionExpense', type: 'number', label: 'Extra Expense (₹)', required: true, isExpense: true },
             { name: 'totalExpense', type: 'number', label: 'Total Expense (₹)', readOnly: true },
             { name: 'travelBill', type: 'file', label: 'Travel Bill (Image)', required: true, accept: 'image/*' },
             { name: 'stayBill', type: 'file', label: 'Stay Bill (Image)', required: false, accept: 'image/*' }
@@ -42,11 +42,23 @@ const formSchemas = {
     }
 };
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const formTitleElement = document.getElementById('form-title');
     const formArea = document.getElementById('dynamic-form-area');
     const submitBtn = formArea.querySelector('.form-submit-btn');
     const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+
+    // ✅ ADDED: Check if lastSubmittedDate is today, otherwise clear exId and exName
+    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const lastSubmittedDate = localStorage.getItem('lastSubmittedDate');
+
+    if (lastSubmittedDate !== today) {
+        // If date is NOT today, remove exId and exName from localStorage
+        localStorage.removeItem('lastSubmittedExId');
+        localStorage.removeItem('lastSubmittedExName');
+    }
 
     // --- Global Helpers ---
     const hqName = userDetails.hqName;
@@ -72,6 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Form Generation and Dependency Fetch
     const generateAndPopulateForm = async () => {
+        // ✅ FIX: Validate exId and exName before showing Expenses form
+        if (formName === 'expenses') {
+            if (!exId || !exName) {
+                formTitleElement.textContent = '⚠ No Tour Plan is Selected';
+                formArea.innerHTML = '';
+                submitBtn.setAttribute('disabled', 'true');
+                return;
+            }
+        }
+
         if (formName === 'tourPlan') {
             await setupTourPlanForm();
         } else if (formName === 'expenses') {
@@ -138,8 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isOutStation = outStationCb.checked;
             const isSameStation = hqName === exName;
 
-            // Kilometers displays ONLY IF (NOT OutStation AND NOT SameStation)
-            const showKilometers = !isOutStation && !isSameStation;
+            // ✅ CHANGED: Kilometers displays ONLY IF (NOT OutStation AND SAME Station)
+            // Previously: !isOutStation && !isSameStation
+            // Now: !isOutStation && isSameStation (Extension = Headquarter)
+            const showKilometers = !isOutStation && isSameStation;
 
             kilometersGroup.classList.toggle('hidden', !showKilometers);
             kilometersInput.required = showKilometers;
@@ -154,15 +178,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If Outstation is checked, allow manual input for extension
                 extensionExpenseInput.value = '';
             } else if (showKilometers) {
-                // If local travel (hq != ex), use kilometer calculation
+                // If local travel (hq == ex), use kilometer calculation
                 updateKilometersExpense();
             } else {
-                // If local and (hq == ex), fixed extension expense to 0
+                // If different stations, fixed extension expense to 0
                 extensionExpenseInput.value = 0;
             }
 
             calculateTotal();
         };
+
+        // ✅ CHANGED: Hide outStation checkbox if extension === headquarter
+        const outStationGroup = formArea.querySelector('[data-field-name="outStation"]');
+        const isSameStation = hqName === exName;
+        if (isSameStation) {
+            outStationGroup.classList.add('hidden');
+        }
 
         // --- 4. Event Listeners ---
         // The error occurred here, now fixed by setting the ID in createFormField
@@ -188,10 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- UTILITY FUNCTIONS ---
     // -------------------------------------------------------------
 
-    /**
-     * Converts a File object to a Base64 string.
-     */
-    
 
     /**
      * Generates HTML for a form field.
@@ -217,24 +244,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (field.type === 'textarea') {
             input = document.createElement('textarea');
+            input.setAttribute('id', field.name);
+            input.setAttribute('name', field.name);
         } else if (field.type === 'select') {
             input = document.createElement('select');
+            input.setAttribute('id', field.name);
+            input.setAttribute('name', field.name);
         } else if (field.type === 'checkbox') {
             group.classList.add('form-group--checkbox');
             input = document.createElement('input');
             input.setAttribute('type', 'checkbox');
             // ✅ FIX: Set the ID attribute for checkboxes
             input.setAttribute('id', field.name);
+            input.setAttribute('name', field.name);
             group.appendChild(input);
             group.appendChild(label);
             return group;
         } else {
             input = document.createElement('input');
             input.setAttribute('type', field.type);
+            input.setAttribute('id', field.name);
+            input.setAttribute('name', field.name);
         }
 
-        input.setAttribute('id', field.name);
-        input.setAttribute('name', field.name);
+        // ✅ FIX: Set attributes for all non-checkbox fields
         if (field.required) input.setAttribute('required', 'true');
         if (field.readOnly) input.setAttribute('readonly', 'true');
         if (field.accept) input.setAttribute('accept', field.accept);
@@ -342,6 +375,26 @@ document.addEventListener('DOMContentLoaded', () => {
             formArea.insertBefore(fieldHTML, submitBtn.parentElement);
         });
 
+        // ✅ CHANGED: Custom logic to hide outStation checkbox when extension === headquarter
+        const extensionSelect = document.getElementById('extensionName');
+        const outStationGroup = formArea.querySelector('[data-field-name="outStation"]');
+
+        const handleExtensionChange = () => {
+            const selectedOption = extensionSelect.options[extensionSelect.selectedIndex];
+            const selectedExtensionName = selectedOption.value;
+
+            // If selected extension equals headquarter name, hide outStation checkbox
+            // Otherwise, show it
+            if (selectedExtensionName === hqName) {
+                outStationGroup.classList.add('hidden');
+            } else {
+                outStationGroup.classList.remove('hidden');
+            }
+        };
+
+        extensionSelect.addEventListener('change', handleExtensionChange);
+        handleExtensionChange(); // Initial state
+
         setupConditionalLogic(currentSchema.fields);
     };
 
@@ -395,6 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await apiFetch('employee/forms-submit', 'POST', apiBody);
 
         if (response.success) {
+            // ✅ CHANGED: Store lastSubmittedDate, exId, and exName in localStorage
+            const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            localStorage.setItem('lastSubmittedDate', today);
             localStorage.setItem('lastSubmittedExId', submissionData.exId);
             localStorage.setItem('lastSubmittedExName', submissionData.extensionName);
 
@@ -409,6 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const submitExpensesForm = async () => {
 
+        /**
+            * Converts a File object to a Base64 string.
+        */
         const fileToBase64 = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -418,8 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
-
-
         const travelBillFile = document.getElementById('travelBill').files[0];
         const stayBillFile = document.getElementById('stayBill').files[0];
 
@@ -428,60 +485,64 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Upload Travel Bill
-        showNotification('Uploading Travel Bill...', 'info');
-        const travelBase64 = await fileToBase64(travelBillFile);
-        const travelUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: travelBase64 });
+        try {
+            // 1. Upload Travel Bill
+            showNotification('Uploading Travel Bill...', 'info');
+            const travelBase64 = await fileToBase64(travelBillFile);
+            const travelUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: travelBase64 });
 
-        if (!travelUploadResponse.url) {
-            showNotification('Travel Bill upload failed.', 'error');
-            return;
-        }
-        const travelBillLink = travelUploadResponse.url;
-
-        // 2. Upload Stay Bill (Optional)
-        let stayBillLink = '';
-        if (stayBillFile) {
-            showNotification('Uploading Stay Bill...', 'info');
-            const stayBase64 = await fileToBase64(stayBillFile);
-            const stayUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: stayBase64 });
-
-            if (!stayUploadResponse.url) {
-                showNotification('Stay Bill upload failed. Submitting without stay bill.', 'warning');
-            } else {
-                stayBillLink = stayUploadResponse.url;
+            if (!travelUploadResponse.url) {
+                showNotification('Travel Bill upload failed.', 'error');
+                return;
             }
-        }
+            const travelBillLink = travelUploadResponse.url;
 
-        // 3. Prepare Final Expense Data
-        const normalExpense = document.getElementById('normalExpense').value;
-        const extensionExpense = document.getElementById('extensionExpense').value;
-        const totalExpense = document.getElementById('totalExpense').value;
+            // 2. Upload Stay Bill (Optional)
+            let stayBillLink = '';
+            if (stayBillFile) {
+                showNotification('Uploading Stay Bill...', 'info');
+                const stayBase64 = await fileToBase64(stayBillFile);
+                const stayUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: stayBase64 });
 
-        const submissionData = {
-            empId: parseInt(empId),
-            exId: parseInt(exId || 0),
-            normalExpense: parseInt(normalExpense || 0),
-            extensionExpense: parseInt(extensionExpense || 0),
-            totalExpense: parseInt(totalExpense || 0),
-            paidStatus: 'Not Paid',
-            travelBill: travelBillLink,
-            stayBill: stayBillLink
-        };
+                if (!stayUploadResponse.url) {
+                    showNotification('Stay Bill upload failed. Submitting without stay bill.', 'warning');
+                } else {
+                    stayBillLink = stayUploadResponse.url;
+                }
+            }
 
-        // 4. Submit Expenses Data
-        const apiBody = { form: 'expenses', data: submissionData };
-        const finalResponse = await apiFetch('employee/forms-submit', 'POST', apiBody);
+            // 3. Prepare Final Expense Data
+            const normalExpense = document.getElementById('normalExpense').value;
+            const extensionExpense = document.getElementById('extensionExpense').value;
+            const totalExpense = document.getElementById('totalExpense').value;
 
-        if (finalResponse.success) {
-            showNotification('Expenses submitted successfully and pending approval.', 'success');
-            formArea.reset();
-        } else {
-            const errorMessage = finalResponse.message || 'Expenses submission failed due to a server error.';
-            showNotification(errorMessage, 'error');
+            const submissionData = {
+                empId: parseInt(empId),
+                exId: parseInt(exId || 0),
+                normalExpense: parseInt(normalExpense || 0),
+                extensionExpense: parseInt(extensionExpense || 0),
+                totalExpense: parseInt(totalExpense || 0),
+                paidStatus: 'Not Paid',
+                travelBill: travelBillLink,
+                stayBill: stayBillLink
+            };
+
+            // 4. Submit Expenses Data
+            const apiBody = { form: 'expenses', data: submissionData };
+            const finalResponse = await apiFetch('employee/forms-submit', 'POST', apiBody);
+
+            if (finalResponse.success) {
+                showNotification('Expenses submitted successfully and pending approval.', 'success');
+                formArea.reset();
+            } else {
+                const errorMessage = finalResponse.message || 'Expenses submission failed due to a server error.';
+                showNotification(errorMessage, 'error');
+            }
+        } catch (error) {
+            console.error('File upload or submission error:', error);
+            showNotification('An error occurred during file upload or submission.', 'error');
         }
     };
-
 
     // 4. Initialization
     generateAndPopulateForm();

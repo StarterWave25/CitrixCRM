@@ -158,7 +158,7 @@
     overflow: hidden;
 }
 
-.conditional-field.hidden {
+.conditional-field.hidden , .hidden{
     display: none;
     opacity: 0;
 }
