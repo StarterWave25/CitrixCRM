@@ -174,6 +174,60 @@
     margin: 0 auto;
 }
 
+/* ------------------------------------------------------------------------- */
+/* FILE UPLOAD STYLES (for inputs of type='file') */
+/* ------------------------------------------------------------------------- */
+
+/* 1. Hide the native file input element completely. 
+   This makes the associated label the sole interactive element for selection. */
+.form-group input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* 2. Style the Label to act as a Button (uses :has() to target only relevant labels) */
+.form-group:has(input[type="file"]) label {
+    /* Button Layout */
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    gap: 8px; 
+    
+    /* Button Sizing and Shape */
+    padding: 12px 24px; /* Adhering to 8-point system */
+    width: 100%;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600; 
+    
+    /* Colors and Transition */
+    background-color: var(--llblue); /* Light accent background */
+    color: var(--blue); /* Primary brand color */
+    border: 1px solid var(--blue);
+    transition: all var(--transition-speed);
+}
+
+/* 3. Hover and Focus States */
+.form-group:has(input[type="file"]) label:hover {
+    background-color: var(--blue);
+    color: var(--white);
+    /* Subtle lift and shadow for premium feel */
+    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.2); 
+}
+
+/* 4. Add a visual cue (Icon) to the Button/Label */
+/* This assumes you are using Font Awesome 6 for icons, as seen in forms.js's submit spinner */
+.form-group:has(input[type="file"]) label::before {
+    content: '\f0ee'; /* Font Awesome 'cloud-arrow-up' icon */
+    font-family: 'Font Awesome 6 Free'; 
+    font-weight: 900;
+    margin-right: 4px;
+}
+
 /* ------------------------------------------- */
 /* ⭐️ RESPONSIVENESS (Attractive on Mobile) */
 /* ------------------------------------------- */
