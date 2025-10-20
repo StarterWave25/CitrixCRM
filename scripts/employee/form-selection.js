@@ -137,9 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalResultState.innerHTML = `
                     <h3 class="error-title">No Meetings Found</h3>
                     <p class="message">${message}</p>
-                    <button class="btn-primary" style="background-color: var(--gray-text); border-color: var(--gray-text); cursor: default;" disabled>
-                        No Meeting Available
-                    </button>
                 `;
             }
             
