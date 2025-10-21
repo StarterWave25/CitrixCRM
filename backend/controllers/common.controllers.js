@@ -601,3 +601,60 @@ export const joinMeeting = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error while retrieving meeting link.' });
   }
 };
+
+/**
+ * Fetches unique tour plan dates for a specific extension (exId)
+ * within the last 365 days (from today to one year ago).
+ *
+ * @param {object} req - The request object.
+ * @param {object} req.body - The request body.
+ * @param {number} req.body.exId - The Extension ID to filter by.
+ */
+export const fetchTourPlanDatesByExId = async (req, res) => {
+  const { exId } = req.body;
+
+  // 1. Input Validation
+  if (!exId) {
+    return res.status(400).json({ success: false, message: "The 'exId' field is required." });
+  }
+
+  try {
+    // 2. SQL Query Construction
+    // Selects distinct dates, filtered by exId and falling within the last 365 days.
+    const query = `
+            SELECT DISTINCT
+                -- Format the date explicitly for clean array output
+                DATE_FORMAT(\`Date\`, '%Y-%m-%d') AS tourDate
+            FROM \`tourplan\`
+            WHERE 
+                \`exId\` = ?
+                -- Filter dates: Must be TODAY or older, but no older than 1 year
+                AND \`Date\` >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                AND \`Date\` <= CURDATE()
+            ORDER BY \`Date\` DESC
+        `;
+
+    const [results] = await pool.query(query, [exId]);
+
+    // 3. Format Output
+    // Map the array of objects (e.g., [{ tourDate: '2025-10-21' }]) 
+    // to a simple array of strings (e.g., ['2025-10-21', '2025-10-15'])
+    const datesArray = results.map(row => row.tourDate);
+
+    // 4. Return Response
+    return res.status(200).json({
+      success: true,
+      message: `${datesArray.length} tour plan dates fetched for extension ${exId}.`,
+      data: {
+        tourDates: datesArray
+      }
+    });
+
+  } catch (error) {
+    console.error(`Database Error during fetching tour plan dates for exId ${exId}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error during date fetching."
+    });
+  }
+};

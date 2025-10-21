@@ -216,20 +216,16 @@ export const uploadImage = async (req, res) => {
 
 /**
  * Fetches dependent data required to pre-fill parts of various forms.
- *
- * It handles two primary use cases based on the 'formName':
- * 1. 'tourPlan': Fetches extension names based on hqId.
- * 2. 'doctor activities': Fetches active doctor details based on exId.
- *
- * @param {object} req - The request object.
+ * * @param {object} req - The request object.
  * @param {object} req.body - The request body.
- * @param {string} req.body.formName - Identifier for the form ('tourPlan' or 'doctor activities').
+ * @param {string} req.body.formName - Identifier for the form ('tourPlan' or 'doctorslist').
  * @param {number} [req.body.hqId] - Headquarters ID, required for 'tourPlan' form.
- * @param {number} [req.body.exId] - Extension ID, required for 'doctor activities' form.
- * @returns {object} JSON response with the fetched data or an error message.   
+ * @param {number} [req.body.exId] - Extension ID, required for 'doctorslist' form.
+ * @returns {object} JSON response with the fetched data or an error message.
  */
 export const fetchFormDependencies = async (req, res) => {
-    const { formName, hqId, exId } = req.body;
+    // Note: empId is NOT destructured as it is not used in the doctorslist logic now
+    const { formName, hqId, exId } = req.body; 
 
     // 1. Initial Input Validation
     if (!formName) {
@@ -239,7 +235,8 @@ export const fetchFormDependencies = async (req, res) => {
     try {
         let query;
         let values;
-        let dataKey; // To label the data array within the 'data' object
+        let dataKey; 
+        const requiredStatus = 'Active';
 
         // --- Use Case 1: Tour Plan (Extensions based on HQ) ---
         if (formName.toLowerCase() === 'tourplan') {
@@ -258,26 +255,35 @@ export const fetchFormDependencies = async (req, res) => {
             values = [hqId];
             dataKey = 'extensions';
 
-            // --- Use Case 2: Doctor Activities (Doctors based on Extension and Status) ---
+        // --- Use Case 2: Doctor Activities (Doctors based on Extension and NO ACTIVITY TODAY) ---
         } else if (formName.toLowerCase() === 'doctorslist') {
+            // Validation: Only exId is required
             if (!exId) {
-                return res.status(400).json({ success: false, message: "For 'doctor activities', the 'exId' is required." });
+                return res.status(400).json({ success: false, message: "For 'doctorslist', the 'exId' is required." });
             }
 
-            // Status is assumed 'Active' to fetch doctors currently being worked on.
-            const requiredStatus = 'Active';
-
-            // Query: Select all required doctor details from the `doctors` table.
+            // Query: Uses LEFT JOIN to exclude doctors who have ANY record in doctor activities today 
+            // regardless of the employee who made the record.
             query = `
                 SELECT 
-                    \`docId\`,
-                    \`Doctor Name\` AS doctorName,
-                    \`Address\` AS address,
-                    \`Phone\` AS phone
-                FROM \`doctors\` 
-                WHERE \`exId\` = ? AND \`Status\` = ?
+                    d.\`docId\`,
+                    d.\`Doctor Name\` AS doctorName,
+                    d.\`Address\` AS address,
+                    d.\`Phone\` AS phone
+                FROM 
+                    \`doctors\` d
+                LEFT JOIN
+                    \`doctor activities\` da
+                ON 
+                    d.docId = da.docId
+                    AND DATE(da.date) = CURDATE() /* Match by Today's Date ONLY */
+                WHERE 
+                    d.exId = ? 
+                    AND d.Status = ?
+                    AND da.docId IS NULL         /* CRITICAL: Exclude the doctor if an activity was found today */
             `;
-            values = [exId, requiredStatus];
+            // Values needed: exId and requiredStatus
+            values = [exId, requiredStatus]; 
             dataKey = 'doctorsList';
 
         } else {
@@ -293,7 +299,7 @@ export const fetchFormDependencies = async (req, res) => {
                 success: true,
                 message: `No ${dataKey} found for the given criteria.`,
                 data: {
-                    [dataKey]: [] // Return an empty array within the data object
+                    [dataKey]: [] 
                 }
             });
         }
@@ -303,7 +309,7 @@ export const fetchFormDependencies = async (req, res) => {
             success: true,
             message: `${results.length} ${dataKey} successfully fetched.`,
             data: {
-                [dataKey]: results // Wrap results in a key named after dataKey
+                [dataKey]: results
             }
         });
 
