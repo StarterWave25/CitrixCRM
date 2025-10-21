@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 01:20 PM
+-- Generation Time: Oct 21, 2025 at 10:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,6 +53,13 @@ CREATE TABLE `doctor activities` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `doctor activities`
+--
+
+INSERT INTO `doctor activities` (`recordId`, `docId`, `empId`, `Employee Name`, `Feedback`, `Order Status`, `date`) VALUES
+(8, 7, 8, 'Prudvi', 'Not interested', '', '2025-10-21');
+
 -- --------------------------------------------------------
 
 --
@@ -68,6 +75,14 @@ CREATE TABLE `doctors` (
   `Status` varchar(100) NOT NULL,
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `doctors`
+--
+
+INSERT INTO `doctors` (`docId`, `Doctor Name`, `Phone`, `Address`, `exId`, `Status`, `Date`) VALUES
+(7, 'Harsha', 9014709040, 'KT ROAD Tirupati', 4, 'Active', '2025-10-21'),
+(8, 'SHerrr', 9828918921, 'Bhavani Nagar, tirupati', 4, 'Active', '2025-10-21');
 
 -- --------------------------------------------------------
 
@@ -114,13 +129,6 @@ CREATE TABLE `expenses` (
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `expenses`
---
-
-INSERT INTO `expenses` (`expId`, `empId`, `exId`, `Normal Expense`, `Extension Expense`, `Total Expense`, `Paid Status`, `Travel Bill`, `Stay Bill`, `Date`) VALUES
-(9, 8, 3, 200, 224, 424, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1760958805/iax71csrkjceashv7kpn.png', '', '2025-10-20');
-
 -- --------------------------------------------------------
 
 --
@@ -140,7 +148,8 @@ CREATE TABLE `extensions` (
 --
 
 INSERT INTO `extensions` (`exId`, `extensionName`, `hqId`, `stockId`, `date`) VALUES
-(3, 'Pileru', 3, NULL, '2025-10-15');
+(3, 'Pileru', 3, NULL, '2025-10-15'),
+(4, 'Tirupati', 3, NULL, '2025-10-20');
 
 -- --------------------------------------------------------
 
@@ -296,12 +305,7 @@ CREATE TABLE `tourplan` (
 --
 
 INSERT INTO `tourplan` (`tId`, `empId`, `hqId`, `exId`, `Extension Name`, `Out Station`, `Joint Work`, `Date`) VALUES
-(8, 2, 3, 3, 'Pileru', 'No', 'Yes with Harsha', '2025-10-15'),
-(10, 2, 3, 3, 'Pileru', 'Yes', 'No', '2025-10-15'),
-(11, 2, 3, 3, 'Pileru', 'No', 'No', '2025-10-14'),
-(12, 8, 3, 3, 'Pileru', 'No', '', '2025-10-19'),
-(13, 8, 3, 3, 'Pileru', 'No', 'no', '2025-10-20'),
-(14, 8, 3, 3, 'Pileru', 'No', 'no', '2025-10-20');
+(27, 8, 3, 4, 'Tirupati', 'No', 'No', '2025-10-21');
 
 --
 -- Indexes for dumped tables
@@ -326,7 +330,8 @@ ALTER TABLE `doctor activities`
 -- Indexes for table `doctors`
 --
 ALTER TABLE `doctors`
-  ADD PRIMARY KEY (`docId`);
+  ADD PRIMARY KEY (`docId`),
+  ADD KEY `docToEx` (`exId`);
 
 --
 -- Indexes for table `employees`
@@ -432,13 +437,13 @@ ALTER TABLE `boss`
 -- AUTO_INCREMENT for table `doctor activities`
 --
 ALTER TABLE `doctor activities`
-  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `doctors`
 --
 ALTER TABLE `doctors`
-  MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `docId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `employees`
@@ -450,13 +455,13 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `extensions`
 --
 ALTER TABLE `extensions`
-  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `exId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `headquarters`
@@ -504,7 +509,7 @@ ALTER TABLE `stockists`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
@@ -516,6 +521,12 @@ ALTER TABLE `tourplan`
 ALTER TABLE `doctor activities`
   ADD CONSTRAINT `docActTodoc` FOREIGN KEY (`docId`) REFERENCES `doctors` (`docId`),
   ADD CONSTRAINT `docActToemp` FOREIGN KEY (`empId`) REFERENCES `employees` (`empId`);
+
+--
+-- Constraints for table `doctors`
+--
+ALTER TABLE `doctors`
+  ADD CONSTRAINT `docToEx` FOREIGN KEY (`exId`) REFERENCES `extensions` (`exId`);
 
 --
 -- Constraints for table `employees`
@@ -565,4 +576,8 @@ ALTER TABLE `tourplan`
   ADD CONSTRAINT `tpToemp` FOREIGN KEY (`empId`) REFERENCES `employees` (`empId`),
   ADD CONSTRAINT `tpToex` FOREIGN KEY (`exId`) REFERENCES `extensions` (`exId`),
   ADD CONSTRAINT `tpTohq` FOREIGN KEY (`hqId`) REFERENCES `headquarters` (`hqId`);
---
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
