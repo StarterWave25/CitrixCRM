@@ -72,10 +72,9 @@
 
 /* Action Card Hover Effect (Brightness Filter Added) */
 .action-card:hover {
-    transform: translateY(-4px); /* Subtle lift for depth */
     filter: brightness(115%); /* Brighter glow effect */
     /* Stronger, floating shadow */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35); 
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.35); 
     z-index: 2;
 }
 
@@ -303,12 +302,16 @@
 /* Tablet/Mobile Adjustments */
 @media (max-width: 768px) {
     .main-selection-container {
-        width: 95%;
+        width: 90%;
         margin: 32px auto 40px auto;
     }
     
     .card-grid {
         grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+    }
+
+    .action-card{
+        padding: 30px;
     }
 }
 

@@ -80,8 +80,6 @@ html {
     scrollbar-color: var(--blue) var(--llblue);
 }
 
-
-
 *::-webkit-scrollbar {
     width: var(--spacing-unit);
 }
@@ -97,6 +95,7 @@ html {
 }
 
 body {
+    overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     /* For pushing footer to bottom */
@@ -369,18 +368,20 @@ a {
 .notification-area {
     position: fixed;
     top: 96px;
-    /* Position below the header */
     right: 24px;
+    left: 24px;
+    /* ✅ ADD THIS - constrains both sides */
     z-index: 200;
-    /* Ensure it's above everything */
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
+    /* ✅ ADD THIS - aligns notifications to right */
     gap: 16px;
-    width: 90%;
-    max-width: 380px;
 }
 
 .notification {
+    width: 100%;
+    max-width: 380px;
     background: var(--cards-bg-color);
     padding: 16px 24px;
     border-radius: var(--border-radius);

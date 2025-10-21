@@ -50,14 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = formArea.querySelector('.form-submit-btn');
     const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
 
-    // ✅ ADDED: Check if lastSubmittedDate is today, otherwise clear exId and exName
+    // ✅ ADDED: Check if lastSubmittedDate is today, otherwise clear all tour plan data
     const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
     const lastSubmittedDate = localStorage.getItem('lastSubmittedDate');
 
     if (lastSubmittedDate !== today) {
-        // If date is NOT today, remove exId and exName from localStorage
+        // If date is NOT today, remove all tour plan and expenses related data
         localStorage.removeItem('lastSubmittedExId');
         localStorage.removeItem('lastSubmittedExName');
+        localStorage.removeItem('lastSubmittedDate');
+        localStorage.removeItem('expensesSubmitted');
     }
 
     // --- Global Helpers ---
@@ -86,6 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateAndPopulateForm = async () => {
         // ✅ FIX: Validate exId and exName before showing Expenses form
         if (formName === 'expenses') {
+            // Check if expenses already submitted today
+            const expensesSubmitted = localStorage.getItem('expensesSubmitted');
+            if (expensesSubmitted) {
+                formTitleElement.textContent = '⚠ Expenses Already Submitted for Today';
+                formArea.innerHTML = '';
+                submitBtn.setAttribute('disabled', 'true');
+                return;
+            }
+
+            // Check if tour plan exists
             if (!exId || !exName) {
                 formTitleElement.textContent = '⚠ No Tour Plan is Selected';
                 formArea.innerHTML = '';
@@ -160,10 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const isOutStation = outStationCb.checked;
             const isSameStation = hqName === exName;
 
-            // ✅ CHANGED: Kilometers displays ONLY IF (NOT OutStation AND SAME Station)
-            // Previously: !isOutStation && !isSameStation
-            // Now: !isOutStation && isSameStation (Extension = Headquarter)
-            const showKilometers = !isOutStation && isSameStation;
+            // ✅ CHANGED: Kilometers displays ONLY IF (NOT OutStation AND NOT Same Station)
+            // Extension != Headquarter (different stations)
+            const showKilometers = !isOutStation && !isSameStation;
 
             kilometersGroup.classList.toggle('hidden', !showKilometers);
             kilometersInput.required = showKilometers;
@@ -178,10 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If Outstation is checked, allow manual input for extension
                 extensionExpenseInput.value = '';
             } else if (showKilometers) {
-                // If local travel (hq == ex), use kilometer calculation
+                // If local travel (hq != ex), use kilometer calculation
                 updateKilometersExpense();
             } else {
-                // If different stations, fixed extension expense to 0
+                // If same station (hq == ex), fixed extension expense to 0
                 extensionExpenseInput.value = 0;
             }
 
@@ -294,6 +305,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // ✅ NEW: Add image upload confirmation for file inputs
+        if (field.type === 'file' && field.accept === 'image/*') {
+            const filePreview = document.createElement('div');
+            filePreview.classList.add('file-preview');
+            filePreview.style.cssText = 'margin-top: 8px; font-size: 14px; color: #28a745; display: none;';
+
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    filePreview.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                    filePreview.style.display = 'block';
+                } else {
+                    filePreview.style.display = 'none';
+                }
+            });
+
+            group.appendChild(label);
+            group.appendChild(input);
+            group.appendChild(filePreview);
+            return group;
+        }
+
         group.appendChild(label);
         group.appendChild(input);
 
@@ -375,20 +408,39 @@ document.addEventListener('DOMContentLoaded', () => {
             formArea.insertBefore(fieldHTML, submitBtn.parentElement);
         });
 
-        // ✅ CHANGED: Custom logic to hide outStation checkbox when extension === headquarter
+        // ✅ NEW: Check if tour plan already submitted today
+        const isEditMode = exId && exName;
+        const originalExtensionName = exName; // Store the original extension name
+
         const extensionSelect = document.getElementById('extensionName');
         const outStationGroup = formArea.querySelector('[data-field-name="outStation"]');
+        const jointWorkGroup = formArea.querySelector('[data-field-name="jointWork"]');
+
+        // ✅ NEW: If edit mode, pre-fill the extension and hide other fields initially
+        if (isEditMode) {
+            extensionSelect.value = originalExtensionName;
+            outStationGroup.classList.add('hidden');
+            jointWorkGroup.classList.add('hidden');
+        }
 
         const handleExtensionChange = () => {
             const selectedOption = extensionSelect.options[extensionSelect.selectedIndex];
             const selectedExtensionName = selectedOption.value;
 
-            // If selected extension equals headquarter name, hide outStation checkbox
-            // Otherwise, show it
-            if (selectedExtensionName === hqName) {
+            // ✅ NEW: If in edit mode and extension hasn't changed, hide outStation and jointWork
+            if (isEditMode && selectedExtensionName === originalExtensionName) {
                 outStationGroup.classList.add('hidden');
+                jointWorkGroup.classList.add('hidden');
             } else {
-                outStationGroup.classList.remove('hidden');
+                // If extension changed or not in edit mode, show fields based on hq comparison
+                jointWorkGroup.classList.remove('hidden');
+
+                // If selected extension equals headquarter name, hide outStation checkbox
+                if (selectedExtensionName === hqName) {
+                    outStationGroup.classList.add('hidden');
+                } else {
+                    outStationGroup.classList.remove('hidden');
+                }
             }
         };
 
@@ -431,31 +483,79 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedOption = formArea.querySelector('select[name="extensionName"] option:checked');
         const selectedExId = selectedOption ? selectedOption.getAttribute('data-ex-id') : null;
 
+        // ✅ NEW: Check if in edit mode
+        const isEditMode = exId && exName;
+        const originalExtensionName = exName;
+        const hasExtensionChanged = data.extensionName !== originalExtensionName;
+
         // Uses the corrected form data check for the checkbox state
         const isOutStation = data.outStation ? true : false;
 
-        const submissionData = {
-            empId: parseInt(empId),
-            hqId: parseInt(userDetails.hqId),
-            exId: parseInt(selectedExId),
-            extensionName: data.extensionName,
-            outStation: isOutStation ? 'Yes' : 'No',
-            jointWork: data.jointWork || '',
-            // 'date' field is correctly removed as per the updated schema
-        };
+        // ✅ NEW: Different endpoints and body based on mode
+        let endpoint, apiBody;
 
-        const apiBody = { form: 'tourPlan', data: submissionData };
-        const response = await apiFetch('employee/forms-submit', 'POST', apiBody);
+        if (isEditMode && !hasExtensionChanged) {
+            // Edit mode but extension NOT changed - only send extensionName
+            endpoint = 'employee/edit-tour-plan';
+            apiBody = {
+                empId: parseInt(empId),
+                hqId: parseInt(userDetails.hqId),
+                extensionName: data.extensionName
+            };
+        } else if (isEditMode && hasExtensionChanged) {
+            // Edit mode and extension changed - send all fields
+            endpoint = 'employee/edit-tour-plan';
+            apiBody = {
+                empId: parseInt(empId),
+                hqId: parseInt(userDetails.hqId),
+                extensionName: data.extensionName,
+                outStation: isOutStation ? 'Yes' : 'No',
+                jointWork: data.jointWork || ''
+            };
+        } else {
+            // New tour plan submission
+            endpoint = 'employee/forms-submit';
+            apiBody = {
+                form: 'tourPlan',
+                data: {
+                    empId: parseInt(empId),
+                    hqId: parseInt(userDetails.hqId),
+                    exId: parseInt(selectedExId),
+                    extensionName: data.extensionName,
+                    outStation: isOutStation ? 'Yes' : 'No',
+                    jointWork: data.jointWork || ''
+                }
+            };
+        }
+
+        const response = await apiFetch(endpoint, 'POST', apiBody);
 
         if (response.success) {
-            // ✅ CHANGED: Store lastSubmittedDate, exId, and exName in localStorage
+            // ✅ Store lastSubmittedDate, exId, and exName in localStorage
             const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
             localStorage.setItem('lastSubmittedDate', today);
-            localStorage.setItem('lastSubmittedExId', submissionData.exId);
-            localStorage.setItem('lastSubmittedExName', submissionData.extensionName);
 
-            showNotification(`Tour Plan submitted successfully for ${submissionData.extensionName}.`, 'success');
-            formArea.reset();
+            // Update exId only if it's a new submission (not edit)
+            if (!isEditMode) {
+                localStorage.setItem('lastSubmittedExId', parseInt(selectedExId));
+            }
+            localStorage.setItem('lastSubmittedExName', data.extensionName);
+
+            const actionText = isEditMode ? 'updated' : 'submitted';
+            showNotification(`Tour Plan ${actionText} successfully for ${data.extensionName}.`, 'success');
+
+            // ✅ NEW: After submission, hide the outStation and jointWork fields
+            const outStationGroup = formArea.querySelector('[data-field-name="outStation"]');
+            const jointWorkGroup = formArea.querySelector('[data-field-name="jointWork"]');
+            outStationGroup.classList.add('hidden');
+            jointWorkGroup.classList.add('hidden');
+
+            // Reload the form to reflect edit mode (only for first-time submission)
+            if (!isEditMode) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
 
         } else {
             const errorMessage = response.message || 'Tour Plan submission failed due to a server error.';
@@ -532,8 +632,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const finalResponse = await apiFetch('employee/forms-submit', 'POST', apiBody);
 
             if (finalResponse.success) {
+                // ✅ NEW: Mark expenses as submitted for today
+                localStorage.setItem('expensesSubmitted', 'true');
+
                 showNotification('Expenses submitted successfully and pending approval.', 'success');
-                formArea.reset();
+
+                // ✅ NEW: Reload page after successful submission
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 const errorMessage = finalResponse.message || 'Expenses submission failed due to a server error.';
                 showNotification(errorMessage, 'error');

@@ -32,7 +32,6 @@ for (const key of Object.keys(FORM_REGISTRY)) {
  * Request body: { form: 'employees', data: { ... } }
  */
 export const submitForm = async (req, res) => {
-    console.log('submitForm handler called')
     try {
         const { form, data } = req.body;
         if (!form || !data || typeof data !== 'object') {
@@ -40,7 +39,7 @@ export const submitForm = async (req, res) => {
         }
 
         const entry = FORM_REGISTRY[form];
-        
+
         if (!entry) return res.status(400).json({ error: 'Unknown form' });
 
         // Check for compiled validator
@@ -205,7 +204,6 @@ export const sendMessage = async (req, res) => {
 
 export const uploadImage = async (req, res) => {
     try {
-        console.log("upload Image calleeeddddddddddddd\n\n\n")
         const { image } = req.body;
         if (!image) return res.status(400).json({ message: "Image is required" });
         const uploadResponse = await cloudinary.uploader.upload(image);
@@ -329,9 +327,10 @@ export const fetchFormDependencies = async (req, res) => {
  * @param {string} req.body.outStation - The Out Station status/name.
  * @param {string} req.body.jointWork - The Joint Work status/person.
  */
-export const editTourPlan = async (req, res) => {
-    const { empId, date, hqId, extensionName, outStation, jointWork } = req.body;
 
+export const editTourPlan = async (req, res) => {
+    const { empId, hqId, extensionName, outStation, jointWork } = req.body;
+    const date = new Date().toISOString().split('T')[0];
     // 1. Input Validation
     if (!empId || !date || !hqId || !extensionName || outStation === undefined || jointWork === undefined) {
         return res.status(400).json({
@@ -364,6 +363,7 @@ export const editTourPlan = async (req, res) => {
             SET 
                 \`hqId\` = ?, 
                 \`exId\` = ?, 
+                \`Extension Name\` = ?,
                 \`Out Station\` = ?, 
                 \`Joint Work\` = ?
             WHERE 
@@ -373,6 +373,7 @@ export const editTourPlan = async (req, res) => {
         const updateValues = [
             hqId,
             exId,
+            extensionName,
             outStation,
             jointWork,
             empId,
