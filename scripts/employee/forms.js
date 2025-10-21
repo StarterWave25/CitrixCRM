@@ -170,8 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleOutStationChange = () => {
             // Check will now pass as outStationCb is not null
             const isOutStation = outStationCb.checked;
-            const isSameStation = hqName === exName;
-
+            // Normalize strings for comparison
+            const isSameStation = hqName?.trim().toLowerCase() === exName?.trim().toLowerCase();
             // ✅ CHANGED: Kilometers displays ONLY IF (NOT OutStation AND NOT Same Station)
             // Extension != Headquarter (different stations)
             const showKilometers = !isOutStation && !isSameStation;
@@ -536,9 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('lastSubmittedDate', today);
 
             // Update exId only if it's a new submission (not edit)
-            if (!isEditMode) {
-                localStorage.setItem('lastSubmittedExId', parseInt(selectedExId));
-            }
+            localStorage.setItem('lastSubmittedExId', parseInt(selectedExId));
             localStorage.setItem('lastSubmittedExName', data.extensionName);
 
             const actionText = isEditMode ? 'updated' : 'submitted';

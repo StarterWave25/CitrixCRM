@@ -259,7 +259,7 @@ export const fetchFormDependencies = async (req, res) => {
             dataKey = 'extensions';
 
             // --- Use Case 2: Doctor Activities (Doctors based on Extension and Status) ---
-        } else if (formName.toLowerCase() === 'doctor activities') {
+        } else if (formName.toLowerCase() === 'doctorslist') {
             if (!exId) {
                 return res.status(400).json({ success: false, message: "For 'doctor activities', the 'exId' is required." });
             }
@@ -278,7 +278,7 @@ export const fetchFormDependencies = async (req, res) => {
                 WHERE \`exId\` = ? AND \`Status\` = ?
             `;
             values = [exId, requiredStatus];
-            dataKey = 'doctors';
+            dataKey = 'doctorsList';
 
         } else {
             // Handle unknown form name
