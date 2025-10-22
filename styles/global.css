@@ -95,6 +95,7 @@ html {
 }
 
 body {
+    padding-top: 64px;
     overflow-x: hidden;
     overflow-y: auto;
     min-height: 100vh;
@@ -184,15 +185,16 @@ a {
 /* HEADER (Glass Morphism Effect) */
 .global-header {
     /* Position fixed to stay on top while scrolling */
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 95%;
     z-index: 100;
     /* Ensure it's above other content */
-    padding: calc(var(--spacing-unit) * 2) 0;
+    padding: calc(var(--spacing-unit) * 2);
     /* 16px vertical padding */
-
+    border-radius: var(--border-radius);
     /* ✨ The GOD-LEVEL Glass Morphism Effect ✨ */
     background-color: var(--glass-bg-color);
     box-shadow: var(--glass-shadow);
@@ -426,9 +428,9 @@ a {
 /* This class MUST be applied to the <body> tag via JavaScript when any modal opens.
    It completely locks the viewport, preventing scroll chaining on mobile browsers. */
 body.modal-open {
-    overflow: hidden; 
+    overflow: hidden;
     /* Critical: Hides body content that extends beyond the viewport */
-    position: fixed; 
+    position: fixed;
     /* Critical: Fixes the body position in the viewport */
     width: 100%;
     /* Ensures the body maintains its width (prevents layout shift) */

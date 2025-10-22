@@ -9,7 +9,7 @@
  * @param {string} type - The notification type ('error', 'success', 'info').
  * @param {number} duration - Time in ms before hiding.
  */
-function showNotification(message, type = 'info', duration = 4000) {
+function showNotification(message, type = 'info', duration = 2000) {
     const area = document.getElementById('notification-area');
     if (!area) {
         console.error('Notification area element not found.');

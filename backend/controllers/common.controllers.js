@@ -219,278 +219,316 @@ export async function createGoogleMeet(req, res) {
  */
 
 export const viewData = async (req, res) => {
-  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-  function isValidDateString(s) {
-    return typeof s === 'string' && DATE_RE.test(s);
-  }
+  function isValidDateString(s) {
+    return typeof s === 'string' && DATE_RE.test(s);
+  }
 
-  function buildDateFilterSingle(fieldName, date) {
-    return { sql: `\`${fieldName}\` = ?`, params: [date] };
-  }
+  function buildDateFilterSingle(fieldName, date) {
+    return { sql: `\`${fieldName}\` = ?`, params: [date] };
+  }
 
-  function buildDateFilterRange(fieldName, from, to) {
-    return { sql: `\`${fieldName}\` BETWEEN ? AND ?`, params: [from, to] };
-  }
+  function buildDateFilterRange(fieldName, from, to) {
+    return { sql: `\`${fieldName}\` BETWEEN ? AND ?`, params: [from, to] };
+  }
 
-  // --- NEW: Data Transformation Helper ---
-  /**
-   * Transforms a single row of data into the cell metadata format.
-   * @param {Object} row - The database row object.
-   * @param {string} tableName - The name of the primary table for this row.
-   * @param {string} idName - The name of the primary key column in the row.
-   * @param {Array<string>} columnsToEncrypt - Array of column names to apply metadata to.
-   * @returns {Object} The transformed row with cell metadata.
-   */
-  const transformDataForCellMetadata = (row, tableName, idName, columnsToEncrypt) => {
-    const transformedRow = {};
-    const idValue = row[idName];
+  // --- NEW: Data Transformation Helper (Unchanged) ---
+  /**
+   * Transforms a single row of data into the cell metadata format.
+   * @param {Object} row - The database row object.
+   * @param {string} tableName - The name of the primary table for this row.
+   * @param {string} idName - The name of the primary key column in the row.
+   * @param {Array<string>} columnsToEncrypt - Array of column names to apply metadata to.
+   * @returns {Object} The transformed row with cell metadata.
+   */
+  const transformDataForCellMetadata = (row, tableName, idName, columnsToEncrypt) => {
+    const transformedRow = {};
+    const idValue = row[idName];
 
-    for (const key in row) {
-      if (key === idName) {
-        // Skip the primary key itself, or keep it if needed
-        transformedRow[idName] = idValue;
-        continue;
-      }
+    for (const key in row) {
+      if (key === idName || key === 'Product Details') {
+        // Skip primary key or the new 'Product Details' array for standard encryption logic
+        transformedRow[key] = row[key];
+        continue;
+      }
 
-      const columnValue = row[key];
+      const columnValue = row[key];
 
-      if (columnsToEncrypt.includes(key)) {
-        // Encrypt the metadata (table, idName, key)
-        const metadata = {
-          table: tableName,
-          idName: idName,
-          idValue: idValue,
-          columnName: key,
-          columnValue: columnValue // Keep columnValue unencrypted for display
-        };
-        // The table, idName, and columnName are combined and encrypted for security.
-        const encryptedMeta = encryptMetadata(metadata);
+      if (columnsToEncrypt.includes(key)) {
+        // Encrypt the metadata (table, idName, key)
+        const metadata = {
+          table: tableName,
+          idName: idName,
+          idValue: idValue,
+          columnName: key,
+          columnValue: columnValue // Keep columnValue unencrypted for display
+        };
+        // NOTE: Assuming encryptMetadata is a globally available function.
+        const encryptedMeta = typeof encryptMetadata !== 'undefined' ? encryptMetadata(metadata) : JSON.stringify(metadata); 
 
-        transformedRow[key] = {
-          meta: encryptedMeta, // Encrypted metadata string
-          value: columnValue   // Original value for display
-        };
+        transformedRow[key] = {
+          meta: encryptedMeta, // Encrypted metadata string
+          value: columnValue   // Original value for display
+        };
 
-      } else {
-        // Columns like 'Date', 'Employee Name' (non-editable or already safe)
-        transformedRow[key] = {
-          value: columnValue
-        };
-      }
-    }
-    return transformedRow;
-  };
-  // ----------------------------------------
+      } else {
+        // Columns like 'Date', 'Employee Name' (non-editable or already safe)
+        transformedRow[key] = {
+          value: columnValue
+        };
+      }
+    }
+    return transformedRow;
+  };
+  // ----------------------------------------
 
-  try {
-    if (!pool) return res.status(500).json({ error: 'DB pool not configured' });
+  try {
+    if (!pool) return res.status(500).json({ error: 'DB pool not configured' });
 
-    const { empId, exId, fromDate, toDate } = req.body || {};
+    const { empId, exId, fromDate, toDate } = req.body || {};
 
-    // Basic validation for empId/exId if provided
-    const empIdNum = empId !== undefined && empId !== '' ? Number(empId) : null;
-    const exIdNum = exId !== undefined && exId !== '' ? Number(exId) : null;
-    if (empId !== undefined && empId !== '' && (!Number.isInteger(empIdNum) || empIdNum <= 0)) {
-      return res.status(400).json({ error: 'Invalid empId' });
-    }
-    if (exId !== undefined && exId !== '' && (!Number.isInteger(exIdNum) || exIdNum <= 0)) {
-      return res.status(400).json({ error: 'Invalid exId' });
-    }
+    // Basic validation for empId/exId if provided
+    const empIdNum = empId !== undefined && empId !== '' ? Number(empId) : null;
+    const exIdNum = exId !== undefined && exId !== '' ? Number(exId) : null;
+    if (empId !== undefined && empId !== '' && (!Number.isInteger(empIdNum) || empIdNum <= 0)) {
+      return res.status(400).json({ error: 'Invalid empId' });
+    }
+    if (exId !== undefined && exId !== '' && (!Number.isInteger(exIdNum) || exIdNum <= 0)) {
+      return res.status(400).json({ error: 'Invalid exId' });
+    }
 
-    const fProvided = fromDate !== undefined && fromDate !== '' && fromDate !== null;
-    const tProvided = toDate !== undefined && toDate !== '' && toDate !== null;
+    const fProvided = fromDate !== undefined && fromDate !== '' && fromDate !== null;
+    const tProvided = toDate !== undefined && toDate !== '' && toDate !== null;
 
-    if (!fProvided && !tProvided) {
-      return res.status(400).json({ error: 'Provide at least fromDate or toDate (YYYY-MM-DD)' });
-    }
+    if (!fProvided && !tProvided) {
+      return res.status(400).json({ error: 'Provide at least fromDate or toDate (YYYY-MM-DD)' });
+    }
 
-    // Validate date strings when provided
-    if (fProvided && !isValidDateString(fromDate)) return res.status(400).json({ error: 'Invalid fromDate format' });
-    if (tProvided && !isValidDateString(toDate)) return res.status(400).json({ error: 'Invalid toDate format' });
+    // Validate date strings when provided
+    if (fProvided && !isValidDateString(fromDate)) return res.status(400).json({ error: 'Invalid fromDate format' });
+    if (tProvided && !isValidDateString(toDate)) return res.status(400).json({ error: 'Invalid toDate format' });
 
-    // Build date clause generator for a given date column name
-    function dateClauseFor(columnName) {
-      if (fProvided && tProvided) {
-        return buildDateFilterRange(columnName, fromDate, toDate);
-      } else if (fProvided) {
-        return buildDateFilterSingle(columnName, fromDate);
-      } else {
-        // only toDate provided
-        return buildDateFilterSingle(columnName, toDate);
-      }
-    }
+    // Build date clause generator for a given date column name
+    function dateClauseFor(columnName) {
+      if (fProvided && tProvided) {
+        return buildDateFilterRange(columnName, fromDate, toDate);
+      } else if (fProvided) {
+        // When only fromDate is provided, treat it as a single-day filter
+        return buildDateFilterSingle(columnName, fromDate);
+      } else {
+        // When only toDate is provided, treat it as a single-day filter
+        return buildDateFilterSingle(columnName, toDate);
+      }
+    }
 
-    // Build common filters (empId, exId)
-    const commonWhereClauses = [];
-    const commonParams = [];
-    if (empIdNum) {
-      commonWhereClauses.push('`empId` = ?');
-      commonParams.push(empIdNum);
-    }
-    if (exIdNum) {
-      commonWhereClauses.push('`exId` = ?');
-      commonParams.push(exIdNum);
-    }
+    // Build common filters (empId, exId)
+    const commonWhereClauses = [];
+    const commonParams = [];
+    if (empIdNum) {
+      commonWhereClauses.push('`empId` = ?');
+      commonParams.push(empIdNum);
+    }
+    if (exIdNum) {
+      commonWhereClauses.push('`exId` = ?');
+      commonParams.push(exIdNum);
+    }
 
-    // --- QUERY CONFIGURATION (Robust and Scalable) ---
-    const queryConfigurations = [
-      {
-        key: 'tourplan',
-        tableName: 'tourplan',
-        idName: 'tId',
-        dateColumn: 'Date',
-        columnsToEncrypt: ['Out Station', 'Joint Work'],
-        sqlBuilder: (dateClause, commonClauses, commonParams) => {
-          const tourWhere = [];
-          const tourParams = [];
+    // --- QUERY CONFIGURATION (FIXED with aggressive de-indentation) ---
+    const queryConfigurations = [
+      {
+        key: 'tourplan',
+        tableName: 'tourplan',
+        idName: 'tId',
+        dateColumn: 'Date',
+        columnsToEncrypt: ['Out Station', 'Joint Work'],
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const tourWhere = [...commonClauses];
+          const tourParams = [...commonParams];
 
-          tourWhere.push(dateClause.sql.replace('`Date`', '`Date`')); // Already correct
-          tourParams.push(...dateClause.params);
+          // Date clause for the 'tourplan' table
+          tourWhere.push(dateClause.sql); 
+          tourParams.push(...dateClause.params);
 
-          if (commonClauses.length) {
-            tourWhere.push(...commonClauses);
-            tourParams.push(...commonParams);
-          }
+          const whereClause = tourWhere.length ? `WHERE ${tourWhere.join(' AND ')}` : '';
 
-          return {
-            sql: `
-              SELECT \`tId\`, \`Date\`, \`Extension Name\`, \`Out Station\`, \`Joint Work\`
-              FROM \`tourplan\`
-              WHERE ${tourWhere.join(' AND ')}
-              ORDER BY \`Date\` ASC
-            `,
-            params: tourParams
-          };
-        }
-      },
-      {
-        key: 'doctorsList',
-        tableName: 'doctors', // Primary table for updates (doctors)
-        idName: 'docId',
-        dateColumn: 'date',
-        columnsToEncrypt: ['Feedback', 'Order Status'],
-        sqlBuilder: (dateClause, commonClauses, commonParams) => {
-          const docWhere = [];
-          const docParams = [];
+          return {
+            sql: (`SELECT \`tId\`, \`Date\`, \`Extension Name\`, \`Out Station\`, \`Joint Work\`
+FROM \`tourplan\`
+${whereClause}
+ORDER BY \`Date\` ASC`).trim(), // Stripped all deep indentation
+            params: tourParams
+          };
+        }
+      },
+      {
+        key: 'doctorsList',
+        tableName: 'doctors', // Primary table for updates (doctors)
+        idName: 'docId',
+        dateColumn: 'date',
+        columnsToEncrypt: ['Feedback', 'Order Status'],
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const docWhere = [];
+          const docParams = [];
 
-          docWhere.push(dateClause.sql.replace('`date`', '`doctor activities`.`date`'));
-          docParams.push(...dateClause.params);
+          // Date filter targeting the doctor activities date column
+          docWhere.push(dateClause.sql.replace('`date`', '`doctor activities`.`date`'));
+          docParams.push(...dateClause.params);
 
-          // Separate empId and exId filters for this join structure
-          if (empIdNum) {
-            docWhere.push('`doctor activities`.`empId` = ?');
-            docParams.push(empIdNum);
-          }
-          if (exIdNum) {
-            docWhere.push('`doctors`.`exId` = ?');
-            docParams.push(exIdNum);
-          }
+          // Separate empId and exId filters for this join structure
+          if (empIdNum) {
+            docWhere.push('`doctor activities`.`empId` = ?');
+            docParams.push(empIdNum);
+          }
+          if (exIdNum) {
+            docWhere.push('`doctors`.`exId` = ?');
+            docParams.push(exIdNum);
+          }
 
-          return {
-            sql: `
-              SELECT
-                \`doctors\`.\`docId\`,
-                \`doctor activities\`.\`date\` AS \`Date\`,
-                \`doctor activities\`.\`Employee Name\` AS \`Employee Name\`,
-                \`doctor activities\`.\`Feedback\` AS \`Feedback\`,
-                \`doctor activities\`.\`Order Status\` AS \`Order Status\`,
-                \`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
-                \`doctors\`.\`Phone\` AS \`Phone\`,
-                \`doctors\`.\`Address\` AS \`Address\`
-              FROM \`doctor activities\`
-              LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
-              WHERE ${docWhere.join(' AND ')}
-              ORDER BY \`doctor activities\`.\`date\` ASC
-            `,
-            params: docParams
-          };
-        }
-      },
-      {
-        key: 'orders',
-        tableName: 'orders',
-        idName: 'orderId',
-        dateColumn: 'Date',
-        columnsToEncrypt: ['Strips', 'Free Strips', 'Total'],
-        sqlBuilder: (dateClause, commonClauses, commonParams) => {
-          const ordersWhere = [];
-          const ordersParams = [];
+          const whereClause = docWhere.length ? `WHERE ${docWhere.join(' AND ')}` : '';
 
-          ordersWhere.push(dateClause.sql.replace('`Date`', 'o.`Date`'));
-          ordersParams.push(...dateClause.params);
+          return {
+            sql: (`SELECT
+\`doctors\`.\`docId\`,
+\`doctor activities\`.\`date\` AS \`Date\`,
+\`doctor activities\`.\`Employee Name\` AS \`Employee Name\`,
+\`doctor activities\`.\`Feedback\` AS \`Feedback\`,
+\`doctor activities\`.\`Order Status\` AS \`Order Status\`,
+\`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
+\`doctors\`.\`Phone\` AS \`Phone\`,
+\`doctors\`.\`Address\` AS \`Address\`
+FROM \`doctor activities\`
+LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
+${whereClause}
+ORDER BY \`doctor activities\`.\`date\` ASC`).trim(), // Stripped all deep indentation
+            params: docParams
+          };
+        }
+      },
+      {
+        key: 'orders',
+        tableName: 'orders',
+        idName: 'orderId',
+        dateColumn: 'Date',
+        columnsToEncrypt: ['DL Copy', 'Prescription', 'Total'], 
+        sqlBuilder: (dateClause, commonClauses, commonParams) => {
+          const ordersWhere = [];
+          const ordersParams = [];
 
-          if (empIdNum) {
-            ordersWhere.push('`o`.`empId` = ?');
-            ordersParams.push(empIdNum);
-          }
-          if (exIdNum) {
-            ordersWhere.push('`o`.`exId` = ?');
-            ordersParams.push(exIdNum);
-          }
+          // Date filter targeting the orders date column
+          ordersWhere.push(dateClause.sql.replace('`Date`', 'o.`Date`'));
+          ordersParams.push(...dateClause.params);
 
-          return {
-            sql: `
-              SELECT
-                o.\`orderId\`,
-                o.\`Date\` AS \`Date\`,
-                o.\`Employee Name\` AS \`Employee Name\`,
-                o.\`Doctor Name\` AS \`Doctor Name\`,
-                o.\`DL Copy\` AS \`DL Copy\`,
-                o.\`Prescription\` AS \`Prescription\`,
-                p.\`Product Name\` AS \`Product Name\`,
-                op.\`Strips\` AS \`Strips\`,
-                op.\`Free Strips\` AS \`Free Strips\`,
-                o.\`Total\` AS \`Total\`
-              FROM \`orders\` o
-              LEFT JOIN \`ordered products\` op ON op.\`orderId\` = o.\`orderId\`
-              LEFT JOIN \`products\` p ON p.\`pId\` = op.\`pId\`
-              WHERE ${ordersWhere.join(' AND ')}
-              ORDER BY o.\`Date\` ASC
-            `,
-            params: ordersParams
-          };
-        }
-      }
-    ];
+          // EmpId and ExId filters targeting the orders table alias 'o'
+          if (empIdNum) {
+            ordersWhere.push('`o`.`empId` = ?');
+            ordersParams.push(empIdNum);
+          }
+          if (exIdNum) {
+            ordersWhere.push('`o`.`exId` = ?');
+            ordersParams.push(exIdNum);
+          }
 
-    // Build all SQL queries and parameters
-    const queryPromises = [];
-    const resultsMap = {};
+          const whereClause = ordersWhere.length ? `WHERE ${ordersWhere.join(' AND ')}` : '';
 
-    for (const config of queryConfigurations) {
-      const dateClause = dateClauseFor(config.dateColumn);
-      const { sql, params } = config.sqlBuilder(dateClause, commonWhereClauses, commonParams);
+          return {
+            sql: (`SELECT
+o.\`orderId\`,
+o.\`Date\` AS \`Date\`,
+o.\`Employee Name\` AS \`Employee Name\`,
+o.\`Doctor Name\` AS \`Doctor Name\`,
+o.\`DL Copy\` AS \`DL Copy\`,
+o.\`Prescription\` AS \`Prescription\`,
+p.\`Product Name\` AS \`Product Name\`,
+op.\`Strips\` AS \`Strips\`,
+op.\`Free Strips\` AS \`Free Strips\`,
+o.\`Total\` AS \`Total\`
+FROM \`orders\` o
+LEFT JOIN \`ordered products\` op ON op.\`orderId\` = o.\`orderId\`
+LEFT JOIN \`products\` p ON p.\`pId\` = op.\`pId\`
+${whereClause}
+ORDER BY o.\`Date\` ASC`).trim(), // Stripped all deep indentation
+            params: ordersParams
+          };
+        }
+      }
+    ];
 
-      queryPromises.push(
-        pool.execute(sql, params).then(([rows]) => ({
-          key: config.key,
-          rows: rows,
-          tableName: config.tableName,
-          idName: config.idName,
-          columnsToEncrypt: config.columnsToEncrypt
-        }))
-      );
-    }
+    // Build all SQL queries and parameters
+    const queryPromises = [];
+    const resultsMap = {};
 
-    // Execute queries in parallel
-    const queryResults = await Promise.all(queryPromises);
+    for (const config of queryConfigurations) {
+      const dateClause = dateClauseFor(config.dateColumn);
+      const { sql, params } = config.sqlBuilder(dateClause, commonWhereClauses, commonParams);
 
-    // Transform and store results
-    for (const result of queryResults) {
-      const transformedRows = (result.rows || []).map(row =>
-        transformDataForCellMetadata(row, result.tableName, result.idName, result.columnsToEncrypt)
-      );
-      resultsMap[result.key] = transformedRows;
-    }
+      queryPromises.push(
+        pool.execute(sql, params).then(([rows]) => ({
+          key: config.key,
+          rows: rows,
+          tableName: config.tableName,
+          idName: config.idName,
+          columnsToEncrypt: config.columnsToEncrypt
+        }))
+      );
+    }
 
-    // Return response with exact keys required
-    return res.status(200).json({ success: true, data: resultsMap });
+    // Execute queries in parallel
+    const queryResults = await Promise.all(queryPromises);
 
-  } catch (err) {
-    console.error('show-my-data error', err);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+    // Transform and store results
+    for (const result of queryResults) {
+      let finalRows = result.rows || [];
+
+      // --- SPECIAL AGGREGATION FOR ORDERS ---
+      if (result.key === 'orders' && finalRows.length > 0) {
+        const groupedOrders = {};
+
+        finalRows.forEach(row => {
+          const orderId = row[result.idName];
+
+          if (!groupedOrders[orderId]) {
+            // Initialize the main order object if it's the first time we see this orderId
+            groupedOrders[orderId] = {
+              ...row,
+              'Product Details': [], // New array to hold all products for this order
+            };
+            // Clean up product-specific keys from the main object
+            delete groupedOrders[orderId]['Product Name'];
+            delete groupedOrders[orderId]['Strips'];
+            delete groupedOrders[orderId]['Free Strips'];
+          }
+
+          // Push the product details from the current row into the array
+          // Only push if there are actual product details (handles orders with no products/null joins)
+          if (row['Product Name'] !== null) {
+            groupedOrders[orderId]['Product Details'].push({
+              'Product Name': row['Product Name'],
+              'Strips': row['Strips'],
+              'Free Strips': row['Free Strips']
+            });
+          }
+        });
+
+        // Use the aggregated results for the final transformation
+        finalRows = Object.values(groupedOrders);
+      }
+      // --- END SPECIAL AGGREGATION FOR ORDERS ---
+
+
+      const transformedRows = (finalRows || []).map(row =>
+        transformDataForCellMetadata(row, result.tableName, result.idName, result.columnsToEncrypt)
+      );
+      resultsMap[result.key] = transformedRows;
+    }
+
+    // Return response with exact keys required
+    return res.status(200).json({ success: true, data: resultsMap });
+
+  } catch (err) {
+    console.error('show-my-data error', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 /*
@@ -517,7 +555,6 @@ export const getExpenses = async (req, res) => {
                 extensions.\`extensionName\`,
                 expenses.\`Normal Expense\`,
                 expenses.\`Extension Expense\`,
-                expenses.\`Outstation Expense\`,
                 expenses.\`Total Expense\`,
                 expenses.\`Paid Status\`,
                 expenses.\`Travel Bill\`,

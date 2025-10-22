@@ -447,7 +447,8 @@
 }
 
 #sheet-select:focus,
-#extension-select:focus {
+#extension-select:focus,
+.custom-date-input:focus {
     border-color: var(--blue);
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.2);
@@ -740,6 +741,9 @@ body.modal-open {
 @media (max-width: 768px) {
     #sheet-select {
         width: 100%;
+        position: sticky;
+        top: 10px;
+        z-index: 1000;
     }
 }
 
