@@ -7,7 +7,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 64px 16px; /* Generous vertical padding */
+    padding: 64px 16px;
+    /* Generous vertical padding */
 }
 
 .form-card {
@@ -16,6 +17,8 @@
     padding: 40px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Center the card */
+    position: relative; /* Establish positioning context */
 }
 
 .card-heading {
@@ -27,7 +30,8 @@
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 24px; /* Spacing between form groups */
+    gap: 24px;
+    /* Spacing between form groups */
 }
 
 /* Individual Form Group (Input + Label) */
@@ -63,7 +67,7 @@
     color: var(--black);
     width: 100%;
     background-color: var(--white);
-    
+
     /* Focus and Transition */
     outline: none;
     transition: all 0.2s ease;
@@ -73,7 +77,8 @@
 .form-group textarea:focus,
 .form-group select:focus {
     border-color: var(--blue);
-    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.1); /* Subtle blue glow */
+    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.1);
+    /* Subtle blue glow */
 }
 
 /* Textarea Specifics */
@@ -86,11 +91,13 @@
 /* ⭐️ SELECT DROPDOWN STYLES */
 /* ------------------------------------------- */
 .form-group select {
-    appearance: none; /* Remove default browser styling */
+    appearance: none;
+    /* Remove default browser styling */
     -webkit-appearance: none;
     -moz-appearance: none;
-    padding-right: 30px; /* Space for the custom arrow */
-    
+    padding-right: 30px;
+    /* Space for the custom arrow */
+
     /* Custom SVG Arrow for premium look */
     background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
     background-repeat: no-repeat;
@@ -110,7 +117,7 @@
 .form-group--checkbox label {
     margin-bottom: 0;
     cursor: pointer;
-    font-weight: normal; 
+    font-weight: normal;
     font-size: 1rem;
     color: var(--gray-text);
 }
@@ -127,7 +134,7 @@
     cursor: pointer;
     position: relative;
     transition: all 0.2s ease;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 
 .form-group--checkbox input[type="checkbox"]:checked {
@@ -154,11 +161,12 @@
 
 /* Conditional Field Styling */
 .conditional-field {
-    transition: opacity 0.3s ease, height 0.3s ease; 
+    transition: opacity 0.3s ease, height 0.3s ease;
     overflow: hidden;
 }
 
-.conditional-field.hidden , .hidden{
+.conditional-field.hidden,
+.hidden {
     display: none;
     opacity: 0;
 }
@@ -170,7 +178,7 @@
 
 .form-submit-btn {
     width: 100%;
-    max-width: 200px; 
+    max-width: 200px;
     margin: 0 auto;
 }
 
@@ -192,21 +200,24 @@
 /* 2. Style the Label to act as a Button (uses :has() to target only relevant labels) */
 .form-group:has(input[type="file"]) label {
     /* Button Layout */
-    display: flex; 
+    display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px; 
-    
+    gap: 8px;
+
     /* Button Sizing and Shape */
-    padding: 12px 24px; /* Adhering to 8-point system */
+    padding: 12px 24px;
+    /* Adhering to 8-point system */
     width: 100%;
     border-radius: var(--border-radius);
     cursor: pointer;
-    font-weight: 600; 
-    
+    font-weight: 600;
+
     /* Colors and Transition */
-    background-color: var(--llblue); /* Light accent background */
-    color: var(--blue); /* Primary brand color */
+    background-color: var(--llblue);
+    /* Light accent background */
+    color: var(--blue);
+    /* Primary brand color */
     border: 1px solid var(--blue);
     transition: all var(--transition-speed);
 }
@@ -216,37 +227,42 @@
     background-color: var(--blue);
     color: var(--white);
     /* Subtle lift and shadow for premium feel */
-    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.2); 
+    box-shadow: 0 4px 12px rgba(0, 83, 93, 0.2);
 }
 
 /* 4. Add a visual cue (Icon) to the Button/Label */
 /* This assumes you are using Font Awesome 6 for icons, as seen in forms.js's submit spinner */
 .form-group:has(input[type="file"]) label::before {
-    content: '\f0ee'; /* Font Awesome 'cloud-arrow-up' icon */
-    font-family: 'Font Awesome 6 Free'; 
+    content: '\f0ee';
+    /* Font Awesome 'cloud-arrow-up' icon */
+    font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     margin-right: 4px;
 }
+
 
 /* ------------------------------------------- */
 /* ⭐️ RESPONSIVENESS (Attractive on Mobile) */
 /* ------------------------------------------- */
 @media (max-width: 600px) {
     .form-main-container {
-        padding: 40px 10px; /* Tighter padding on mobile */
+        padding: 40px 10px;
+        /* Tighter padding on mobile */
     }
 
     .form-card {
-        padding: 24px 16px; /* Reduced card padding */
+        padding: 24px 16px;
+        /* Reduced card padding */
     }
-    
+
     .card-heading {
         font-size: 1.8rem;
         margin-bottom: 24px;
     }
 
     .dynamic-form {
-        gap: 16px; /* Tighter vertical spacing */
+        gap: 16px;
+        /* Tighter vertical spacing */
     }
 
     /* Reduce input padding for compactness */
@@ -264,7 +280,8 @@
 
     /* Ensure submit button remains easy to tap */
     .form-submit-btn {
-        max-width: 100%; /* Can go full width on mobile for tap targets */
+        max-width: 100%;
+        /* Can go full width on mobile for tap targets */
         padding: 12px 0;
     }
 }

@@ -25,7 +25,7 @@
     /* Error messages [cite: 190] */
 
     /* Layout/Effect Variables */
-    --border-radius: 8px;
+    --border-radius: 5px;
     /* Standard radius [cite: 189, 222] */
     --transition-speed: 0.3s;
     /* Standard transition time [cite: 192, 219] */
@@ -61,11 +61,11 @@
 *,
 *::before,
 *::after {
+    transition: all var(--transition-speed) ease-in-out;
     box-sizing: border-box;
     /* Disable mobile tap highlight for cleaner touch interactions [cite: 232] */
     -webkit-tap-highlight-color: transparent;
     /* Set standard transition for interactive elements [cite: 219] */
-    transition: all var(--transition-speed) ease-in-out;
 }
 
 html {
@@ -96,6 +96,7 @@ html {
 
 body {
     overflow-x: hidden;
+    overflow-y: auto;
     min-height: 100vh;
     display: flex;
     /* For pushing footer to bottom */
@@ -108,7 +109,7 @@ body {
     font-family: 'Avenir';
     /* Responsive Fluid Body Font Size (9.2) [cite: 241] */
     font-size: clamp(0.875rem, 1.5vw, 1rem);
-
+    position: relative;
     /* Gradient Background (5.3)  */
     background: linear-gradient(60deg,
             rgba(0, 83, 93, 0.2) 0%,
@@ -151,15 +152,15 @@ h1 {
 
 /* Fluid H1 [cite: 240] */
 h2 {
-    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    font-size: clamp(1.6rem, 3.5vw, 2.5rem);
 }
 
 h3 {
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: clamp(1.4rem, 3vw, 2rem);
 }
 
 h4 {
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
 }
 
 /* Images (9.4) [cite: 243] */
@@ -281,7 +282,7 @@ a {
 /* Button Hover State (Color change only, NO transform) */
 .btn-primary:hover {
     /* Subtle darkening on hover, keeping the border visible */
-    background-color: color-mix(in srgb, var(--blue), var(--black) 10%);
+    background-color: color-mix(in srgb, var(--blue), var(--black) 30%);
     /* Slightly more pronounced shadow on hover */
     box-shadow: 0 6px 15px rgba(0, 83, 93, 0.4);
     /* Border color shifts slightly for a dynamic feel */
@@ -416,4 +417,21 @@ a {
 .notification-message {
     color: var(--white);
     font-weight: 500;
+}
+
+/* ------------------------------------------------------------------------- */
+/* 5. CRITICAL FIX: BODY SCROLL LOCK SYSTEM (Point 4 Final Fix) */
+/* ------------------------------------------------------------------------- */
+
+/* This class MUST be applied to the <body> tag via JavaScript when any modal opens.
+   It completely locks the viewport, preventing scroll chaining on mobile browsers. */
+body.modal-open {
+    overflow: hidden; 
+    /* Critical: Hides body content that extends beyond the viewport */
+    position: fixed; 
+    /* Critical: Fixes the body position in the viewport */
+    width: 100%;
+    /* Ensures the body maintains its width (prevents layout shift) */
+    height: 100vh;
+    /* Explicitly sets height to viewport height for Safari compliance */
 }

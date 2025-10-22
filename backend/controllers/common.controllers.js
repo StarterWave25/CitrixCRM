@@ -438,7 +438,7 @@ export const viewData = async (req, res) => {
                 o.\`Doctor Name\` AS \`Doctor Name\`,
                 o.\`DL Copy\` AS \`DL Copy\`,
                 o.\`Prescription\` AS \`Prescription\`,
-                p.\`Product Name\` AS \`Product Name\`
+                p.\`Product Name\` AS \`Product Name\`,
                 op.\`Strips\` AS \`Strips\`,
                 op.\`Free Strips\` AS \`Free Strips\`,
                 o.\`Total\` AS \`Total\`
@@ -485,7 +485,7 @@ export const viewData = async (req, res) => {
     }
 
     // Return response with exact keys required
-    return res.json(resultsMap);
+    return res.status(200).json({ success: true, data: resultsMap });
 
   } catch (err) {
     console.error('show-my-data error', err);
@@ -631,7 +631,7 @@ export const fetchTourPlanDatesByExId = async (req, res) => {
                 -- Filter dates: Must be TODAY or older, but no older than 1 year
                 AND \`Date\` >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
                 AND \`Date\` <= CURDATE()
-            ORDER BY \`Date\` DESC
+            ORDER BY \`Date\` ASC
         `;
 
     const [results] = await pool.query(query, [exId]);

@@ -225,7 +225,7 @@ export const uploadImage = async (req, res) => {
  */
 export const fetchFormDependencies = async (req, res) => {
     // Note: empId is NOT destructured as it is not used in the doctorslist logic now
-    const { formName, hqId, exId } = req.body; 
+    const { formName, hqId, exId } = req.body;
 
     // 1. Initial Input Validation
     if (!formName) {
@@ -235,7 +235,7 @@ export const fetchFormDependencies = async (req, res) => {
     try {
         let query;
         let values;
-        let dataKey; 
+        let dataKey;
         const requiredStatus = 'Active';
 
         // --- Use Case 1: Tour Plan (Extensions based on HQ) ---
@@ -255,7 +255,7 @@ export const fetchFormDependencies = async (req, res) => {
             values = [hqId];
             dataKey = 'extensions';
 
-        // --- Use Case 2: Doctor Activities (Doctors based on Extension and NO ACTIVITY TODAY) ---
+            // --- Use Case 2: Doctor Activities (Doctors based on Extension and NO ACTIVITY TODAY) ---
         } else if (formName.toLowerCase() === 'doctorslist') {
             // Validation: Only exId is required
             if (!exId) {
@@ -283,7 +283,7 @@ export const fetchFormDependencies = async (req, res) => {
                     AND da.docId IS NULL         /* CRITICAL: Exclude the doctor if an activity was found today */
             `;
             // Values needed: exId and requiredStatus
-            values = [exId, requiredStatus]; 
+            values = [exId, requiredStatus];
             dataKey = 'doctorsList';
 
         } else {
@@ -299,7 +299,7 @@ export const fetchFormDependencies = async (req, res) => {
                 success: true,
                 message: `No ${dataKey} found for the given criteria.`,
                 data: {
-                    [dataKey]: [] 
+                    [dataKey]: []
                 }
             });
         }
@@ -424,6 +424,55 @@ export const editTourPlan = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Internal Server Error during tour plan update."
+        });
+    }
+};
+
+/**
+ * Fetches all product details (ID, Name, Price) from the 'products' table.
+ * Does not require any input parameters.
+ *
+ * @param {object} req - The request object (not used for data).
+ * @param {object} res - The response object.
+ */
+export const getProducts = async (req, res) => {
+    try {
+        // Query to select all relevant fields from the products table
+        const query = `
+            SELECT 
+                pId, 
+                \`Product Name\` AS productName,
+                Price AS price
+            FROM \`products\`
+            ORDER BY \`Product Name\` ASC
+        `;
+
+        const [results] = await pool.query(query);
+
+        if (results.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No products found in the database.",
+                data: {
+                    products: []
+                }
+            });
+        }
+
+        // Return the results
+        return res.status(200).json({
+            success: true,
+            message: `${results.length} products successfully fetched.`,
+            data: {
+                products: results
+            }
+        });
+
+    } catch (error) {
+        console.error("Database Error during product fetching:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error during product fetching."
         });
     }
 };

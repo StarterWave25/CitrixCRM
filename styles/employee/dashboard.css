@@ -4,13 +4,16 @@
 
 /* Main Container Layout */
 .main-selection-container {
-    flex-grow: 1; 
-    max-width: 1200px; /* Wider container for the main menu */
+    flex-grow: 1;
+    max-width: 1200px;
+    /* Wider container for the main menu */
     width: 90%;
-    margin: 48px auto 64px auto; /* Generous top/bottom margin (8-point system) */
+    margin: 48px auto 64px auto;
+    /* Generous top/bottom margin (8-point system) */
     display: flex;
     flex-direction: column;
-    gap: 40px; /* Space between hero and grid */
+    gap: 40px;
+    /* Space between hero and grid */
 }
 
 /* Hero Section (Greeting) */
@@ -22,8 +25,10 @@
 .hero-greeting {
     margin-top: 0;
     margin-bottom: 8px;
-    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Large, impactful dynamic heading */
-    color: var(--black); /* Default text color for better contrast */
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    /* Large, impactful dynamic heading */
+    color: var(--black);
+    /* Default text color for better contrast */
 }
 
 .hero-greeting .placeholder-name {
@@ -42,47 +47,53 @@
 .card-grid {
     display: grid;
     /* 3-column layout on large screens */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-    gap: 32px; /* Large gap for visual breathing room */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    /* Large gap for visual breathing room */
 }
 
 /* Action Card Styling (Premium Aesthetic) */
 .action-card {
     /* Uses .card base class for shadow/padding */
-    padding: 40px; 
+    padding: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     text-decoration: none;
-    
+
     /* REQUIRED STYLE: Use the custom gradient background */
-    background: var(--cards-bg-color); 
-    color: var(--white); /* White text on the dark gradient background */
-    
+    background: var(--cards-bg-color);
+    color: var(--white);
+    /* White text on the dark gradient background */
+
     /* Remove default card shadow/border for this stylized card type */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border: none;
-    
+
     /* Animation base for the premium hover effect */
     transform: none;
-    filter: brightness(100%); /* Set initial filter state */
+    filter: brightness(100%);
+    /* Set initial filter state */
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, filter 0.4s ease;
 }
 
 /* Action Card Hover Effect (Brightness Filter Added) */
 .action-card:hover {
-    filter: brightness(115%); /* Brighter glow effect */
+    filter: brightness(115%);
+    /* Brighter glow effect */
     /* Stronger, floating shadow */
-    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.35); 
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.35);
     z-index: 2;
 }
 
 /* Icon Styling */
 .card-icon {
-    font-size: 3rem; /* Large icon for visual anchor */
+    font-size: 3rem;
+    /* Large icon for visual anchor */
     margin-bottom: 16px;
-    color: var(--lblue); /* Use light secondary color for contrast */
+    color: var(--lblue);
+    /* Use light secondary color for contrast */
 }
 
 /* Title Styling */
@@ -91,12 +102,14 @@
     font-size: 1.8rem;
     margin-top: 0;
     margin-bottom: 8px;
-    color: var(--white); /* White on dark background */
+    color: var(--white);
+    /* White on dark background */
 }
 
 /* Description Styling */
 .card-description {
-    color: rgba(255, 255, 255, 0.8); /* Slightly transparent white for subtext */
+    color: rgba(255, 255, 255, 0.8);
+    /* Slightly transparent white for subtext */
     font-size: 1rem;
     line-height: 1.4;
 }
@@ -109,65 +122,71 @@
 /* Header Slot Layout Adjustment for multiple buttons */
 .header-main-nav-slot {
     display: flex;
-    gap: 12px; /* Space between the two header buttons */
+    gap: 12px;
+    /* Space between the two header buttons */
     align-items: center;
 }
 
 /* Style for the Header Logout Button (Primary look) */
 .btn-header-logout {
-    padding: 12px 16px; /* Consistently increased size */
+    padding: 12px 16px;
+    /* Consistently increased size */
     font-size: 1rem;
-    font-weight: normal; 
-    background-color: var(--blue);
-    border-color: var(--lblue);
-    transition: background-color 0.2s, box-shadow 0.2s;
+    font-weight: normal;
+    background-color: var(--white);
+    border-color: var(--blue);
+    color: var(--blue);
+    transition: all var(--transition-speed) ease-in-out;
 }
 
 .btn-header-logout:hover {
-    background-color: var(--error-red); 
+    color: var(--error-red);
+    background-color: var(--white);
     border-color: var(--error-red);
     box-shadow: 0 4px 10px rgba(217, 83, 79, 0.4);
 }
 
 /* Style for the View Data Button (Secondary look) */
 .btn-header-view-data {
-    padding: 12px 16px; /* Consistently increased size */
+    padding: 12px 16px;
+    /* Consistently increased size */
     font-size: 1rem;
-    font-weight: normal; 
-    
+    font-weight: normal;
     /* Secondary Style: White background, blue text */
-    background-color: var(--white);
-    color: var(--blue);
-    border: 1px solid var(--blue);
+    background-color: var(--blue);
+    color: var(--llblue);
+    border: 1px solid var(--lblue);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.2s, box-shadow 0.2s;
+    transition: all var(--transition-speed) ease-in-out;
 }
 
 .btn-header-view-data:hover {
-    background-color: var(--llblue);
-    color: var(--blue);
-    border-color: var(--blue);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* FIXED BUTTON - Join Meeting (Bottom Right) */
 .fixed-action-btn--bottom-right {
     position: fixed;
-    bottom: 32px; /* 8-point system spacing from bottom */
-    right: 32px;  /* 8-point system spacing from right */
-    left: auto; /* Ensure it stays right-aligned */
-    z-index: 50; /* Ensure it stays above content */
-    
+    bottom: 32px;
+    /* 8-point system spacing from bottom */
+    right: 32px;
+    /* 8-point system spacing from right */
+    left: auto;
+    /* Ensure it stays right-aligned */
+    z-index: 50;
+    /* Ensure it stays above content */
+
     /* Apply primary button styling overrides for fixed element */
-    padding: 16px 24px; /* Generous padding for a fixed CTA */
+    padding: 16px 24px;
+    /* Generous padding for a fixed CTA */
     font-size: 1.1rem;
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 10px;
-    
+
     /* Ensure primary button hover effects still work */
-    box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4); 
+    box-shadow: 0 10px 20px rgba(0, 83, 93, 0.4);
 }
 
 
@@ -182,12 +201,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); /* Darker, dramatic backdrop */
+    background-color: rgba(0, 0, 0, 0.75);
+    /* Darker, dramatic backdrop */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0; /* Start hidden */
+    opacity: 0;
+    /* Start hidden */
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
@@ -201,13 +222,16 @@
 /* Modal Content Box (Simple and Center-Focused) */
 .modal-content {
     /* Uses the global .card style for shadow/border-radius */
-    position: relative; /* REQUIRED for close button positioning */
+    position: relative;
+    /* REQUIRED for close button positioning */
     background-color: var(--white);
-    padding: 40px; /* Increased padding for premium feel */
+    padding: 40px;
+    /* Increased padding for premium feel */
     width: 90%;
-    max-width: 450px; /* Focused popup width */
+    max-width: 450px;
+    /* Focused popup width */
     text-align: center;
-    
+
     /* Smooth entry animation */
     transform: translateY(-20px) scale(0.95);
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s;
@@ -221,17 +245,21 @@
 
 /* Close Button (Positioned top-right) */
 .modal-close-btn {
-    position: absolute; /* Place relative to modal-content */
-    top: 15px; /* Spacing from the top edge */
-    right: 15px; /* Spacing from the right edge */
-    
+    position: absolute;
+    /* Place relative to modal-content */
+    top: 15px;
+    /* Spacing from the top edge */
+    right: 15px;
+    /* Spacing from the right edge */
+
     background: none;
     border: none;
     color: var(--gray-text);
     font-size: 1.2rem;
     cursor: pointer;
     transition: color 0.2s;
-    z-index: 10; /* Ensure it is above other content */
+    z-index: 10;
+    /* Ensure it is above other content */
 }
 
 .modal-close-btn:hover {
@@ -253,20 +281,27 @@
 
 .spinner {
     border: 4px solid var(--lblue);
-    border-top: 4px solid var(--blue); /* Primary blue spinner */
+    border-top: 4px solid var(--blue);
+    /* Primary blue spinner */
     border-radius: 50%;
-    width: 40px; 
+    width: 40px;
     height: 40px;
     animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Result State Styling (Success/Error) */
-.result-state.hidden, .hidden {
+.result-state.hidden,
+.hidden {
     display: none;
 }
 
@@ -294,6 +329,473 @@
     width: 100%;
 }
 
+/* Spinner remains unchanged */
+
+/* ------------------------------------------------------------------------- */
+/* 3. DATA VIEWER MODAL STYLES (Filter & Scrolling Fixes) */
+/* ------------------------------------------------------------------------- */
+
+/* Primary Modal Structure Fix for Scrolling (Point 4) */
+.modal-backdrop--large .modal-content {
+    max-width: 1400px;
+    width: 90%;
+    height: 95vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent parent from scrolling */
+}
+
+.data-viewer-subtitle {
+    color: var(--gray-text);
+    margin-bottom: 24px;
+}
+
+/* Compact Data Controls Layout (Point 3) */
+.data-controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    align-items: center;
+    padding: 20px 24px;
+    background-color: var(--llblue);
+    border-radius: var(--border-radius-base);
+    margin-bottom: 24px;
+    border: 1px solid var(--lblue);
+    position: relative;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: var(--blue);
+    font-size: 1rem;
+    text-align: left;
+}
+
+.control-group--button {
+    align-self: flex-end;
+    height: 100%;
+    padding-top: 22px;
+}
+
+/* --- VIEW SHEET SELECTOR REDESIGN --- */
+
+.sheet-selection-container {
+    display: flex;
+    flex-direction: column;
+    /* Stack label and dropdown for better structure */
+    align-items: flex-start;
+    /* Align contents to the left */
+    gap: 8px;
+    /* Tighter spacing between label and dropdown */
+    margin-bottom: 24px;
+    /* More separation from the data content */
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--lblue);
+    /* Thicker, defined separator line */
+}
+
+/* Label Style: Clear hierarchy and high contrast */
+.sheet-selection-container label {
+    font-size: 1rem;
+    /* Slightly larger for prominence */
+    font-weight: 800;
+    /* Extra bold to stand out */
+    color: var(--blue);
+    /* Use brand color for importance */
+    letter-spacing: 0.5px;
+    padding-left: 4px;
+    /* Slight offset for visual rhythm */
+}
+
+/* Dropdown Style: Large, touch-friendly, and modern */
+#sheet-select,
+#extension-select,
+.custom-date-input {
+    width: 300px;
+    /* Constrain width for focused reading */
+    max-width: 100%;
+    padding: 12px 16px;
+    /* Larger padding for a touch-friendly target */
+    font-size: 1.05rem;
+    height: 48px;
+    /* Standardized height */
+    border-radius: 8px;
+    /* Softer, modern corners */
+    border: 2px solid var(--border-color);
+    background-color: var(--white);
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* Dropdown Style: Large, touch-friendly, and modern */
+#sheet-select,
+#extension-select {
+    /* Remove default browser arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+#sheet-select:focus,
+#extension-select:focus {
+    border-color: var(--blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 83, 93, 0.2);
+    /* Focus ring */
+}
+
+/* APPLY Button Redesign (Point 5) */
+.btn-apply {
+    /* Override generic button styles for a distinct look */
+    background-color: var(--blue);
+    color: var(--white);
+    border: 1px solid var(--llblue);
+    font-weight: 700;
+    box-shadow: 0 4px 6px rgba(0, 83, 93, 0.2);
+    cursor: pointer;
+}
+
+.btn-apply:hover:not(:disabled) {
+    background-color: #003e46;
+    /* Darker blue on hover */
+    box-shadow: 0 0px 5px rgba(0, 83, 93, 0.3);
+}
+
+.btn-apply:disabled {
+    background-color: #a0a0a0;
+    border-color: #a0a0a0;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Validation Message Box */
+.validation-message-box {
+    grid-column: 1 / span 4;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: var(--soft-error-bg);
+    color: var(--error-red);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid #ff9999;
+    margin-top: -8px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.validation-message-box.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Data State Container - CRUCIAL FLEX CONTEXT FOR SCROLLING */
+.data-viewer-states-container {
+    flex-grow: 1;
+    /* Takes up all remaining vertical space */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* REQUIRED for flex item scrolling to work */
+}
+
+.data-sheets-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* This is the element that scrolls */
+    -webkit-overflow-scrolling: touch;
+    /* CRITICAL: Enables smooth inertial scrolling on iOS */
+    padding-right: 12px;
+    padding-bottom: 16px;
+}
+
+.data-table-card-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    padding-top: 8px;
+}
+
+/* --- DATA CARD REDESIGN: Premium, Scannable UX --- */
+
+.data-card {
+    background-color: var(--llblue);
+    padding: 24px;
+    border-radius: var(--border-radius-base);
+    border: 1px solid var(--lblue);
+    /* Lighter, more modern shadow than the default subtle */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Vertically align content */
+    padding: 8px 0;
+    /* Increased vertical padding for air */
+    border-bottom: 1px solid #f0f0f0;
+    /* Soft separator */
+}
+
+.data-row:last-child {
+    border-bottom: none;
+}
+
+/* KEY STYLES: Subdued, contextual */
+.data-label {
+    font-weight: 600;
+    color: var(--blue);
+    /* Softer color */
+    font-size: 1rem;
+    flex-basis: 45%;
+    /* Give keys slightly more space */
+    text-align: left;
+}
+
+/* VALUE STYLES: Primary focus, standout */
+.data-value {
+    color: var(--black);
+    font-size: 1.05rem;
+    /* Slightly larger than key */
+    /* Bold for emphasis */
+    text-align: right;
+    flex-basis: 55%;
+    word-break: break-word;
+    /* Ensure long values wrap */
+}
+
+/* Ensures the backdrop covers full viewport */
+.modal-backdrop.active,
+.modal-backdrop--large.active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    /* Prevent background scroll */
+    z-index: 1000;
+    touch-action: none;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+    touch-action: none;
+    /* iOS fix */
+}
+
+/* Modal content - take up full height, allow for internal scroll */
+.modal-backdrop--large .modal-content {
+    max-width: 1400px;
+    width: 90vw;
+    height: 95vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    /* Only children scroll */
+}
+
+/* Flex child, enables scroll for inner data */
+.data-viewer-states-container {
+    flex-grow: 1;
+    min-height: 0;
+    /* Required fix for flexbox scroll */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main scrollable area */
+.data-sheets-container {
+    flex-grow: 1;
+    -webkit-overflow-scrolling: touch;
+    /* iOS smooth scroll */
+    padding-right: 12px;
+    padding-bottom: 16px;
+    min-height: 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* 5. JQUERY UI DATEPICKER THEMEING (For Tour Plan Feature) */
+/* ------------------------------------------------------------------------- */
+
+/* Base Container Styling */
+.ui-datepicker {
+    width: 300px;
+    padding: 16px;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    z-index: 2001 !important;
+    /* Ensure it is above the modal backdrop */
+}
+
+/* Header (Month/Year Selector) */
+.ui-datepicker-header {
+    background-color: var(--blue);
+    color: var(--white);
+    padding: 8px 0;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 8px;
+}
+
+/* Navigation Arrows (Prev/Next) */
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5em;
+    height: 1.5em;
+    cursor: pointer;
+    border: none;
+}
+
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: 100%;
+    margin-top: 0;
+    margin-left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.ui-datepicker .ui-datepicker-next span {
+    transform: rotate(180deg);
+}
+
+/* Day Cells (General) */
+.ui-datepicker td {
+    padding: 0;
+}
+
+.ui-datepicker td span,
+.ui-datepicker td a {
+    display: block;
+    padding: 0.5em;
+    text-align: center;
+    text-decoration: none;
+    color: var(--black);
+    border-radius: 4px;
+}
+
+/* Disabled Dates (The core feature visibility) */
+.ui-datepicker-unselectable.ui-state-disabled {
+    /* Style for dates NOT in the tour plan */
+    color: #ccc !important;
+    opacity: 0.5;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+/* Enabled/Available Tour Dates */
+.ui-datepicker td .tour-date-available {
+    color: var(--blue);
+    font-weight: 700;
+}
+
+.ui-datepicker td .tour-date-available:hover {
+    background-color: var(--lblue);
+    color: var(--blue);
+}
+
+/* Selected Date */
+.ui-datepicker .ui-state-active {
+    background-color: var(--blue) !important;
+    color: var(--white) !important;
+    font-weight: 700;
+    border: 1px solid var(--blue);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* 4. RESPONSIVENESS (Final Scroll Fix Applied Here) */
+/* ------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+
+    /* Retain previous tablet layout adjustments */
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Mobile Adjustments (Ensure it goes to 100% width on small screens) */
+@media (max-width: 768px) {
+    #sheet-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-selection-container {
+        width: 95%;
+        margin: 24px auto 40px auto;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* 1. Modal Container Setup (Full Height) */
+    .modal-backdrop--large .modal-content {
+        height: 100vh;
+        max-width: 100%;
+        width: 100%;
+        border-radius: 0;
+        padding: 16px;
+    }
+
+    /* 2. CRITICAL FIX: The Flex Item Constraint */
+    .data-viewer-states-container {
+        flex-grow: 1;
+        /* THIS IS THE SOLUTION: Prevents Flexbox from setting an "infinite" height 
+           and allows the child element's scroll bar to activate. */
+        min-height: 0;
+    }
+
+    /* 3. Ensure the inner scroller is clean */
+    .data-sheets-container {
+        overflow-y: auto;
+        padding-right: 0;
+    }
+
+    /* Filter Layout Adjustments */
+    .data-controls {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .control-group--button {
+        align-self: unset;
+        padding-top: 0;
+    }
+
+    .validation-message-box {
+        grid-column: 1 / -1;
+    }
+
+    .data-table-card-view {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* ------------------------------------------------------------------------- */
 /* RESPONSIVENESS */
@@ -305,12 +807,13 @@
         width: 90%;
         margin: 32px auto 40px auto;
     }
-    
+
     .card-grid {
-        grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+        grid-template-columns: 1fr;
+        /* Stack cards vertically on small screens */
     }
 
-    .action-card{
+    .action-card {
         padding: 30px;
     }
 }
@@ -318,8 +821,8 @@
 /* Mobile Adjustments for Fixed Button */
 @media (max-width: 600px) {
     .fixed-action-btn--bottom-right {
-        bottom: 16px; 
-        right: 16px; 
+        bottom: 16px;
+        right: 16px;
         left: auto;
         font-size: 0.9rem;
         padding: 12px 18px;
@@ -327,9 +830,11 @@
 
     .header-main-nav-slot {
         /* Allow buttons to wrap onto a new line if the screen is too narrow */
-        flex-wrap: wrap; 
-        justify-content: flex-end; /* Keep them aligned to the right */
-        gap: 8px; /* Slightly tighter spacing on mobile */
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        /* Keep them aligned to the right */
+        gap: 8px;
+        /* Slightly tighter spacing on mobile */
     }
 
     /* Make buttons full width relative to their container when they wrap (optional, but good for touch) */
@@ -337,8 +842,11 @@
     .btn-header-view-data {
         /* Using max-width ensures they stay inline on slightly larger mobile views */
         width: auto;
-        flex-grow: 1; /* Allow them to fill available space evenly */
-        padding: 10px 12px; /* Slightly reduce padding for compactness */
-        font-size: 0.9rem; /* Slightly smaller text */
+        flex-grow: 1;
+        /* Allow them to fill available space evenly */
+        padding: 10px 12px;
+        /* Slightly reduce padding for compactness */
+        font-size: 0.9rem;
+        /* Slightly smaller text */
     }
 }

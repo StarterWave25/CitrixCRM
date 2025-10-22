@@ -43,6 +43,111 @@ const formSchemas = {
 };
 
 
+/**
+     * Generates HTML for a form field.
+     */
+const createFormField = (field) => {
+    const group = document.createElement('div');
+    group.classList.add('form-group');
+    group.setAttribute('data-field-name', field.name);
+
+    const requiredMark = field.required ? '<span class="required-mark">*</span>' : '';
+
+    if (field.conditional) {
+        group.classList.add('conditional-field', 'hidden');
+        group.setAttribute('data-condition-field', field.conditional.field);
+        group.setAttribute('data-condition-value', field.conditional.value);
+    }
+
+    const label = document.createElement('label');
+    label.setAttribute('for', field.name);
+    label.innerHTML = field.label + requiredMark;
+
+    let input;
+
+    if (field.type === 'textarea') {
+        input = document.createElement('textarea');
+        input.setAttribute('id', field.name);
+        input.setAttribute('name', field.name);
+    } else if (field.type === 'select') {
+        input = document.createElement('select');
+        input.setAttribute('id', field.name);
+        input.setAttribute('name', field.name);
+    } else if (field.type === 'checkbox') {
+        group.classList.add('form-group--checkbox');
+        input = document.createElement('input');
+        input.setAttribute('type', 'checkbox');
+        // ✅ FIX: Set the ID attribute for checkboxes
+        input.setAttribute('id', field.name);
+        input.setAttribute('name', field.name);
+        group.appendChild(input);
+        group.appendChild(label);
+        return group;
+    } else {
+        input = document.createElement('input');
+        input.setAttribute('type', field.type);
+        input.setAttribute('id', field.name);
+        input.setAttribute('name', field.name);
+        if (field?.value !== undefined) {
+            input.setAttribute('value', field.value);
+        }
+    }
+
+    // ✅ FIX: Set attributes for all non-checkbox fields
+    if (field.required) input.setAttribute('required', 'true');
+    if (field.readOnly) input.setAttribute('readonly', 'true');
+    if (field.accept) input.setAttribute('accept', field.accept);
+
+    if (field.type === 'select') {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = `-- Select ${field.label} --`;
+        defaultOption.setAttribute('disabled', 'true');
+        defaultOption.setAttribute('selected', 'true');
+        input.appendChild(defaultOption);
+
+        (field.options || []).forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.textContent = option.label;
+            if (option.dataExId) {
+                opt.setAttribute('data-ex-id', option.dataExId);
+            }
+            if (option.disabled) {
+                opt.setAttribute('disabled', 'true');
+            }
+            input.appendChild(opt);
+        });
+    }
+
+    // ✅ NEW: Add image upload confirmation for file inputs
+    if (field.type === 'file' && field.accept === 'image/*') {
+        const filePreview = document.createElement('div');
+        filePreview.classList.add('file-preview');
+        filePreview.style.cssText = 'margin-top: 8px; font-size: 14px; color: #28a745; display: none;';
+
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                filePreview.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                filePreview.style.display = 'block';
+            } else {
+                filePreview.style.display = 'none';
+            }
+        });
+
+        group.appendChild(label);
+        group.appendChild(input);
+        group.appendChild(filePreview);
+        return group;
+    }
+
+    group.appendChild(label);
+    group.appendChild(input);
+
+    return group;
+};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const formTitleElement = document.getElementById('form-title');
@@ -110,6 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
             await setupTourPlanForm();
         } else if (formName === 'expenses') {
             setupExpensesForm();
+        } else if (formName === 'doctorsList') {
+            await setupDoctorsListForm(); // This function will be in doctors.js
         } else {
             currentSchema.fields.forEach(field => {
                 const fieldHTML = createFormField(field);
@@ -230,108 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- UTILITY FUNCTIONS ---
     // -------------------------------------------------------------
 
-
-    /**
-     * Generates HTML for a form field.
-     */
-    const createFormField = (field) => {
-        const group = document.createElement('div');
-        group.classList.add('form-group');
-        group.setAttribute('data-field-name', field.name);
-
-        const requiredMark = field.required ? '<span class="required-mark">*</span>' : '';
-
-        if (field.conditional) {
-            group.classList.add('conditional-field', 'hidden');
-            group.setAttribute('data-condition-field', field.conditional.field);
-            group.setAttribute('data-condition-value', field.conditional.value);
-        }
-
-        const label = document.createElement('label');
-        label.setAttribute('for', field.name);
-        label.innerHTML = field.label + requiredMark;
-
-        let input;
-
-        if (field.type === 'textarea') {
-            input = document.createElement('textarea');
-            input.setAttribute('id', field.name);
-            input.setAttribute('name', field.name);
-        } else if (field.type === 'select') {
-            input = document.createElement('select');
-            input.setAttribute('id', field.name);
-            input.setAttribute('name', field.name);
-        } else if (field.type === 'checkbox') {
-            group.classList.add('form-group--checkbox');
-            input = document.createElement('input');
-            input.setAttribute('type', 'checkbox');
-            // ✅ FIX: Set the ID attribute for checkboxes
-            input.setAttribute('id', field.name);
-            input.setAttribute('name', field.name);
-            group.appendChild(input);
-            group.appendChild(label);
-            return group;
-        } else {
-            input = document.createElement('input');
-            input.setAttribute('type', field.type);
-            input.setAttribute('id', field.name);
-            input.setAttribute('name', field.name);
-        }
-
-        // ✅ FIX: Set attributes for all non-checkbox fields
-        if (field.required) input.setAttribute('required', 'true');
-        if (field.readOnly) input.setAttribute('readonly', 'true');
-        if (field.accept) input.setAttribute('accept', field.accept);
-
-        if (field.type === 'select') {
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = `-- Select ${field.label} --`;
-            defaultOption.setAttribute('disabled', 'true');
-            defaultOption.setAttribute('selected', 'true');
-            input.appendChild(defaultOption);
-
-            (field.options || []).forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option.value;
-                opt.textContent = option.label;
-                if (option.dataExId) {
-                    opt.setAttribute('data-ex-id', option.dataExId);
-                }
-                if (option.disabled) {
-                    opt.setAttribute('disabled', 'true');
-                }
-                input.appendChild(opt);
-            });
-        }
-
-        // ✅ NEW: Add image upload confirmation for file inputs
-        if (field.type === 'file' && field.accept === 'image/*') {
-            const filePreview = document.createElement('div');
-            filePreview.classList.add('file-preview');
-            filePreview.style.cssText = 'margin-top: 8px; font-size: 14px; color: #28a745; display: none;';
-
-            input.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    filePreview.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                    filePreview.style.display = 'block';
-                } else {
-                    filePreview.style.display = 'none';
-                }
-            });
-
-            group.appendChild(label);
-            group.appendChild(input);
-            group.appendChild(filePreview);
-            return group;
-        }
-
-        group.appendChild(label);
-        group.appendChild(input);
-
-        return group;
-    };
 
     const setupConditionalLogic = (fields) => {
         const conditionalFields = document.querySelectorAll('.conditional-field');

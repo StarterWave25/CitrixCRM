@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/employee/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
 </head>
 
 <body>
@@ -21,7 +24,7 @@
 
             <div class="header-main-nav-slot">
                 <button class="btn-primary btn-header-view-data" id="view-data-btn">
-                    <i class="fa-solid fa-chart-simple"></i> View Data
+                    <i class="fa-solid fa-database"></i> View Data
                 </button>
                 <button class="btn-primary btn-header-logout" id="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
@@ -82,6 +85,72 @@
             </div>
 
             <div id="modal-result-state" class="result-state hidden">
+            </div>
+        </div>
+    </div>
+
+    <div id="data-viewer-modal" class="modal-backdrop modal-backdrop--large">
+        <div class="modal-content card data-viewer-content">
+            <button class="modal-close-btn" id="data-viewer-close-btn"><i class="fa-solid fa-xmark"></i></button>
+
+            <h3 class="data-viewer-title">Employee Data Viewer</h3>
+            <p class="data-viewer-subtitle">Select your extension and date range to view your reports.</p>
+
+            <div id="data-controls" class="data-controls">
+
+                <div class="control-group">
+                    <label for="extension-select">Extension Name</label>
+                    <select id="extension-select" disabled>
+                        <option value="" disabled selected>Loading Extensions...</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="from-date-input">From Date</label>
+                    <input type="text" id="from-date-input" class="custom-date-input" readonly placeholder="Select From Date">
+                    <input type="hidden" id="from-date-iso">
+                </div>
+
+                <div class="control-group">
+                    <label for="to-date-input">To Date</label>
+                    <input type="text" id="to-date-input" class="custom-date-input" readonly placeholder="Select To Date">
+                    <input type="hidden" id="to-date-iso">
+                </div>
+
+                <div class="control-group control-group--button">
+                    <button class="btn-primary btn-apply" id="apply-data-btn" disabled>
+                        <i class="fa-solid fa-magnifying-glass"></i> Apply
+                    </button>
+                </div>
+
+                <div id="date-validation-message" class="validation-message-box"></div>
+            </div>
+
+            <div class="data-viewer-states-container">
+
+                <div id="data-loading-state" class="loading-state data-state">
+                    <div class="spinner"></div>
+                    <p>Fetching extensions and dependencies...</p>
+                </div>
+
+                <div id="data-display-state" class="data-state hidden">
+
+                    <div class="sheet-selection-container">
+                        <label for="sheet-select">View Sheet:</label>
+                        <select id="sheet-select"></select>
+                    </div>
+
+                    <div id="data-sheets-container" class="data-sheets-container">
+                    </div>
+                </div>
+
+                <div id="data-error-state" class="result-state hidden data-state">
+                    <h3 class="error-title">Data Not Available</h3>
+                    <p class="message" id="data-error-message">Could not load required data or dates.</p>
+                    <button class="btn-primary" style="background-color: var(--error-red);" id="data-retry-btn">
+                        <i class="fa-solid fa-rotate-right"></i> Try Again
+                    </button>
+                </div>
             </div>
         </div>
     </div>
