@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses To be Paid - Citrix CRM</title>
+    <link rel="shortcut icon" href="../img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/employee/expenses.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+</head>
+
+<body>
+
+    <header class="global-header">
+        <div class="header-content-wrapper">
+            <a href="./dashboard.html" class="logo-link">
+                <img src="../img/Citrix-blue.png" alt="Citrix Ltd Pharma CRM Logo" class="header-logo">
+            </a>
+
+            <div class="header-main-nav-slot">
+                <a href="./dashboard.html" class="btn-header-back">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-selection-container">
+        <section class="hero-selection">
+            <h1 class="page-title">Expenses To be Paid</h1>
+            <p class="hero-subtext">View, filter, and track all expenses awaiting payment.</p>
+        </section>
+
+        <section class="filter-section card">
+            <div class="filter-controls-grid">
+                <div class="form-group">
+                    <input type="text" id="from-date-input" placeholder="Select Date" readonly disabled>
+                    <input type="hidden" id="from-date-iso">
+                </div>
+
+                <button class="btn-primary btn-apply-filter" id="apply-filter-btn" disabled>
+                    <i class="fa-solid fa-filter"></i> Apply Filter
+                </button>
+                
+                <button class="btn-clear-filter" id="clear-filter-btn" disabled>
+                    <i class="fa-solid fa-times"></i> Clear Filter
+                </button>
+            </div>
+            <div id="date-validation-message" class="validation-message-box"></div>
+        </section>
+
+        <section class="expenses-results-section">
+            <div id="expenses-container" class="cards-grid">
+                </div>
+
+            <div id="no-data-state" class="no-data-state hidden">
+                <i class="fa-solid fa-receipt"></i>
+                <p class="message">No expenses found for the selected filter or employee.</p>
+            </div>
+        </section>
+    </main>
+    
+    <div class="total-summary-card-fixed hidden" id="total-summary-card">
+        <div class="total-summary-content-wrapper">
+            <p>Total Unpaid Amount:</p>
+            <h3 id="unpaid-total-amount">₹ 0.00</h3>
+        </div>
+    </div>
+
+
+    <script src="../scripts/api-fetch.js"></script>
+    <script src="../scripts/employee/expenses.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,295 @@
+/* ------------------------------------------------------------------------- */
+/* EXPENSES PAGE STYLES - expenses.css (UPDATED) */
+/* ------------------------------------------------------------------------- */
+
+/* Header Back Button (Unchanged) */
+.btn-header-back {
+    color: var(--blue);
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s, background-color 0.3s;
+    border-radius: var(--border-radius);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-header-back:hover {
+    color: var(--black);
+    background-color: var(--border-color);
+}
+
+
+.main-selection-container {
+    flex-grow: 1;
+    max-width: 1200px;
+    width: 90%;
+    /* Add extra bottom margin to account for the fixed bottom summary card */
+    margin: 40px auto 140px auto; 
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-unit) * 5); 
+}
+
+/* 2. Page Title / Hero (Unchanged) */
+.page-title {
+    margin-top: 0;
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--blue);
+}
+
+.hero-subtext {
+    text-align: center;
+    color: var(--gray-text);
+}
+
+
+/* 3. Filter Section - COMPACT DESIGN */
+.filter-section {
+    padding: calc(var(--spacing-unit) * 3);
+    background-color: var(--lblue); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+/* Aligned controls: Date Input | Apply | Clear - ENSURE ALIGNMENT */
+.filter-controls-grid {
+    display: grid;
+    grid-template-columns: 200px auto auto; 
+    gap: calc(var(--spacing-unit) * 2); 
+    /* Key for vertical alignment */
+    align-items: center; 
+    margin-top: 0; 
+}
+
+/* Input Field Styles - Increased Padding for better feel */
+.filter-section input[type="text"] {
+    width: 100%;
+    padding: 12px 16px; /* Increased vertical padding to match button height */
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Matched button border radius */
+    background-color: var(--white); 
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    font-style: italic;
+    color: var(--gray-text);
+}
+
+/* Apply Button - PREMIUM STYLES with subtle gradient */
+.btn-primary.btn-apply-filter {
+    background: linear-gradient(180deg, var(--blue) 0%, #00454d 100%);
+    color: var(--white);
+    font-weight: 700;
+    padding: 12px 20px;
+    border: none; /* Removed border redundancy */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 83, 93, 0.4); 
+    transition: all 0.2s ease;
+    height: 100%; /* Match height of other controls */
+}
+
+.btn-primary.btn-apply-filter:hover {
+    background: linear-gradient(180deg, #00798b 0%, #00535d 100%);
+    box-shadow: 0 6px 15px rgba(0, 83, 93, 0.6);
+    transform: translateY(-1px);
+}
+
+/* Clear Filter Button - ATTRACTIVE STYLES (Height matched) */
+.btn-clear-filter {
+    background: none !important;
+    border: 1px solid var(--error-red) !important;
+    color: var(--error-red) !important;
+    font-weight: 600;
+    padding: 12px 10px;
+    width: auto !important;
+    align-self: center; 
+    transition: all 0.2s;
+    border-radius: 8px;
+    height: 100%; /* Match height of other controls */
+}
+
+.btn-clear-filter:hover {
+    background-color: var(--error-red) !important; 
+    color: var(--white) !important; 
+    text-decoration: none;
+}
+
+
+/* 5. TOTAL SUMMARY CARD - FIXED BOTTOM, INCREASED WIDTH */
+.total-summary-card-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Increased Max Width by ~50% (450px * 1.5 = 675px) */
+    width: 90%; 
+    max-width: 675px; 
+    
+    z-index: 100;
+    background-color: var(--blue);
+    color: var(--white);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    padding: calc(var(--spacing-unit) * 3) 0; 
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    transition: opacity 0.3s;
+}
+
+.total-summary-content-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-summary-card-fixed p {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--lblue);
+}
+
+.total-summary-card-fixed h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: var(--white); 
+}
+
+
+/* 4. Expense Cards Grid (Unchanged Design) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: calc(var(--spacing-unit) * 3); 
+}
+
+.expense-card {
+    background-color: var(--white);
+    border-radius: 12px; 
+    padding: calc(var(--spacing-unit) * 3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-out;
+}
+
+.expense-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--blue);
+}
+
+/* Card Design: Heading on Left, Data on Right */
+.data-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-unit) 0;
+    border-bottom: 1px dashed var(--border-color); 
+}
+
+.data-row:last-child {
+    border-bottom: none;
+}
+
+.data-label {
+    font-weight: 500;
+    color: var(--gray-text); 
+    text-align: left;
+    padding-right: var(--spacing-unit);
+}
+
+.data-value {
+    font-weight: 600;
+    color: var(--black);
+    text-align: right;
+    font-size: 1rem;
+}
+
+/* Specific highlight for Total and Paid Status */
+.data-row--total {
+    border-bottom: none;
+    padding-top: calc(var(--spacing-unit) * 2);
+}
+
+.data-row--total .data-label {
+    color: var(--black);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.data-row--total .data-value {
+    color: var(--error-red);
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.paid-status--not-paid {
+    color: var(--error-red);
+    font-weight: 700;
+}
+
+.paid-status--paid {
+    color: #4CAF50; 
+    font-weight: 700;
+}
+
+.data-value a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--blue);
+}
+
+/* No Data State (Unchanged) */
+.no-data-state {
+    text-align: center;
+    padding: 64px 0;
+    color: var(--gray-text);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVENESS (Mobile-First) */
+/* ------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .filter-controls-grid {
+        /* Stack vertically on mobile */
+        grid-template-columns: 1fr;
+    }
+    
+    .main-selection-container {
+        margin-bottom: 120px; 
+    }
+
+    /* Fixed Summary Card Mobile Adjustments */
+    .total-summary-card-fixed {
+        max-width: 100%;
+        border-radius: 0;
+        padding: calc(var(--spacing-unit) * 2) 0;
+    }
+    
+    .total-summary-content-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 16px;
+    }
+
+    .total-summary-card-fixed h3 {
+        font-size: 1.8rem;
+        margin-top: 4px;
+    }
+
+    /* Card Layout on Mobile */
+    .data-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
