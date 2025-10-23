@@ -24,8 +24,12 @@
 
             <div class="header-main-nav-slot">
                 <button class="btn-primary btn-header-view-data" id="view-data-btn">
-                    <i class="fa-solid fa-database"></i> View Data
+                    <i class="fa-solid fa-square-poll-horizontal"></i>
                 </button>
+                <a href="expenses.html">
+                    <button class="btn-primary btn-header-view-data">
+                        <i class="fa-solid fa-money-bill"></i> </button>
+                </a>
                 <button class="btn-primary btn-header-logout" id="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
@@ -107,13 +111,15 @@
 
                 <div class="control-group">
                     <label for="from-date-input">From Date</label>
-                    <input type="text" id="from-date-input" class="custom-date-input" readonly placeholder="Select From Date">
+                    <input type="text" id="from-date-input" class="custom-date-input" readonly
+                        placeholder="Select From Date">
                     <input type="hidden" id="from-date-iso">
                 </div>
 
                 <div class="control-group">
                     <label for="to-date-input">To Date</label>
-                    <input type="text" id="to-date-input" class="custom-date-input" readonly placeholder="Select To Date">
+                    <input type="text" id="to-date-input" class="custom-date-input" readonly
+                        placeholder="Select To Date">
                     <input type="hidden" id="to-date-iso">
                 </div>
 

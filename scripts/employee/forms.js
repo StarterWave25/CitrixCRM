@@ -148,6 +148,19 @@ const createFormField = (field) => {
     return group;
 };
 
+/**
+     * 1. Authentication and Personalization Check
+     */
+const loadUserDetails = () => {
+    const userDetails = localStorage.getItem('userDetails');
+
+    if (!userDetails) {
+        console.warn('User details not found. Redirecting to login.');
+        window.location.href = './employee-login.html';
+        return;
+    }
+
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const formTitleElement = document.getElementById('form-title');
@@ -188,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentSchema = formSchemas[formName];
     formTitleElement.textContent = currentSchema.title;
     formArea.setAttribute('id', currentSchema.formId);
-
+    document.title = currentSchema.title;
     // 2. Form Generation and Dependency Fetch
     const generateAndPopulateForm = async () => {
         // ✅ FIX: Validate exId and exName before showing Expenses form
@@ -655,5 +668,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 4. Initialization
+    loadUserDetails();
     generateAndPopulateForm();
 });

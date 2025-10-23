@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 22, 2025 at 06:03 PM
+-- Generation Time: Oct 23, 2025 at 04:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,7 +61,11 @@ INSERT INTO `doctor activities` (`recordId`, `docId`, `empId`, `Employee Name`, 
 (12, 7, 8, 'Prudvi', 'No response', 'No', '2025-10-22'),
 (13, 8, 8, 'Prudvi', 'Ordered dolo 500 strips 10 strips free', 'Yes', '2025-10-22'),
 (14, 11, 8, 'Prudvi', 'Ordered', 'Yes', '2025-10-22'),
-(15, 12, 8, 'Prudvi', 'No response', 'No', '2025-10-22');
+(15, 12, 8, 'Prudvi', 'No response', 'No', '2025-10-22'),
+(19, 7, 8, 'Prudvi', 'Ordered', 'Yes', '2025-10-23'),
+(20, 8, 8, 'Prudvi', 'Ordered 3 products', 'Yes', '2025-10-23'),
+(21, 11, 8, 'Prudvi', 'ordered', 'Yes', '2025-10-23'),
+(22, 12, 8, 'Prudvi', 'Ordered slkfsalkdfjslkafjdsalkfjslak;fjaslkdfjlksdfjslkfjdsl;kfjdslkfjskld;fjsdlkfnds;lkfndsflksdnfsdklfnasdlkfnasd;lfksdmnflkas;dfnaslkfnasdlkf;a', 'Yes', '2025-10-23');
 
 -- --------------------------------------------------------
 
@@ -139,7 +143,8 @@ CREATE TABLE `expenses` (
 --
 
 INSERT INTO `expenses` (`expId`, `empId`, `exId`, `Normal Expense`, `Extension Expense`, `Total Expense`, `Paid Status`, `Travel Bill`, `Stay Bill`, `Date`) VALUES
-(13, 8, 4, 200, 0, 200, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761112148/vliyeeftggjzh7wyqzlj.jpg', '', '2025-10-22');
+(13, 8, 4, 200, 0, 200, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761112148/vliyeeftggjzh7wyqzlj.jpg', '', '2025-10-22'),
+(14, 8, 4, 200, 0, 200, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761210835/qbcjhouoyljcvhufxobq.png', '', '2025-10-23');
 
 -- --------------------------------------------------------
 
@@ -242,9 +247,15 @@ CREATE TABLE `ordered products` (
 --
 
 INSERT INTO `ordered products` (`opId`, `orderId`, `pId`, `Strips`, `Free Strips`) VALUES
-(8, 2, 2, 500, 10),
-(9, 3, 2, 20, 2),
-(10, 3, 1, 35, 5);
+(12, 5, 3, 120, 0),
+(13, 5, 2, 40, 0),
+(14, 6, 3, 20, 2),
+(15, 6, 2, 50, 5),
+(16, 6, 1, 100, 10),
+(17, 7, 2, 2, 0),
+(18, 7, 3, 2, 0),
+(19, 8, 3, 20, 2),
+(20, 8, 1, 20, 3);
 
 -- --------------------------------------------------------
 
@@ -255,7 +266,7 @@ INSERT INTO `ordered products` (`opId`, `orderId`, `pId`, `Strips`, `Free Strips
 CREATE TABLE `orders` (
   `orderId` int(11) NOT NULL,
   `empId` int(11) NOT NULL,
-  `Employee Name` int(11) NOT NULL,
+  `Employee Name` varchar(110) NOT NULL,
   `docId` int(11) NOT NULL,
   `Doctor Name` varchar(100) NOT NULL,
   `exId` int(11) NOT NULL,
@@ -270,8 +281,10 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`orderId`, `empId`, `Employee Name`, `docId`, `Doctor Name`, `exId`, `DL Copy`, `Prescription`, `Total`, `Date`) VALUES
-(2, 8, 0, 8, 'SHerrr', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761141176/jl7lh8pzk9k3sq9vkwmj.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761141177/b8nzqioyxyvyhv8astgv.png', 33000, '2025-10-22'),
-(3, 8, 0, 11, 'Satheesh', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761141442/zc8vuxvmedfxehibjegf.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761141444/mjctp7ekjg2j4dlandna.png', 3070.56, '2025-10-22');
+(5, 8, 'Prudvi', 7, 'Harsha', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761197051/t420m0691xelexv2tt6d.jpg', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761197058/z0xi3avg5wlb81mafqyo.jpg', 6240, '2025-10-23'),
+(6, 8, 'Prudvi', 8, 'SHerrr', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200585/imlzfjiwt3bc68tkz0qn.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200588/mehs3cllak6mwmuywprq.png', 8900, '2025-10-23'),
+(7, 8, 'Prudvi', 11, 'Satheesh', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200798/ynlsnep4cvxpkzfobuks.gif', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200800/ay0n51ymfd0ioayctayd.png', 192, '2025-10-23'),
+(8, 8, 'Prudvi', 12, 'Reddy', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200977/winzzesofno5lq1jvt1f.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200979/hzjdhqwolcsyu4gci149.png', 1600, '2025-10-23');
 
 -- --------------------------------------------------------
 
@@ -347,7 +360,9 @@ INSERT INTO `tourplan` (`tId`, `empId`, `hqId`, `exId`, `Extension Name`, `Out S
 (32, 8, 3, 4, 'Tirupati', '', '', '2025-09-28'),
 (33, 8, 3, 4, 'Tirupati', '', '', '2025-10-06'),
 (34, 8, 3, 4, 'Tirupati', '', '', '2025-10-16'),
-(35, 8, 3, 4, 'Tirupati', 'No', '', '2025-10-22');
+(35, 8, 3, 4, 'Tirupati', 'No', '', '2025-10-22'),
+(36, 8, 3, 4, 'Tirupati', 'No', '', '2025-10-23'),
+(37, 8, 3, 4, 'Tirupati', 'Yes', 'No', '2025-10-23');
 
 --
 -- Indexes for dumped tables
@@ -479,7 +494,7 @@ ALTER TABLE `boss`
 -- AUTO_INCREMENT for table `doctor activities`
 --
 ALTER TABLE `doctor activities`
-  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `doctors`
@@ -497,7 +512,7 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `extensions`
@@ -527,13 +542,13 @@ ALTER TABLE `meetings`
 -- AUTO_INCREMENT for table `ordered products`
 --
 ALTER TABLE `ordered products`
-  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -551,7 +566,7 @@ ALTER TABLE `stockists`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints for dumped tables

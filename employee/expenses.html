@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenses To be Paid - Citrix CRM</title>
-    <link rel="shortcut icon" href="../img/favicon.png" type="image/x-icon">
+    <title>Expenses To Be Paid</title>
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/employee/expenses.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -15,7 +14,6 @@
 </head>
 
 <body>
-
     <header class="global-header">
         <div class="header-content-wrapper">
             <a href="./dashboard.html" class="logo-link">
@@ -23,55 +21,52 @@
             </a>
 
             <div class="header-main-nav-slot">
-                <a href="./dashboard.html" class="btn-header-back">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                <a href="./dashboard.html" class="btn-primary btn-header-view-data">
+                    <i class="fa-solid fa-arrow-left"></i> Back
                 </a>
             </div>
         </div>
     </header>
 
-    <main class="main-selection-container">
-        <section class="hero-selection">
-            <h1 class="page-title">Expenses To be Paid</h1>
-            <p class="hero-subtext">View, filter, and track all expenses awaiting payment.</p>
-        </section>
+    <main class="expense-main-container">
+        <h1 class="page-title">Expenses To be Paid</h1>
 
-        <section class="filter-section card">
-            <div class="filter-controls-grid">
-                <div class="form-group">
-                    <input type="text" id="from-date-input" placeholder="Select Date" readonly disabled>
-                    <input type="hidden" id="from-date-iso">
+        <section class="filter-controls card">
+            <div class="filter-group">
+                <div class="form-group form-group--date">
+                    <label for="dateFilter" class="form-label expenses-date-label">Filter by Date</label>
+                    <input type="text" id="dateFilter" class="form-input expenses-date-box"
+                        placeholder="Select Expense Date" readonly>
                 </div>
 
-                <button class="btn-primary btn-apply-filter" id="apply-filter-btn" disabled>
-                    <i class="fa-solid fa-filter"></i> Apply Filter
-                </button>
-                
-                <button class="btn-clear-filter" id="clear-filter-btn" disabled>
-                    <i class="fa-solid fa-times"></i> Clear Filter
-                </button>
-            </div>
-            <div id="date-validation-message" class="validation-message-box"></div>
-        </section>
-
-        <section class="expenses-results-section">
-            <div id="expenses-container" class="cards-grid">
+                <div class="filter-actions">
+                    <button id="resetFilter" class="btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset
+                    </button>
+                    <button id="applyFilter" class="btn-primary">
+                        <i class="fa-solid fa-filter"></i> Apply
+                    </button>
                 </div>
-
-            <div id="no-data-state" class="no-data-state hidden">
-                <i class="fa-solid fa-receipt"></i>
-                <p class="message">No expenses found for the selected filter or employee.</p>
             </div>
         </section>
+
+        <section id="expensesGrid" class="expenses-grid">
+            <p id="loadingMessage" class="loading-message">Loading expenses data...</p>
+        </section>
+
     </main>
-    
-    <div class="total-summary-card-fixed hidden" id="total-summary-card">
-        <div class="total-summary-content-wrapper">
-            <p>Total Unpaid Amount:</p>
-            <h3 id="unpaid-total-amount">₹ 0.00</h3>
-        </div>
+
+    <div id="totalNotPaidFixed" class="total-not-paid-fixed">
+        <span class="label">Total Not Paid:</span>
+        <span class="value" id="notPaidValue">...</span>
     </div>
 
+    <footer class="login-footer">
+        <span class="footer-text">Built by</span>
+        <a href="http://starterwave.xyz" target="_blank">
+            <img src="../img/starterwave.png" alt="Starterwave Logo" class="starterwave-logo">
+        </a>
+    </footer>
 
     <script src="../scripts/api-fetch.js"></script>
     <script src="../scripts/employee/expenses.js"></script>

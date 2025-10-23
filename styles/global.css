@@ -192,7 +192,7 @@ a {
     width: 95%;
     z-index: 100;
     /* Ensure it's above other content */
-    padding: calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 2) 0;
     /* 16px vertical padding */
     border-radius: var(--border-radius);
     /* ✨ The GOD-LEVEL Glass Morphism Effect ✨ */

@@ -1,307 +1,275 @@
 /* ------------------------------------------------------------------------- */
-/* EXPENSES PAGE LOGIC - expenses.js (CALENDAR FIX) */
-/* Fixes: Datepicker showing previous day due to UTC/Timezone conversion. */
+/* EXPENSES PAGE JAVASCRIPT LOGIC (Client-Side Filtering) */
 /* ------------------------------------------------------------------------- */
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM Elements ---
-    const expensesContainer = document.getElementById('expenses-container');
-    const noDataState = document.getElementById('no-data-state');
-    const totalSummaryFixedCard = document.getElementById('total-summary-card'); 
-    const unpaidTotalAmount = document.getElementById('unpaid-total-amount');
+// Global variable to store all fetched expenses for client-side filtering
+let allExpenses = [];
+const expensesGrid = document.getElementById('expensesGrid');
+const dateFilter = document.getElementById('dateFilter'); // Text input for datepicker
+const applyFilterBtn = document.getElementById('applyFilter');
+const resetFilterBtn = document.getElementById('resetFilter');
+const loadingMessage = document.getElementById('loadingMessage');
+const notPaidValueElement = document.getElementById('notPaidValue');
 
-    // Filter Controls
-    const fromDateInput = document.getElementById('from-date-input');
-    const fromDateIsoInput = document.getElementById('from-date-iso');
-    const applyFilterBtn = document.getElementById('apply-filter-btn');
-    const clearFilterBtn = document.getElementById('clear-filter-btn');
-    const dateValidationMessageBox = document.getElementById('date-validation-message');
+// Array to store available expense dates in 'MM/DD/YYYY' format for Datepicker
+let availableDates = [];
 
-    // --- Global State ---
-    let allExpensesData = []; // Stores all fetched expenses
-
-    /**
-     * Helper to safely get user details from localStorage.
+/**
+     * 1. Authentication and Personalization Check
      */
-    const getUserDetails = () => {
-        try {
-            const userDetailsString = localStorage.getItem('userDetails');
-            if (userDetailsString) {
-                return JSON.parse(userDetailsString);
-            }
-        } catch (e) {
-            console.error("Error retrieving user details:", e);
+const loadUserDetails = () => {
+    const userDetails = localStorage.getItem('userDetails');
+
+    if (!userDetails) {
+        console.warn('User details not found. Redirecting to login.');
+        window.location.href = './employee-login.html';
+        return;
+    }
+    return;
+};
+
+/**
+ * Helper function to format date string to the display format (06 Oct 2025).
+ */
+function formatDateForDisplay(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+}
+
+/**
+ * Helper function to format date string to the date picker's required format (MM/DD/YYYY).
+ */
+function formatDateForDatepicker(dateString) {
+    // We convert the ISO part to a Date object, ensuring it's treated consistently (e.g., midnight UTC)
+    const date = new Date(dateString.split('T')[0]);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+}
+
+/**
+ * Calculates the total of all expenses marked as "Not Paid" and updates the fixed card.
+ * This is CRITICAL for financial visibility and should run only once after fetch.
+ * @param {Array<object>} expenses - The array of ALL fetched expenses (not filtered).
+ */
+function updateNotPaidTotal(expenses) {
+    let totalNotPaid = 0;
+
+    expenses.forEach(expense => {
+        if (expense['Paid Status'] === 'Not Paid') {
+            // Sum up the 'Total Expense' field for unpaid items
+            totalNotPaid += expense['Total Expense'];
         }
-        return null;
-    };
+    });
 
-    /**
-     * Helper function to display/hide validation messages.
-     */
-    const showValidationMessage = (message) => {
-        dateValidationMessageBox.textContent = message || '';
-    };
+    // Helper function to format currency
+    const formatCurrency = (amount) => `₹${Number(amount).toFixed(2)}`;
 
-    /**
-     * Converts a UTC timestamp string to a local date string (DD Mon, YYYY).
-     */
-    const formatDisplayDate = (isoDate) => {
-        if (!isoDate) return '-';
-        try {
-            const date = new Date(isoDate);
-            return date.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-        } catch (e) {
-            return isoDate;
-        }
-    };
+    // Update the DOM element
+    if (notPaidValueElement) {
+        notPaidValueElement.textContent = formatCurrency(totalNotPaid);
+    }
+}
 
-    /**
-     * Calculates the total amount for expenses marked 'Not Paid' and controls the visibility of the fixed card.
-     */
-    const updateExpensesSummary = (expenses) => {
-        if (!expenses || expenses.length === 0) {
-            unpaidTotalAmount.textContent = '₹ 0.00';
-            totalSummaryFixedCard.classList.add('hidden');
-            return;
-        }
+/**
+ * Creates the HTML markup for a single expense card.
+ */
+function createExpenseCard(expense) {
+    const formatCurrency = (amount) => `₹${Number(amount).toFixed(2)}`;
+    const statusText = expense['Paid Status'];
+    const statusStyle = statusText === 'Paid' ? 'background-color: #5cb85c; color: white;' : 'background-color: #f0ad4e; color: white;';
+    const displayDate = formatDateForDisplay(expense.Date);
 
-        let totalUnpaid = 0;
-        expenses.forEach(expense => {
-            if (expense['Paid Status'] === 'Not Paid') {
-                totalUnpaid += parseFloat(expense['Total Expense'] || 0);
-            }
-        });
-
-        unpaidTotalAmount.textContent = `₹ ${totalUnpaid.toFixed(2)}`;
-        totalSummaryFixedCard.classList.remove('hidden');
-    };
-
-    /**
-     * Renders the expense data into the card-grid.
-     */
-    const renderExpensesCards = (data) => {
-        expensesContainer.innerHTML = '';
-        updateExpensesSummary(data);
-
-        if (!data || data.length === 0) {
-            noDataState.classList.remove('hidden');
-            return;
-        }
-        noDataState.classList.add('hidden');
-
-        const cardsHtml = data.map(item => {
-            const formatBillLink = (value, fallbackText = 'N/A') => {
-                const urlPattern = /^(https?:\/\/[^\s/$.?#].[^\s]*)$/i;
-                if (typeof value === 'string' && value.length > 0 && urlPattern.test(value)) {
-                    return `<a href="${value}" target="_blank" rel="noopener noreferrer">View Bill <i class="fa-solid fa-external-link-alt"></i></a>`;
-                }
-                return fallbackText;
-            };
-
-            const statusClass = item['Paid Status'] === 'Not Paid' ? 'paid-status--not-paid' : 'paid-status--paid';
-            const stayBillLink = item['Stay Bill'] ? formatBillLink(item['Stay Bill'], 'Not Applicable') : 'Not Applicable';
-
-            return `
-                <div class="expense-card card">
-                    <div class="data-row">
-                        <span class="data-label">Date:</span>
-                        <span class="data-value">${formatDisplayDate(item['Date'])}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Extension Name:</span>
-                        <span class="data-value">${item.extensionName || '-'}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Normal Expenses:</span>
-                        <span class="data-value">₹ ${item['Normal Expense']?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Extension Expenses:</span>
-                        <span class="data-value">₹ ${item['Extension Expense']?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Travel Bill:</span>
-                        <span class="data-value">${formatBillLink(item['Travel Bill'])}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Stay Bill:</span>
-                        <span class="data-value">${stayBillLink}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Paid Status:</span>
-                        <span class="data-value ${statusClass}">${item['Paid Status'] || '-'}</span>
-                    </div>
-                    <div class="data-row data-row--total">
-                        <span class="data-label">Total Expense:</span>
-                        <span class="data-value">₹ ${item['Total Expense']?.toFixed(2) || '0.00'}</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        expensesContainer.innerHTML = cardsHtml;
-    };
-
-
-    /**
-     * Filters and sorts the global expense data based on the single selected date (from only).
-     */
-    const filterAndSortExpenses = () => {
-        const fromDateISO = fromDateIsoInput.value;
-        let filteredData = [...allExpensesData];
-
-        showValidationMessage(null);
-
-        if (!fromDateISO) {
-            filteredData.sort((a, b) => new Date(b.Date) - new Date(a.Date));
-            renderExpensesCards(filteredData);
-            clearFilterBtn.disabled = true;
-            return;
-        }
-
-        const fromDate = new Date(fromDateISO);
-        fromDate.setHours(0, 0, 0, 0); // Start of the selected day
-
-        filteredData = filteredData.filter(expense => {
-            // FIX: Convert expense date to start-of-day for a true date-only comparison
-            const expenseDate = new Date(expense.Date);
-            expenseDate.setHours(0, 0, 0, 0); 
+    return `
+        <div class="expense-card">
+            <div class="card-header">
+                <p class="extension-name">${expense.extensionName}</p>
+                <span class="paid-status" style="${statusStyle}">${statusText}</span>
+            </div>
             
-            return expenseDate.getTime() >= fromDate.getTime();
-        });
+            <div class="data-row">
+                <span class="data-label">Date:</span>
+                <span class="data-value">${displayDate}</span>
+            </div>
 
-        filteredData.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+            <div class="data-row">
+                <span class="data-label">Normal Expense:</span>
+                <span class="data-value">${formatCurrency(expense['Normal Expense'])}</span>
+            </div>
 
-        renderExpensesCards(filteredData);
-        clearFilterBtn.disabled = false;
-    };
-    
-    /**
-     * Resets the date filter inputs and re-renders all data.
-     */
-    const clearDateFilter = () => {
-        fromDateInput.value = '';
-        fromDateIsoInput.value = '';
-        applyFilterBtn.disabled = true;
-        clearFilterBtn.disabled = true;
-        filterAndSortExpenses();
-    };
-
-    /**
-     * Checks validity and enables/disables the filter button.
-     */
-    const checkFilterValidity = () => {
-        if (fromDateIsoInput.value) {
-            applyFilterBtn.disabled = false;
-        } else {
-            applyFilterBtn.disabled = true;
+            <div class="data-row">
+                <span class="data-label">Extension Expense:</span>
+                <span class="data-value">${formatCurrency(expense['Extension Expense'])}</span>
+            </div>
+            
+            <div class="data-row">
+                <span class="data-label">Travel Bill:</span>
+                <span class="data-value">
+                    ${expense['Travel Bill'] ?
+            `<a href="${expense['Travel Bill']}" target="_blank" class="bill-link">Click to View</i></a>` :
+            `N/A`
         }
-    };
+                </span>
+            </div>
 
+            ${expense['Stay Bill'] ? `
+            <div class="data-row">
+                <span class="data-label">Stay Bill:</span>
+                <span class="data-value">
+                    <a href="${expense['Stay Bill']}" target="_blank" class="bill-link">Click to View</a>
+                </span>
+            </div>
+            ` : ''}
+            
+            <div class="data-row data-row--total">
+                <span class="data-label">TOTAL:</span>
+                <span class="data-value">${formatCurrency(expense['Total Expense'])}</span>
+            </div>
+        </div>
+    `;
+}
 
-    /**
-     * Initializes the jQuery UI datepicker (FIXED).
-     */
-    const initializeDatepickers = (expenseDates) => {
-        if (expenseDates.length === 0) {
-            fromDateInput.disabled = true;
-            applyFilterBtn.disabled = true;
-            clearFilterBtn.disabled = true;
-            return;
-        }
+/**
+ * Renders the expense cards to the DOM.
+ */
+function renderExpenseCards(expenses) {
+    expensesGrid.innerHTML = ''; // Clear existing cards
 
-        const minDate = new Date(expenseDates[0]);
-        // FIX: Ensure maxDate includes the entire day to prevent timezone shift issue
-        const maxDate = new Date(expenseDates[expenseDates.length - 1]);
-        maxDate.setHours(23, 59, 59, 999); // Set to the very end of the day
+    if (expenses.length === 0) {
+        expensesGrid.innerHTML = `<p class="loading-message">No expenses found for this date. Try resetting the filter.</p>`;
+        return;
+    }
 
-        $("#from-date-input").datepicker("destroy");
+    const cardsHtml = expenses.map(createExpenseCard).join('');
+    expensesGrid.innerHTML = cardsHtml;
+}
 
-        const commonDatepickerOptions = {
-            dateFormat: "dd-mm-yy",
-            altFormat: "yy-mm-dd",
-            changeMonth: true,
-            changeYear: true,
-            minDate: minDate,
-            maxDate: maxDate,
-            onSelect: function (dateText, inst) {
-                $(this).trigger('change'); 
-                checkFilterValidity();
-            }
-        };
+/**
+ * Initializes the jQuery UI Datepicker and sets available dates.
+ */
+function initializeDatepicker() {
+    // 1. Collect all unique expense dates and format them for the datepicker check
+    const uniqueDates = new Set(allExpenses.map(expense => {
+        // Date part only (e.g., "2025-10-21")
+        const datePart = expense.Date.split('T')[0];
+        return formatDateForDatepicker(datePart);
+    }));
 
-        $("#from-date-input").datepicker({
-            ...commonDatepickerOptions,
-            altField: "#from-date-iso"
-        });
-        
-        fromDateInput.disabled = false;
-    };
+    availableDates = Array.from(uniqueDates);
 
+    // 2. Initialize the datepicker on the input field
+    $('#dateFilter').datepicker({
+        dateFormat: 'dd M yy', // Display format: 06 Oct 2025
+        showAnim: 'fadeIn',
+        changeMonth: true,
+        changeYear: true,
+        constrainInput: true,
 
-    /**
-     * CORE: Fetches all expenses for the employee.
-     */
-    const fetchExpensesData = async () => {
-        const userDetails = getUserDetails();
-        if (!userDetails || !userDetails.id) {
-            console.error('Employee ID not found. Redirecting...');
-            return;
-        }
+        // 3. CRITICAL function to enable/disable days
+        beforeShowDay: function (date) {
+            // date is a native Date object provided by jQuery UI
+            // Format it to MM/DD/YYYY for internal comparison
+            const dateString = formatDateForDatepicker(date.toISOString());
 
-        try {
-            // Assuming apiFetch is available via api-fetch.js
-            const response = await apiFetch('common/get-expenses', 'POST', {
-                empId: userDetails.id
-            });
-
-            if (response.success && response.expenses && Array.isArray(response.expenses)) {
-                allExpensesData = response.expenses.map(expense => {
-                    expense['Normal Expense'] = parseFloat(expense['Normal Expense'] || 0);
-                    expense['Extension Expense'] = parseFloat(expense['Extension Expense'] || 0);
-                    expense['Total Expense'] = parseFloat(expense['Total Expense'] || 0);
-                    return expense;
-                });
-
-                // Get unique dates (YYYY-MM-DD format)
-                const uniqueDates = Array.from(new Set(
-                    allExpensesData.map(e => e.Date.substring(0, 10))
-                )).sort();
-
-                initializeDatepickers(uniqueDates);
-                filterAndSortExpenses();
-
+            if (availableDates.includes(dateString)) {
+                return [true, "selectable-date", "Expense available on this date"];
             } else {
-                console.warn('API returned no expense data.');
-                allExpensesData = [];
-                renderExpensesCards([]);
-                initializeDatepickers([]);
+                return [false, "ui-state-disabled", "No expense data for this date"];
             }
-
-        } catch (error) {
-            noDataState.classList.remove('hidden');
-            noDataState.querySelector('.message').textContent = 'A network error occurred while fetching expenses. Please try again.';
-            console.error('API Error during expense fetch:', error);
         }
-    };
-
-
-    // --- Event Listeners ---
-    
-    applyFilterBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        filterAndSortExpenses();
     });
-    
-    clearFilterBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        clearDateFilter();
+}
+
+
+/**
+ * Fetches data from the API and initializes the page.
+ */
+async function initializePage() {
+    loadUserDetails();
+    loadingMessage.style.display = 'block';
+    expensesGrid.style.display = 'grid';
+
+    try {
+        // 1. Get user details from localStorage (using 'userdetails' and 'id' as specified)
+        const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+        const empIdValue = userDetails.id;
+
+        if (!empIdValue) {
+            expensesGrid.innerHTML = `<p class="loading-message" style="color: var(--error-red);">Error: Employee ID ('id') not found in local storage ('userdetails'). Cannot fetch data.</p>`;
+            return;
+        }
+
+        // 2. Fetch data
+        const response = await apiFetch('common/get-expenses', 'POST', { empId: empIdValue });
+
+        if (response.success && response.expenses) {
+            allExpenses = response.expenses;
+
+            initializeDatepicker();
+            renderExpenseCards(allExpenses);
+
+            // 💡 NEW STEP: Calculate and update the fixed "Total Not Paid" card
+            updateNotPaidTotal(allExpenses);
+
+        } else {
+            expensesGrid.innerHTML = `<p class="loading-message">Failed to load expenses: ${response.message || 'Unknown error'}</p>`;
+        }
+
+    } catch (error) {
+        console.error("Initialization failed:", error);
+        expensesGrid.innerHTML = `<p class="loading-message" style="color: var(--error-red);">An error occurred while fetching data. Please check the console.</p>`;
+    } finally {
+        loadingMessage.style.display = 'none';
+    }
+}
+
+
+/**
+ * Event handler for the Apply button. (Client-side filter for selected date)
+ */
+function handleApplyFilter() {
+    // Get date object from jQuery UI datepicker
+    const selectedDate = $('#dateFilter').datepicker('getDate');
+
+    if (!selectedDate) {
+        // If the date is reset or not selected, show all expenses
+        renderExpenseCards(allExpenses);
+        return;
+    }
+
+    // Convert selectedDate object to the required comparison format (YYYY-MM-DD)
+    const filterDateString = selectedDate.toISOString().split('T')[0];
+
+    // Filter the global array (client-side filter)
+    const filteredExpenses = allExpenses.filter(expense => {
+        // Get the date part of the expense's Date string
+        const expenseDateString = new Date(expense.Date).toISOString().split('T')[0];
+        return expenseDateString === filterDateString;
     });
 
-    // --- Initialization ---
-    fetchExpensesData();
-});
+    // RENDER: Show only the cards for the filtered date
+    renderExpenseCards(filteredExpenses);
+}
+
+/**
+ * Event handler for the Reset button. (Removes filter, shows all)
+ */
+function handleResetFilter() {
+    // Clear the input field using jQuery UI method
+    $('#dateFilter').datepicker('setDate', null);
+
+    // RENDER: Show all data without a new API call
+    renderExpenseCards(allExpenses);
+}
+
+// 4. Attach Event Listeners
+applyFilterBtn.addEventListener('click', handleApplyFilter);
+resetFilterBtn.addEventListener('click', handleResetFilter);
+
+// Initialize data fetching on page load
+document.addEventListener('DOMContentLoaded', initializePage);

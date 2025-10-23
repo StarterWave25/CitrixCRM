@@ -46,8 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sheetNameMap = {
         'tourplan': 'Tour Plan',
         'doctorsList': 'Doctors List',
-        'orders': 'Orders',
-        'expenses': 'Expenses'
+        'orders': 'Orders'
     };
 
     /**
@@ -163,69 +162,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CORE DATA RENDERING LOGIC ---
 
     /**
-     * NEW: Function to calculate Not Paid Total for Expenses sheet.
-     */
-    const calculateExpensesTotal = (data) => {
-        const total = data.reduce((sum, item) => {
-            // Check for 'Payment Status' field and 'Not Paid' value
-            if (item['Payment Status']?.value === 'Not Paid') {
-                const totalValue = parseFloat(item['Total']?.value || item['Total'] || 0);
-                if (isFinite(totalValue)) {
-                    return sum + totalValue;
-                }
-            }
-            return sum;
-        }, 0);
-        return total.toFixed(2); // Format total to two decimal places
+ * Dynamically generates an HTML table for a nested array of objects (e.g., Product Details).
+ * @param {string} key - The title for the nested section (e.g., "Product Details").
+ * @param {Array<Object>} nestedArray - The array of objects to render.
+ * @returns {string} The HTML string for the table section.
+ */
+    const renderNestedTable = (key, nestedArray) => {
+        if (!nestedArray || nestedArray.length === 0) return '';
+
+        // 1. Group all unique keys (column headers) from all objects
+        let allKeys = new Set();
+        nestedArray.forEach(obj => {
+            Object.keys(obj).forEach(k => allKeys.add(k));
+        });
+
+        const headers = Array.from(allKeys);
+
+        // 2. Build the Table Header (<thead>)
+        const headerRow = headers.map(h => `<th>${h}</th>`).join('');
+        const tableHeader = `<thead><tr>${headerRow}</tr></thead>`;
+
+        // 3. Build the Table Body (<tbody>)
+        const tableBodyRows = nestedArray.map(item => {
+            const cells = headers.map(header => {
+                const value = item[header] !== undefined ? item[header] : '-';
+                // Use a class for potential number alignment/styling
+                const cellClass = typeof value === 'number' ? 'data-numeric' : '';
+                return `<td class="${cellClass}">${value}</td>`;
+            }).join('');
+            return `<tr>${cells}</tr>`;
+        }).join('');
+
+        const tableBody = `<tbody>${tableBodyRows}</tbody>`;
+
+        // 4. Assemble the final HTML structure
+        return `
+        <div class="product-details-section">
+            <h4 class="section-title">${key}</h4>
+            <table class="product-details-table">
+                ${tableHeader}
+                ${tableBody}
+            </table>
+        </div>
+    `;
     };
 
     /**
-     * NEW: Function to render the data into mobile-friendly cards.
-     */
+ * Function to render the data into mobile-friendly cards,
+ * automatically detecting and rendering nested arrays as tables.
+ */
     const renderDataCards = (sheetKey, data) => {
         // Handle empty or invalid data
         if (!Array.isArray(data) || data.length === 0) {
             return `<p class="no-data-message">No Data Found for ${sheetNameMap[sheetKey] || sheetKey}.</p>`;
         }
 
-        let notPaidTotalHtml = '';
+        // --- Expense Logic Removed: notPaidTotalHtml is no longer needed ---
 
-        // Check for Expenses sheet and perform calculation
-        if (sheetKey.toLowerCase() === 'expenses') {
-            const formattedTotal = calculateExpensesTotal(data);
-
-            notPaidTotalHtml = `
-                <div class="expense-total-footer">
-                    <span class="expense-total-label">Manager Owes:</span>
-                    <span class="expense-total-amount">₹ ${formattedTotal}</span>
-                </div>
-            `;
-        }
-
-        // Use keys from the first object to generate card labels
+        // Get all keys excluding IDs
         const keys = Object.keys(data[0] || {}).filter(key => key !== 'tId' && key !== 'docId');
 
-        const cardsHtml = data.map((item, index) => {
-            const rows = keys.map(key => {
+        const cardsHtml = data.map((item) => {
+            let rowsHtml = ''; // Initialize mutable string to build the card content
+
+            keys.forEach(key => {
                 const formattedKey = key.replace(/_/g, ' ');
 
-                // Get the value: check for nested 'value' property (from API response) or direct value
+                // Get the value: check for nested 'value' property or direct value
                 let rawValue = item[key];
                 const value = rawValue && typeof rawValue === 'object' && 'value' in rawValue
                     ? rawValue.value
                     : rawValue;
 
+                // -----------------------------------------------------------------
+                // 1. ARRAY DETECTION & TABLE RENDERING (Nested Array Logic)
+                // -----------------------------------------------------------------
+                const nestedArray = Array.isArray(value) ? value : null;
+
+                if (nestedArray) {
+                    // If it's a nested array (like "Product Details"), render the full table and stop.
+                    rowsHtml += renderNestedTable(key, nestedArray);
+                    return; // Skip the rest of the loop for this key
+                }
+                // -----------------------------------------------------------------
+
+                // 2. STANDARD ROW RENDERING (Original Logic Continued)
                 const displayValue = value === null || value === undefined || value === '' ? '-' : value;
 
-                // Highlight 'Not Paid' status
-                const valueClass = (sheetKey.toLowerCase() === 'expenses' && key === 'Payment Status' && displayValue === 'Not Paid') ? 'data-value-highlight' : '';
+                // --- Expense Logic Removed: isNotPaid calculation is gone ---
+                const valueClass = ''; // No special class needed now
 
                 // Format Date objects for display
                 let finalDisplayValue = displayValue;
+
                 if (displayValue && typeof displayValue === "string") {
                     finalDisplayValue = formatIfUrl(displayValue);
                 }
-                // Then continue your existing logic for date formatting, etc.
 
                 if (key === 'Date' && displayValue !== '-') {
                     try {
@@ -237,22 +269,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                return `
-                    <div class="data-row">
-                        <span class="data-label">${formattedKey}:</span>
-                        <span class="data-value ${valueClass}">${finalDisplayValue}</span>
-                    </div>
-                `;
-            }).join('');
+                // Append the standard row HTML
+                rowsHtml += `
+                <div class="data-row">
+                    <span class="data-label">${formattedKey}:</span>
+                    <span class="data-value ${valueClass}">${finalDisplayValue}</span>
+                </div>
+            `;
+            });
 
-            return `<div class="data-card">
-                ${rows}
-            </div>`;
+            return `<div class="data-card">${rowsHtml}</div>`;
         }).join('');
 
-        // Combine cards and the optional total footer
-        return `${notPaidTotalHtml}<div class="data-table-card-view">${cardsHtml}</div>`;
-    }
+        // Combine cards (Expense total footer is removed from here)
+        return `<div class="data-table-card-view">${cardsHtml}</div>`;
+    };
 
     /**
      * NEW: Function to handle dropdown sheet switching.

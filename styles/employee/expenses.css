@@ -1,295 +1,413 @@
 /* ------------------------------------------------------------------------- */
-/* EXPENSES PAGE STYLES - expenses.css (UPDATED) */
+/* EXPENSES PAGE STYLES */
 /* ------------------------------------------------------------------------- */
 
-/* Header Back Button (Unchanged) */
-.btn-header-back {
+/* Main Container: Uses a grid system for alignment  */
+.expense-main-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding: calc(var(--spacing-unit) * 4) 0;
+    /* 32px padding top/bottom */
+}
+
+/* Page Title Style */
+.page-title {
+    margin-top: calc(var(--spacing-unit) * 6);
+    /* Extra space below header */
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    /* 32px */
+    text-align: center;
     color: var(--blue);
-    background: none;
-    border: none;
-    padding: 8px 12px;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.3s, background-color 0.3s;
+}
+
+/* Back Link Styling (Part of the Header UX) */
+.back-link {
+    color: var(--blue);
+    font-size: 1.2rem;
+    padding: var(--spacing-unit);
     border-radius: var(--border-radius);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
 }
 
-.btn-header-back:hover {
-    color: var(--black);
-    background-color: var(--border-color);
+.back-link:hover {
+    background-color: var(--lblue);
 }
 
+/* --- CHANGED SNIPPET for style.css: Filter Section Styles --- */
 
-.main-selection-container {
-    flex-grow: 1;
-    max-width: 1200px;
-    width: 90%;
-    /* Add extra bottom margin to account for the fixed bottom summary card */
-    margin: 40px auto 140px auto; 
+/* Filter Section Styling - Changed for a minimalist, premium look */
+.filter-controls {
+    margin-bottom: calc(var(--spacing-unit) * 8);
+    /* 64px gap before grid [cite: 3] */
+    text-align: center;
+    /* Removed card background and shadow for a cleaner look */
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.filter-group {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--spacing-unit) * 5); 
-}
-
-/* 2. Page Title / Hero (Unchanged) */
-.page-title {
-    margin-top: 0;
-    text-align: center;
-    font-size: clamp(2rem, 5vw, 3rem);
-    color: var(--blue);
-}
-
-.hero-subtext {
-    text-align: center;
-    color: var(--gray-text);
-}
-
-
-/* 3. Filter Section - COMPACT DESIGN */
-.filter-section {
+    align-items: center;
+    /* Wrap the group in a card look for prominence */
+    background-color: var(--white);
     padding: calc(var(--spacing-unit) * 3);
-    background-color: var(--lblue); 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-/* Aligned controls: Date Input | Apply | Clear - ENSURE ALIGNMENT */
-.filter-controls-grid {
-    display: grid;
-    grid-template-columns: 200px auto auto; 
-    gap: calc(var(--spacing-unit) * 2); 
-    /* Key for vertical alignment */
-    align-items: center; 
-    margin-top: 0; 
-}
-
-/* Input Field Styles - Increased Padding for better feel */
-.filter-section input[type="text"] {
+.form-group--date {
     width: 100%;
-    padding: 12px 16px; /* Increased vertical padding to match button height */
+    max-width: 300px;
+}
+
+.expenses-date-label {
+    color: var(--blue);
+    /* Subtler color */
+    font-family: 'Ivymode', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.expenses-date-box {
+    cursor: pointer;
+    /* Remove default browser arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+/* --- CHANGED SNIPPET for style.css: jQuery UI Datepicker Styling --- */
+
+/* Modernizing jQuery UI Datepicker to match Brand */
+.ui-datepicker {
+    font-family: var(--font-body), sans-serif;
+    padding: calc(var(--spacing-unit) * 2);
+    /* 16px */
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     border: 1px solid var(--border-color);
-    border-radius: 8px; /* Matched button border radius */
-    background-color: var(--white); 
+    background: var(--white);
+}
+
+.ui-widget-header {
+    background: var(--lblue) !important;
+    border: none;
+    color: var(--white) !important;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
+}
+
+.ui-datepicker-prev,
+.ui-datepicker-next {
+    color: var(--white) !important;
+    border: none;
+    cursor: pointer;
+    top: 5px;
+    padding: 0;
+}
+
+.ui-datepicker-title {
+    color: var(--white) !important;
+}
+
+.ui-state-default {
+    background: none !important;
+    border: none !important;
+    color: var(--black) !important;
+    text-align: center;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
+    margin: 1px;
+    font-weight: 500 !important;
+}
+
+/* Hover state for days */
+.ui-state-default.ui-state-hover {
+    background: var(--blue) !important;
+    border-radius: 3px;
+    color: var(--lblue) !important;
+}
+
+/* Active day (Selected Date) */
+.ui-state-active {
+    background: var(--blue) !important;
+    color: var(--lblue) !important;
+    border-radius: 3px;
+}
+
+/* Styling for selectable days (the crucial visual cue) */
+.ui-datepicker-calendar .ui-state-default.selectable-date {
+    /* Style for dates that are available to select */
+    font-weight: 700 !important;
+    color: var(--blue) !important;
+    border: 1px solid var(--lblue) !important;
+}
+
+.ui-datepicker-calendar .ui-state-default.selectable-date.ui-state-hover {
+    background: var(--lblue) !important;
+}
+
+/* Styling for disabled days */
+.ui-datepicker-unselectable {
+    color: var(--border-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* --- END CHANGED SNIPPET --- */
+.filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 2);
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Secondary Button Style (For Reset) - Adjusted for new palette */
+.btn-secondary {
+    background-color: var(--white);
+    color: var(--gray-text);
+    border: 1px solid var(--border-color);
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    border-radius: var(--border-radius);
     font-size: 1rem;
     cursor: pointer;
-    transition: border-color 0.3s;
-    font-style: italic;
-    color: var(--gray-text);
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Apply Button - PREMIUM STYLES with subtle gradient */
-.btn-primary.btn-apply-filter {
-    background: linear-gradient(180deg, var(--blue) 0%, #00454d 100%);
-    color: var(--white);
-    font-weight: 700;
-    padding: 12px 20px;
-    border: none; /* Removed border redundancy */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 83, 93, 0.4); 
-    transition: all 0.2s ease;
-    height: 100%; /* Match height of other controls */
+.btn-secondary:hover {
+    background-color: var(--llblue);
+    color: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 4px 8px rgba(0, 83, 93, 0.1);
 }
 
-.btn-primary.btn-apply-filter:hover {
-    background: linear-gradient(180deg, #00798b 0%, #00535d 100%);
-    box-shadow: 0 6px 15px rgba(0, 83, 93, 0.6);
-    transform: translateY(-1px);
+/* --- END CHANGED SNIPPET --- */
+
+/* Expenses Grid Layout */
+.expenses-grid {
+    display: grid;
+    /* Mobile: single column  */
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing-unit) * 3);
+    /* 24px gap between cards */
+    margin-top: calc(var(--spacing-unit) * 4);
 }
 
-/* Clear Filter Button - ATTRACTIVE STYLES (Height matched) */
-.btn-clear-filter {
-    background: none !important;
-    border: 1px solid var(--error-red) !important;
-    color: var(--error-red) !important;
-    font-weight: 600;
-    padding: 12px 10px;
-    width: auto !important;
-    align-self: center; 
-    transition: all 0.2s;
-    border-radius: 8px;
-    height: 100%; /* Match height of other controls */
+/* Card Styling for Individual Expense */
+.expense-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 4);
+    /* 32px padding [cite: 3] */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    /* Premium shadow */
+    /* Brand highlight */
 }
 
-.btn-clear-filter:hover {
-    background-color: var(--error-red) !important; 
-    color: var(--white) !important; 
-    text-decoration: none;
-}
-
-
-/* 5. TOTAL SUMMARY CARD - FIXED BOTTOM, INCREASED WIDTH */
-.total-summary-card-fixed {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    
-    /* Increased Max Width by ~50% (450px * 1.5 = 675px) */
-    width: 90%; 
-    max-width: 675px; 
-    
-    z-index: 100;
-    background-color: var(--blue);
-    color: var(--white);
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
-    padding: calc(var(--spacing-unit) * 3) 0; 
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    transition: opacity 0.3s;
-}
-
-.total-summary-content-wrapper {
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 24px;
+/* Header within the card */
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    padding-bottom: calc(var(--spacing-unit) * 2);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.total-summary-card-fixed p {
+.extension-name {
+    font-family: 'Ivymode', serif;
+    color: var(--blue);
+    font-size: 1.5rem;
     margin: 0;
-    font-size: 1.2rem;
-    color: var(--lblue);
 }
 
-.total-summary-card-fixed h3 {
-    margin: 0;
-    font-weight: 800;
-    font-size: 2.2rem;
-    color: var(--white); 
+.paid-status {
+    font-weight: 700;
+    padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
+    border-radius: 3px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
-
-/* 4. Expense Cards Grid (Unchanged Design) */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: calc(var(--spacing-unit) * 3); 
-}
-
-.expense-card {
-    background-color: var(--white);
-    border-radius: 12px; 
-    padding: calc(var(--spacing-unit) * 3);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease-out;
-}
-
-.expense-card:hover {
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--blue);
-}
-
-/* Card Design: Heading on Left, Data on Right */
+/* Left/Right Data Display (Two-column structure) */
 .data-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-unit) 0;
-    border-bottom: 1px dashed var(--border-color); 
+    padding: calc(var(--spacing-unit) * 1.5) 0;
+    border-bottom: 1px solid var(--llblue);
 }
 
-.data-row:last-child {
+.data-row:last-of-type {
     border-bottom: none;
+    margin-bottom: 0;
 }
 
 .data-label {
+    color: var(--gray-text);
     font-weight: 500;
-    color: var(--gray-text); 
-    text-align: left;
-    padding-right: var(--spacing-unit);
+    margin-right: calc(var(--spacing-unit) * 2);
+    /* 16px space to push data right */
+    flex-shrink: 0;
 }
 
 .data-value {
-    font-weight: 600;
     color: var(--black);
+    font-weight: 600;
     text-align: right;
+    /* Ensures data aligns right */
     font-size: 1rem;
+    flex-grow: 1;
 }
 
-/* Specific highlight for Total and Paid Status */
+/* Total Expense Highlight (Conversion Psychology ) */
 .data-row--total {
+    margin-top: calc(var(--spacing-unit) * 2);
+    /* 16px spacing */
+    background-color: var(--llblue);
+    padding: calc(var(--spacing-unit) * 2);
+    border-radius: var(--border-radius);
     border-bottom: none;
-    padding-top: calc(var(--spacing-unit) * 2);
 }
 
-.data-row--total .data-label {
-    color: var(--black);
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
+.data-row--total .data-label,
 .data-row--total .data-value {
-    color: var(--error-red);
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.paid-status--not-paid {
-    color: var(--error-red);
-    font-weight: 700;
-}
-
-.paid-status--paid {
-    color: #4CAF50; 
-    font-weight: 700;
-}
-
-.data-value a {
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    font-size: 1.2rem;
     color: var(--blue);
+    font-weight: 700;
 }
 
-/* No Data State (Unchanged) */
-.no-data-state {
+/* Bill Link Styling */
+.bill-link {
+    color: var(--blue);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bill-link:hover {
+    color: color-mix(in srgb, var(--blue), var(--black) 30%);
+}
+
+.loading-message {
     text-align: center;
-    padding: 64px 0;
+    grid-column: 1 / -1;
     color: var(--gray-text);
+    padding: calc(var(--spacing-unit) * 8);
 }
 
+/* --- NEW SNIPPET for style.css: Total Not Paid Fixed Card --- */
 
-/* ------------------------------------------------------------------------- */
-/* RESPONSIVENESS (Mobile-First) */
-/* ------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    .filter-controls-grid {
-        /* Stack vertically on mobile */
-        grid-template-columns: 1fr;
-    }
-    
-    .main-selection-container {
-        margin-bottom: 120px; 
-    }
+.total-not-paid-fixed {
+    /* Fixed position for clear visibility on scroll */
+    position: fixed;
+    bottom: calc(var(--spacing-unit) * 4);
+    /* 32px from bottom */
+    right: calc(var(--spacing-unit) * 4);
+    /* 32px from right */
+    z-index: 100;
+    /* Above all content */
 
-    /* Fixed Summary Card Mobile Adjustments */
-    .total-summary-card-fixed {
-        max-width: 100%;
+    /* Card styling for premium look */
+    background: var(--cards-bg-color);
+    /* High contrast color */
+    color: var(--white);
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    /* 16px 24px */
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* Stronger shadow to lift it */
+    /* Layout */
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 1);
+    /* 8px gap */
+    /* Font style */
+    letter-spacing: 0.5px;
+}
+
+.total-not-paid-fixed .label {
+    font-size: 1.2rem;
+    font-family: 'Ivymode', sans-serif;
+    font-weight: 500;
+}
+
+.total-not-paid-fixed .value {
+    font-family: 'Ivymode', serif;
+    /* Use premium font for the value */
+    font-size: 1.4rem;
+}
+
+.login-footer {
+    padding-bottom: calc(var(--spacing-unit) * 10);
+}
+
+/* Mobile Responsiveness: Full-width bottom bar */
+@media (max-width: 767px) {
+    .total-not-paid-fixed {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
         border-radius: 0;
-        padding: calc(var(--spacing-unit) * 2) 0;
+        /* Full width bar on mobile */
+        padding: calc(var(--spacing-unit) * 2);
+        justify-content: space-between;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        /* Shadow on top edge */
     }
-    
-    .total-summary-content-wrapper {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0 16px;
+}
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVENESS (Desktop: 12-column grid system ) */
+/* ------------------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+
+    /* Tablet/Desktop: Two-column grid for cards */
+    .expenses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc(var(--spacing-unit) * 4);
+        /* 32px */
     }
 
-    .total-summary-card-fixed h3 {
-        font-size: 1.8rem;
-        margin-top: 4px;
+    .filter-group {
+        flex-direction: row;
+        justify-content: center;
+        gap: calc(var(--spacing-unit) * 3);
+        max-width: 800px;
     }
 
-    /* Card Layout on Mobile */
-    .data-row {
-        grid-template-columns: 1fr 1fr;
+    .form-group--date {
+        /* Allow date input to align centrally with buttons */
+        max-width: 250px;
+    }
+
+    .filter-actions {
+        /* Allow buttons to take necessary width */
+        max-width: 250px;
+    }
+}
+
+@media (min-width: 1024px) {
+
+    /* Large Desktop: Three-column grid */
+    .expenses-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

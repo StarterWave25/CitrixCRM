@@ -419,6 +419,11 @@
 #sheet-select,
 #extension-select,
 .custom-date-input {
+    /* Remove default browser arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
     width: 300px;
     /* Constrain width for focused reading */
     max-width: 100%;
@@ -434,16 +439,6 @@
     appearance: none;
     cursor: pointer;
     transition: all 0.2s;
-}
-
-/* Dropdown Style: Large, touch-friendly, and modern */
-#sheet-select,
-#extension-select {
-    /* Remove default browser arrow */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 20px;
 }
 
 #sheet-select:focus,
@@ -632,97 +627,134 @@ body.modal-open {
 /* ------------------------------------------------------------------------- */
 /* 5. JQUERY UI DATEPICKER THEMEING (For Tour Plan Feature) */
 /* ------------------------------------------------------------------------- */
-
-/* Base Container Styling */
 .ui-datepicker {
-    width: 300px;
-    padding: 16px;
-    background-color: var(--white);
-    border: 1px solid var(--border-color);
+    font-family: var(--font-body), sans-serif;
+    padding: calc(var(--spacing-unit) * 2);
+    /* 16px */
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-card);
-    z-index: 2001 !important;
-    /* Ensure it is above the modal backdrop */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    background: var(--white);
 }
 
-/* Header (Month/Year Selector) */
-.ui-datepicker-header {
-    background-color: var(--blue);
-    color: var(--white);
-    padding: 8px 0;
+.ui-widget-header {
+    background: var(--lblue) !important;
     border: none;
-    border-radius: 6px 6px 0 0;
-    margin-bottom: 8px;
+    color: var(--white) !important;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
 }
 
-/* Navigation Arrows (Prev/Next) */
-.ui-datepicker .ui-datepicker-prev,
-.ui-datepicker .ui-datepicker-next {
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1.5em;
-    height: 1.5em;
+.ui-datepicker-prev,
+.ui-datepicker-next {
+    color: var(--white) !important;
+    border: none;
     cursor: pointer;
-    border: none;
-}
-
-.ui-datepicker .ui-datepicker-prev span,
-.ui-datepicker .ui-datepicker-next span {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E");
-    background-size: 100%;
-    margin-top: 0;
-    margin-left: 0;
-    height: 100%;
-    width: 100%;
-}
-
-.ui-datepicker .ui-datepicker-next span {
-    transform: rotate(180deg);
-}
-
-/* Day Cells (General) */
-.ui-datepicker td {
+    top: 5px;
     padding: 0;
 }
 
-.ui-datepicker td span,
-.ui-datepicker td a {
-    display: block;
-    padding: 0.5em;
-    text-align: center;
-    text-decoration: none;
-    color: var(--black);
-    border-radius: 4px;
-}
-
-/* Disabled Dates (The core feature visibility) */
-.ui-datepicker-unselectable.ui-state-disabled {
-    /* Style for dates NOT in the tour plan */
-    color: #ccc !important;
-    opacity: 0.5;
-    text-decoration: line-through;
-    cursor: not-allowed;
-}
-
-/* Enabled/Available Tour Dates */
-.ui-datepicker td .tour-date-available {
-    color: var(--blue);
-    font-weight: 700;
-}
-
-.ui-datepicker td .tour-date-available:hover {
-    background-color: var(--lblue);
-    color: var(--blue);
-}
-
-/* Selected Date */
-.ui-datepicker .ui-state-active {
-    background-color: var(--blue) !important;
+.ui-datepicker-title {
     color: var(--white) !important;
-    font-weight: 700;
-    border: 1px solid var(--blue);
 }
 
+.ui-state-default {
+    background: none !important;
+    border: none !important;
+    color: var(--black) !important;
+    text-align: center;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
+    margin: 1px;
+    font-weight: 500 !important;
+}
+
+/* Hover state for days */
+.ui-state-default.ui-state-hover {
+    background: var(--blue) !important;
+    border-radius: 3px;
+    color: var(--lblue) !important;
+}
+
+/* Active day (Selected Date) */
+.ui-state-active {
+    background: var(--blue) !important;
+    color: var(--lblue) !important;
+    border-radius: 3px;
+}
+
+/* Styling for selectable days (the crucial visual cue) */
+.ui-datepicker-calendar .ui-state-default.selectable-date {
+    /* Style for dates that are available to select */
+    font-weight: 700 !important;
+    color: var(--blue) !important;
+    border: 1px solid var(--lblue) !important;
+}
+
+.ui-datepicker-calendar .ui-state-default.selectable-date.ui-state-hover {
+    background: var(--lblue) !important;
+}
+
+/* Styling for disabled days */
+.ui-datepicker-unselectable {
+    color: var(--border-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* NESTED DATA TABLE STYLES (For Product Details, etc.) */
+/* ------------------------------------------------------------------------- */
+
+.product-details-section {
+    /* Clean separator from the standard key/value pairs above */
+    border-top: 2px dashed var(--border-color);
+}
+
+.product-details-section .section-title {
+    font-size: 1.05rem;
+    color: var(--black);
+    /* Clear, high-contrast title */
+    margin-bottom: 12px;
+    letter-spacing: 0.2px;
+}
+
+.product-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    table-layout: fixed;
+}
+
+/* Table Header (The columns) */
+.product-details-table th {
+    background-color: var(--lblue);
+    /* Light brand background */
+    color: var(--blue);
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 1px solid var(--blue);
+    /* Strong separator */
+}
+
+/* Table Body Cells */
+.product-details-table td {
+    padding: 10px 8px;
+    color: var(--black);
+    border-bottom: 1px solid #f0f0f0;
+    /* Soft horizontal lines */
+    font-weight: 500;
+    vertical-align: top;
+    text-align: left;
+}
+
+/* Last row has no bottom border */
+.product-details-table tr:last-child td {
+    border-bottom: none;
+}
 
 /* ------------------------------------------------------------------------- */
 /* 4. RESPONSIVENESS (Final Scroll Fix Applied Here) */
@@ -852,5 +884,15 @@ body.modal-open {
         /* Slightly reduce padding for compactness */
         font-size: 0.9rem;
         /* Slightly smaller text */
+    }
+}
+
+/* Mobile Tweak: Ensure padding is tight enough on small screens */
+@media (max-width: 480px) {
+
+    .product-details-table th,
+    .product-details-table td {
+        padding: 8px 4px;
+        font-size: 0.85rem;
     }
 }

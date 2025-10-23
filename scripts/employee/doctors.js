@@ -19,11 +19,11 @@ async function setupDoctorsListForm() {
     let doctorFormCounter = 0;
     let productRowCounter = 0;
     let productsData = []; // Store fetched products
+    let isSubmitting = false; // Global flag to track submission state
 
     // Validate tour plan selected
     if (!exId || !exName) {
         document.getElementById('form-title').textContent = '⚠ No Tour Plan is Selected';
-        formArea.innerHTML = '<p style="text-align: center; color: #dc3545; margin-top: 20px;">Please submit a Tour Plan first before adding doctors.</p>';
         return;
     }
 
@@ -67,7 +67,6 @@ async function setupDoctorsListForm() {
                 response.data.doctorsList.forEach(doctor => createDoctorForm(doctor, false));
                 if (response.data.doctorsList.length === 0) {
                     document.getElementById('form-title').textContent = '⚠ No Doctors Found!';
-                    formArea.innerHTML = '<p style="text-align: center; color: #dc3545; margin-top: 20px;">You can add new Doctors!</p>';
                     showNotification('No existing doctors found. You can add new doctors.', 'info');
                 }
             } else {
@@ -134,7 +133,6 @@ async function setupDoctorsListForm() {
     // --- Create Individual Doctor Form (Card) ---
     const createDoctorForm = (doctorData = null, isNewDoctor = true) => {
         document.getElementById('form-title').textContent = 'Doctors List';
-        formArea.innerHTML = '';
         doctorFormCounter++;
         const formId = `doctor-form-${doctorFormCounter}`;
         const formContainer = document.createElement('div');
@@ -404,6 +402,7 @@ async function setupDoctorsListForm() {
 
     // --- Add Floating "+" Button ---
     const addFloatingNewDoctorButton = () => {
+
         let fixedAddBtn = document.getElementById('fixed-add-doctor-btn');
         if (!fixedAddBtn) {
             fixedAddBtn = document.createElement('button');
@@ -433,9 +432,22 @@ async function setupDoctorsListForm() {
             }, 120);
         };
     };
+    // --- Disable/Enable All Submit Buttons ---
+    const toggleAllSubmitButtons = (disabled) => {
+        const allSubmitButtons = formArea.querySelectorAll('.form-submit-btn');
+        allSubmitButtons.forEach(btn => {
+            btn.disabled = disabled;
+        });
+    };
 
     // --- Submission Logic ---
     const handleDoctorSubmission = async (formId, isNewDoctor) => {
+        // ✅ Check if any submission is in progress
+        if (isSubmitting) {
+            showNotification('Another form is being submitted. Please wait.', 'warning');
+            return;
+        }
+
         const formContainer = document.getElementById(formId);
         if (!formContainer) return;
 
@@ -477,6 +489,9 @@ async function setupDoctorsListForm() {
                 return;
             }
         }
+        // ✅ Set global flag and disable all buttons
+        isSubmitting = true;
+        toggleAllSubmitButtons(true);
 
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
@@ -498,6 +513,11 @@ async function setupDoctorsListForm() {
         } catch (error) {
             console.error('Doctor submission error:', error);
             showNotification('An unexpected error occurred.', 'error');
+
+            // ✅ Reset flag and enable all buttons
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
+
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
         }
@@ -628,6 +648,7 @@ async function setupDoctorsListForm() {
             const productRows = productsContainer.querySelectorAll('.product-row');
 
             const productsArray = [];
+
             for (const row of productRows) {
                 const selectElement = row.querySelector('select[name="productName"]');
                 const stripsInput = row.querySelector('input[name="strips"]');
@@ -679,18 +700,48 @@ async function setupDoctorsListForm() {
             // Create button container
             const buttonContainer = document.createElement('div');
             buttonContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;';
-
+            let productsListText = '';
+            // Format products list as string
+            productsArray.forEach((product, index) => {
+                productsListText += `${index + 1}. ${product.productName} – ${product.strips} Strips - ${product.freeStrips} Free Strips\n`;
+            });
             // Prepare message data for template (you can use this in your template)
             const messageData = {
                 doctorName: doctorName,
-                products: productsArray,
+                doctorPhone: formContainer.querySelector('#phone').value.trim(),
+                doctorAddress: formContainer.querySelector('#address').value.trim(),
+                products: productsListText,
                 grandTotal: grandTotal,
                 employeeName: employeeName,
-                exName: exName
+                exName: exName,
+                dlCopy: dlCopyResponse.url,
+                prescription: prescriptionResponse.url
             };
 
             // Convert to string for message variable
-            const message = JSON.stringify(messageData);
+            const message = `Please arrange immediate delivery of the following order to Dr. ${messageData.doctorName} 👨‍⚕️
+
+👤 Representative: ${messageData.employeeName}
+
+📋 Order Details:
+👨‍⚕️ Doctor: ${messageData.doctorName}
+📞 Phone: ${messageData.doctorPhone},
+🏠 Address: ${messageData.doctorAddress}
+🧾 DL Copy: ${messageData.dlCopy}
+💊 Prescription: ${messageData.prescription}
+
+🧃 Products Ordered:
+${messageData.products}
+
+💰 Total Amount: ₹${messageData.grandTotal}
+
+⏰ Kindly prioritize this delivery and ensure it reaches Dr. Suresh Kumar as soon as possible today.
+Every minute counts, let’s make it quick! ⚡💨
+
+Thank you 🙏
+Citrix Ltd Team.`;
+
+            console.log(message);
 
             // Stockist Button
             const stockistBtn = document.createElement('button');
@@ -739,6 +790,10 @@ async function setupDoctorsListForm() {
                 // Hide buttons and form
                 buttonContainer.style.display = 'none';
                 formContainer.style.display = 'none';
+
+                // ✅ Reset flag and enable other buttons
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
             } else {
                 const errorMessage = response.message || 'Failed to send message.';
                 showNotification(errorMessage, 'error');
@@ -769,6 +824,9 @@ async function setupDoctorsListForm() {
         if (response.success) {
             showNotification('Doctor activity submitted successfully.', 'success');
             formContainer.style.display = 'none';
+            // ✅ Reset flag and enable other buttons
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
         } else {
             const errorMessage = response.message || 'Doctor activity submission failed.';
             showNotification(errorMessage, 'error');
@@ -819,6 +877,10 @@ async function setupDoctorsListForm() {
         if (activityResponse.success) {
             showNotification('New doctor and activity submitted successfully.', 'success');
             formContainer.style.display = 'none';
+
+            // ✅ Reset flag and enable other buttons
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
         } else {
             const errorMessage = activityResponse.message || 'Doctor activity submission failed.';
             showNotification(errorMessage, 'error');
