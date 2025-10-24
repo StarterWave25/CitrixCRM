@@ -19,6 +19,7 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     margin: 0 auto; /* Center the card */
     position: relative; /* Establish positioning context */
+    overflow-x: hidden;
 }
 
 .card-heading {
@@ -283,5 +284,77 @@
         max-width: 100%;
         /* Can go full width on mobile for tap targets */
         padding: 12px 0;
+    }
+}
+
+/* ------------------------------------------- */
+/* DOCTORS LIST FORM STYLES                    */
+/* ------------------------------------------- */
+
+.doctor-form-container {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.product-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    background: #fff;
+}
+
+.product-row .form-group {
+    flex: 1 1 120px; /* Grow, shrink, with a basis of 120px */
+    min-width: 120px; /* Prevent shrinking too small */
+    margin-bottom: 0; /* Override default form-group margin */
+}
+
+.product-row .form-group[data-field-name="productName"] {
+    flex-basis: 200px; /* Give more space to product name */
+    min-width: 150px;
+}
+
+.product-row .remove-product-btn {
+    flex-shrink: 0; /* Prevent the button from shrinking */
+    background: var(--error-red);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 16px;
+    height: 42px; /* Match input height */
+    line-height: 1;
+}
+
+.product-row .remove-product-btn:hover {
+    background: color-mix(in srgb, var(--error-red), var(--black) 10%);
+}
+
+/* Responsive adjustments for product row */
+@media (max-width: 768px) {
+    .product-row {
+        flex-direction: column;
+        align-items: stretch; /* Full width items */
+        gap: 16px;
+    }
+
+    .product-row .form-group,
+    .product-row .form-group[data-field-name="productName"] {
+        flex-basis: auto; /* Reset basis */
+        min-width: 100%; /* Take full width */
+    }
+
+    .product-row .remove-product-btn {
+        width: 100%;
+        margin-top: 0;
     }
 }

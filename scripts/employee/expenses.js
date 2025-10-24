@@ -207,8 +207,8 @@ async function initializePage() {
         // 2. Fetch data
         const response = await apiFetch('common/get-expenses', 'POST', { empId: empIdValue });
 
-        if (response.success && response.expenses) {
-            allExpenses = response.expenses;
+        if (response.success && response.data.expenses) {
+            allExpenses = response.data.expenses;
 
             initializeDatepicker();
             renderExpenseCards(allExpenses);

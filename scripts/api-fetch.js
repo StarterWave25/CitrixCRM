@@ -35,12 +35,11 @@ async function apiFetch(url, type = "GET", data = {}) {
 
         const response = await fetch(endpoint, options);
         const result = await response.json();
-        if (!result.authorized) {
-            if (!location.href.includes('login')) {
-                localStorage.removeItem('userDetails');
-                location.href = 'http://127.0.0.1:5500/';
-            }
-        }
+        // if (!result.authorized) {
+        //     localStorage.removeItem('userDetails');
+        //     location.href = 'http://127.0.0.1:5500/';
+        //     return;
+        // }
         return result;
     } catch (err) {
         console.error("Fetch failed:", err);

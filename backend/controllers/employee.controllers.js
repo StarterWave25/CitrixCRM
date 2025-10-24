@@ -35,20 +35,20 @@ export const submitForm = async (req, res) => {
     try {
         const { form, data } = req.body;
         if (!form || !data || typeof data !== 'object') {
-            return res.status(400).json({ error: 'Invalid request: missing form or data' });
+            return res.status(400).json({ success: false, message: 'Invalid request: missing form or data' });
         }
 
         const entry = FORM_REGISTRY[form];
 
-        if (!entry) return res.status(400).json({ error: 'Unknown form' });
+        if (!entry) return res.status(400).json({ success: false, message: 'Unknown form' });
 
         // Check for compiled validator
-        if (!entry.validator) return res.status(500).json({ error: 'Form validator not initialized' });
+        if (!entry.validator) return res.status(500).json({ success: false, message: 'Form validator not initialized' });
 
         // 1. Validate with Ajv (server-side source of truth)
         const valid = entry.validator(data);
         if (!valid) {
-            return res.status(400).json({ error: 'Validation failed', details: entry.validator.errors });
+            return res.status(400).json({ success: false, message: 'Validation failed', data: { details: entry.validator.errors } });
         }
 
         // 2. Build columns & values from whitelist only
@@ -63,7 +63,7 @@ export const submitForm = async (req, res) => {
         }
 
         if (toInsert.length === 0) {
-            return res.status(400).json({ error: 'No insertable fields provided' });
+            return res.status(400).json({ success: false, message: 'No insertable fields provided' });
         }
 
         // 3. Build safe parameterized SQL
@@ -79,9 +79,9 @@ export const submitForm = async (req, res) => {
         console.error('Submit error', err);
         // 1062 is typically a Duplicate Entry error code in MySQL
         if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ error: 'Record already exists (Duplicate entry)' });
+            return res.status(409).json({ success: false, message: 'Record already exists (Duplicate entry)' });
         }
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 
@@ -189,7 +189,7 @@ export const sendMessage = async (req, res) => {
 
         // 6. Return the successful response body
         const wpresponse = await wprequest.json();
-        return res.status(200).json(wpresponse);
+        return res.status(200).json({ success: true, message: 'Message sent successfully', data: wpresponse });
 
     } catch (error) {
         // 7. Handle internal exceptions (DB errors, network errors, JSON parsing)
@@ -205,12 +205,12 @@ export const sendMessage = async (req, res) => {
 export const uploadImage = async (req, res) => {
     try {
         const { image } = req.body;
-        if (!image) return res.status(400).json({ message: "Image is required" });
+        if (!image) return res.status(400).json({ success: false, message: "Image is required" });
         const uploadResponse = await cloudinary.uploader.upload(image);
         return res.status(200).json({ message: "Image uploaded successfully", url: uploadResponse.secure_url });
     } catch (error) {
         console.log("Error in upload-image-route:", error);
-        res.status(500).json({ message: "Internal Server Error", ok: false });
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 

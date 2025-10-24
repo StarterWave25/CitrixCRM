@@ -51,7 +51,7 @@ export const addEntity = async (req, res) => {
     // 1. Initial Request Validation
     if (!form || !data) {
         return res.status(400).json({
-            ok: false,
+            success: false,
             message: "Request body must contain 'form' (entity key) and 'data' (payload)."
         });
     }
@@ -60,7 +60,7 @@ export const addEntity = async (req, res) => {
 
     if (!entityConfig) {
         return res.status(400).json({
-            ok: false,
+            success: false,
             message: `Invalid form key: '${form}'. Entity not found in registry.`
         });
     }
@@ -71,9 +71,9 @@ export const addEntity = async (req, res) => {
     if (validationErrors) {
         console.warn(`Validation failed for form ${form}:`, validationErrors);
         return res.status(400).json({
-            ok: false,
+            success: false,
             message: "Validation Error",
-            errors: validationErrors
+            data: { errors: validationErrors }
         });
     }
 
@@ -108,10 +108,9 @@ export const addEntity = async (req, res) => {
 
         // 6. Respond with Success
         return res.status(201).json({
-            ok: true,
+            success: true,
             message: `${entityConfig.table} added successfully.`,
-            insertedId: result.insertId,
-            rowCount: result.affectedRows
+            data: { insertedId: result.insertId, rowCount: result.affectedRows }
         });
 
     } catch (error) {
@@ -119,18 +118,18 @@ export const addEntity = async (req, res) => {
         // Specifically check for common MySQL duplicate entry errors (Code 1062)
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({
-                ok: false,
+                success: false,
                 message: "Employee already exists!"
             });
         }
         if (error.errno === 1452) {
             return res.status(409).json({
-                ok: false,
+                success: false,
                 message: "No Headquarter present!"
             });
         }
         return res.status(500).json({
-            ok: false,
+            success: false,
             message: "Internal Server Error during data insertion."
         });
     }
@@ -383,7 +382,7 @@ export const payExpenses = async (req, res) => {
     const empId = parseInt(req.body.empId, 10);
 
     if (isNaN(empId) || empId <= 0) {
-        return res.status(400).json({ error: 'Invalid employee ID format provided in request body.' });
+        return res.status(400).json({ success: false, message: 'Invalid employee ID format provided in request body.' });
     }
 
     try {
@@ -415,8 +414,7 @@ export const payExpenses = async (req, res) => {
             if (checkRows.length === 0) {
                 return res.status(404).json({
                     success: false,
-                    message: `Employee ID ${empId} not found in the expenses table.`,
-                    affectedRows: 0
+                    message: `Employee ID ${empId} not found in the expenses table.`
                 });
             }
 
@@ -429,15 +427,15 @@ export const payExpenses = async (req, res) => {
         }
 
         // 4. Return success message and the number of rows updated
-        return res.json({
+return res.status(200).json({
             success: true,
             message: `Successfully updated ${affectedRows} expense record(s) to 'Paid' for empId ${empId}.`,
-            affectedRows: affectedRows
+            data: { affectedRows: affectedRows }
         });
 
     } catch (err) {
         console.error(`Pay Expenses error for empId ${empId}:`, err);
-        return res.status(500).json({ error: 'Internal server error during expense payment update.' });
+        return res.status(500).json({ success: false, message: 'Internal server error during expense payment update.' });
     }
 };
 
@@ -453,7 +451,7 @@ export const editCell = async (req, res) => {
     // 1. Initial Input Validation
     if (!encryptedMetadata || columnValue === undefined) {
         return res.status(400).json({
-            ok: false,
+            success: false,
             message: "Missing required fields: encryptedMetadata and columnValue must be provided."
         });
     }
@@ -472,7 +470,7 @@ export const editCell = async (req, res) => {
         // Handle errors thrown during decryption (e.g., corrupted token, invalid JSON)
         console.error('Decryption failed on request:', e.message);
         return res.status(401).json({
-            ok: false,
+            success: false,
             message: "Authentication failure: Invalid or corrupted access token (metadata)."
         });
     }
@@ -481,7 +479,7 @@ export const editCell = async (req, res) => {
     const disallowedColumns = ['date', 'created_at', 'updated_at'];
     if (disallowedColumns.includes(columnName.toLowerCase()) && columnName.toLowerCase() !== 'password') {
         return res.status(403).json({
-            ok: false,
+            success: false,
             // FIXED: Used template literal backticks for the message string
             message: `Updating column '${columnName}' is restricted via this endpoint.`
         });
@@ -510,25 +508,27 @@ export const editCell = async (req, res) => {
 
             if (checkRows.length === 0) {
                 return res.status(404).json({
-                    ok: false,
+                    success: false,
                     // FIXED: Used template literal backticks for the message string
                     message: `Row not found in table '${tableName}' with ${IdName} = ${IdValue}.`
                 });
             } else {
                 return res.status(200).json({
-                    ok: true,
+                    success: true,
                     message: "Update successful, but the new value was the same as the old value (0 rows affected)."
                 });
             }
         }
 
         return res.status(200).json({
-            ok: true,
+            success: true,
             // FIXED: Used template literal backticks for the message string
             message: `${result.affectedRows} row(s) updated successfully in table '${tableName}'.`,
-            info: {
-                updatedColumn: columnName,
-                newValue: columnValue, // Now correctly defined
+            data: {
+                info: {
+                    updatedColumn: columnName,
+                    newValue: columnValue, // Now correctly defined
+                }
             }
         });
 
@@ -539,16 +539,16 @@ export const editCell = async (req, res) => {
         // Check for specific database errors
         if (error.code === 'ER_NO_SUCH_TABLE') {
             // FIXED: Used template literal backticks for the message string
-            return res.status(404).json({ ok: false, message: `Table '${tableName}' does not exist.` });
+            return res.status(404).json({ success: false, message: `Table '${tableName}' does not exist.` });
         }
         if (error.code === 'ER_BAD_FIELD_ERROR') {
             // FIXED: Used template literal backticks for the message string
-            return res.status(400).json({ ok: false, message: `Column '${columnName}' or identifier '${IdName}' does not exist in table '${tableName}'.` });
+            return res.status(400).json({ success: false, message: `Column '${columnName}' or identifier '${IdName}' does not exist in table '${tableName}'.` });
         }
 
         // Generic internal error
         return res.status(500).json({
-            ok: false,
+            success: false,
             message: "Internal Server Error during data update."
         });
     }

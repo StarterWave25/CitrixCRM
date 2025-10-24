@@ -19,9 +19,6 @@ if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
   console.error('Missing one of GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN in .env. Meeting creation will fail.');
 }
 
-// Scope used for full calendar access including conference creation
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-
 /**
  * Returns a pre-configured OAuth2 client with refresh token attached.
  * Google libraries will auto-refresh access tokens as needed.
@@ -72,7 +69,7 @@ export async function createGoogleMeet(req, res) {
   } = req.body;
 
   if (!startTime || !endTime) {
-    return res.status(400).json({ error: 'Missing startTime or endTime in request body.' });
+    return res.status(400).json({ success: false, message: 'Missing startTime or endTime in request body.' });
   }
 
   // --- SECURE VALIDATION BLOCK ---
@@ -83,19 +80,19 @@ export async function createGoogleMeet(req, res) {
   const maxDurationMs = 4 * 60 * 60 * 1000; // 4 hours
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    return res.status(400).json({ error: 'Invalid date/time format. Use ISO 8601 strings (e.g., 2025-10-13T14:00:00+05:30).' });
+    return res.status(400).json({ success: false, message: 'Invalid date/time format. Use ISO 8601 strings (e.g., 2025-10-13T14:00:00+05:30).' });
   }
   if (start.getTime() <= now.getTime() + 60000) {
-    return res.status(400).json({ error: 'Meeting start time must be in the future (allowing a 60s buffer).' });
+    return res.status(400).json({ success: false, message: 'Meeting start time must be in the future (allowing a 60s buffer).' });
   }
   if (end.getTime() <= start.getTime()) {
-    return res.status(400).json({ error: 'Meeting end time must be after the start time.' });
+    return res.status(400).json({ success: false, message: 'Meeting end time must be after the start time.' });
   }
   const durationMs = end.getTime() - start.getTime();
   if (durationMs < minDurationMs || durationMs > maxDurationMs) {
     const minMin = minDurationMs / 60000;
     const maxHr = maxDurationMs / 3600000;
-    return res.status(400).json({ error: `Meeting duration must be between ${minMin} minutes and ${maxHr} hours.` });
+    return res.status(400).json({ success: false, message: `Meeting duration must be between ${minMin} minutes and ${maxHr} hours.` });
   }
 
   // --- ATTENDEES CONSTRUCTION ---
@@ -177,7 +174,7 @@ export async function createGoogleMeet(req, res) {
       const insertSql = 'INSERT INTO `meetings` (\`Meeting Link\`, count) VALUES (?, ?)';
       await pool.execute(insertSql, [meetingLink, newCount]);
 
-      return res.json({
+      return res.status(200).json({
         success: true,
         message: 'Google Meet created and logged successfully.',
         meetingLink,
@@ -201,15 +198,15 @@ export async function createGoogleMeet(req, res) {
 
     // Handle the persistent 'invalid_grant' error
     if (errMsg && typeof errMsg === 'string' && errMsg.includes('invalid_grant')) {
-      return res.status(401).json({ error: 'CRITICAL: Invalid or expired refresh token. Re-authorize the application.', details: errMsg });
+      return res.status(401).json({ success: false, message: 'CRITICAL: Invalid or expired refresh token. Re-authorize the application.', data: { details: errMsg } });
     }
 
     // Handle Forbidden errors
     if (errMsg?.error === 'insufficientPermissions' || (errMsg && errMsg.toString().includes('Forbidden'))) {
-      return res.status(403).json({ error: 'Insufficient permissions. The token owner cannot create meetings on the target calendar.', details: errMsg });
+      return res.status(403).json({ success: false, message: 'Insufficient permissions. The token owner cannot create meetings on the target calendar.', data: { details: errMsg } });
     }
 
-    return res.status(500).json({ error: 'Failed to create Google Meet event', details: errMsg });
+    return res.status(500).json({ success: false, message: 'Failed to create Google Meet event', data: { details: errMsg } });
   }
 }
 
@@ -284,7 +281,7 @@ export const viewData = async (req, res) => {
   // ----------------------------------------
 
   try {
-    if (!pool) return res.status(500).json({ error: 'DB pool not configured' });
+    if (!pool) return res.status(500).json({ success: false, message: 'DB pool not configured' });
 
     const { empId, exId, fromDate, toDate } = req.body || {};
 
@@ -292,22 +289,22 @@ export const viewData = async (req, res) => {
     const empIdNum = empId !== undefined && empId !== '' ? Number(empId) : null;
     const exIdNum = exId !== undefined && exId !== '' ? Number(exId) : null;
     if (empId !== undefined && empId !== '' && (!Number.isInteger(empIdNum) || empIdNum <= 0)) {
-      return res.status(400).json({ error: 'Invalid empId' });
+      return res.status(400).json({ success: false, message: 'Invalid empId' });
     }
     if (exId !== undefined && exId !== '' && (!Number.isInteger(exIdNum) || exIdNum <= 0)) {
-      return res.status(400).json({ error: 'Invalid exId' });
+      return res.status(400).json({ success: false, message: 'Invalid exId' });
     }
 
     const fProvided = fromDate !== undefined && fromDate !== '' && fromDate !== null;
     const tProvided = toDate !== undefined && toDate !== '' && toDate !== null;
 
     if (!fProvided && !tProvided) {
-      return res.status(400).json({ error: 'Provide at least fromDate or toDate (YYYY-MM-DD)' });
+      return res.status(400).json({ success: false, message: 'Provide at least fromDate or toDate (YYYY-MM-DD)' });
     }
 
     // Validate date strings when provided
-    if (fProvided && !isValidDateString(fromDate)) return res.status(400).json({ error: 'Invalid fromDate format' });
-    if (tProvided && !isValidDateString(toDate)) return res.status(400).json({ error: 'Invalid toDate format' });
+    if (fProvided && !isValidDateString(fromDate)) return res.status(400).json({ success: false, message: 'Invalid fromDate format' });
+    if (tProvided && !isValidDateString(toDate)) return res.status(400).json({ success: false, message: 'Invalid toDate format' });
 
     // Build date clause generator for a given date column name
     function dateClauseFor(columnName) {
@@ -408,7 +405,7 @@ ORDER BY \`doctor activities\`.\`date\` ASC`).trim(),
       {
         key: 'orders',
         tableName: 'orders',
-        idName: 'orderId',
+        idName: 'Order ID',
         dateColumn: 'Date',
         columnsToEncrypt: ['DL Copy', 'Prescription', 'Total'],
         sqlBuilder: (dateClause, commonClauses, commonParams) => {
@@ -433,7 +430,7 @@ ORDER BY \`doctor activities\`.\`date\` ASC`).trim(),
 
           return {
             sql: (`SELECT
-o.\`orderId\`, 
+o.\`orderId\` AS \`Order ID\`, 
 o.\`Date\` AS \`Date\`,
 o.\`Employee Name\` AS \`Employee Name\`,
 o.\`Doctor Name\` AS \`Doctor Name\`,
@@ -520,11 +517,11 @@ ORDER BY o.\`Date\` ASC`).trim(),
     }
 
     // Return response with exact keys required
-    return res.status(200).json({ success: true, data: resultsMap });
+    return res.status(200).json({ success: true, message: 'Data retrieved successfully', data: resultsMap });
 
   } catch (err) {
     console.error('show-my-data error', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -538,7 +535,7 @@ export const getExpenses = async (req, res) => {
   const empId = parseInt(req.body.empId, 10);
 
   if (isNaN(empId) || empId <= 0) {
-    return res.status(400).json({ error: 'Invalid employee ID format provided.' });
+    return res.status(400).json({ success: false, message: 'Invalid employee ID format provided.' });
   }
 
   try {
@@ -571,15 +568,15 @@ export const getExpenses = async (req, res) => {
 
     // 4. Handle no records found
     if (rows.length === 0) {
-      return res.status(404).json({ message: `No expense records found for empId: ${empId}` });
+      return res.status(404).json({ success: false, message: `No expense records found for empId: ${empId}` });
     }
 
     // 5. Return the expense records
-    return res.json({ success: true, expenses: rows });
+    return res.status(200).json({ success: true, message: 'Expenses retrieved successfully', data: { expenses: rows } });
 
   } catch (err) {
     console.error(`Get Expenses error for empId ${empId}:`, err);
-    return res.status(500).json({ error: 'Internal server error while fetching expenses.' });
+    return res.status(500).json({ success: false, message: 'Internal server error while fetching expenses.' });
   }
 };
 
@@ -624,14 +621,14 @@ export const joinMeeting = async (req, res) => {
     }
 
     // 3. Return the meeting link (which will be the first and only row)
-    return res.json({
+    return res.status(200).json({
       success: true,
       meetingLink: rows[0].meetingLink
     });
 
   } catch (err) {
     console.error('Join Meeting error:', err);
-    return res.status(500).json({ error: 'Internal server error while retrieving meeting link.' });
+    return res.status(500).json({ success: false, message: 'Internal server error while retrieving meeting link.' });
   }
 };
 

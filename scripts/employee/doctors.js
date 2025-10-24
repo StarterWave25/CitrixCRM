@@ -130,6 +130,36 @@ async function setupDoctorsListForm() {
         return { valid: true };
     };
 
+    const validateOrderFields = (formContainer, formId) => {
+        const dlCopyFile = formContainer.querySelector('input[name="dlCopy"]').files[0];
+        const prescriptionFile = formContainer.querySelector('input[name="prescription"]').files[0];
+
+        if (!dlCopyFile || !prescriptionFile) {
+            return { valid: false, message: 'Both DL Copy and Prescription images are required.' };
+        }
+
+        const productsContainer = document.getElementById(`products-container-${formId}`);
+        const productRows = productsContainer.querySelectorAll('.product-row');
+
+        if (productRows.length > 0) {
+            for (const row of productRows) {
+                const selectElement = row.querySelector('select[name="productName"]');
+                const stripsInput = row.querySelector('input[name="strips"]');
+                const freeStripsInput = row.querySelector('input[name="freeStrips"]');
+
+                const pId = selectElement.getAttribute('data-p-id');
+                const strips = parseInt(stripsInput.value);
+                const freeStrips = parseInt(freeStripsInput.value);
+
+                if (!pId || isNaN(strips) || strips <= 0 || isNaN(freeStrips) || freeStrips < 0) {
+                    return { valid: false, message: 'Please select a product and enter valid quantities for all product rows.' };
+                }
+            }
+        }
+
+        return { valid: true };
+    };
+
     // --- Create Individual Doctor Form (Card) ---
     const createDoctorForm = (doctorData = null, isNewDoctor = true) => {
         document.getElementById('form-title').textContent = 'Doctors List';
@@ -138,7 +168,6 @@ async function setupDoctorsListForm() {
         const formContainer = document.createElement('div');
         formContainer.classList.add('doctor-form-container');
         formContainer.setAttribute('id', formId);
-        formContainer.style.cssText = 'border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px; background: #f9f9f9;';
 
         const formTitle = document.createElement('h3');
         formTitle.textContent = isNewDoctor ? '➕ New Doctor' : `👨‍⚕️ ${doctorData.doctorName}`;
@@ -270,7 +299,6 @@ async function setupDoctorsListForm() {
         const productRow = document.createElement('div');
         productRow.classList.add('product-row');
         productRow.setAttribute('id', rowId);
-        productRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; background: #fff;';
 
         // Product Dropdown
         const productOptions = productsData.map(p => ({
@@ -286,8 +314,6 @@ async function setupDoctorsListForm() {
             required: true,
             options: productOptions
         });
-        productSelect.style.flex = '1';
-        productSelect.style.minWidth = '200px';
 
         const selectElement = productSelect.querySelector('select');
         selectElement.addEventListener('change', () => {
@@ -310,10 +336,8 @@ async function setupDoctorsListForm() {
             type: 'number',
             label: 'Strips (Quantity)',
             required: true,
-            value: '0'
+            placeholder: 'No of Strips'
         });
-        stripsInput.style.flex = '1';
-        stripsInput.style.minWidth = '120px';
 
         const stripsField = stripsInput.querySelector('input');
         stripsField.addEventListener('input', () => calculateProductTotal(rowId, formId));
@@ -326,10 +350,8 @@ async function setupDoctorsListForm() {
             type: 'number',
             label: 'Free Strips',
             required: true,
-            value: '0'
+            placeholder: 'No of Free Strips'
         });
-        freeStripsInput.style.flex = '1';
-        freeStripsInput.style.minWidth = '120px';
         productRow.appendChild(freeStripsInput);
 
         // Total Input (ReadOnly)
@@ -341,8 +363,6 @@ async function setupDoctorsListForm() {
             readOnly: true,
             value: '0'
         });
-        totalInput.style.flex = '1';
-        totalInput.style.minWidth = '120px';
         productRow.appendChild(totalInput);
 
         // Remove Button
@@ -350,7 +370,6 @@ async function setupDoctorsListForm() {
         removeBtn.type = 'button';
         removeBtn.classList.add('remove-product-btn');
         removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-        removeBtn.style.cssText = 'background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;';
         removeBtn.addEventListener('click', () => {
             productRow.remove();
             calculateGrandTotal(formId);
@@ -501,6 +520,16 @@ async function setupDoctorsListForm() {
 
             if (orderStatus) {
                 // Order Status = Yes logic
+                // Validate order-specific fields upfront
+                const orderValidation = validateOrderFields(formContainer, formId);
+                if (!orderValidation.valid) {
+                    showNotification(orderValidation.message, 'error');
+                    isSubmitting = false;
+                    toggleAllSubmitButtons(false);
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                    return;
+                }
                 await submitDoctorWithOrder(formContainer, formId, isNewDoctor, submitButton);
             } else {
                 // Order Status = No logic (existing)
@@ -531,6 +560,10 @@ async function setupDoctorsListForm() {
             const doctorNameInput = formContainer.querySelector('#doctorName');
             const doctorName = doctorNameInput.value.trim();
 
+            // Re-declare dlCopyFile and prescriptionFile here
+            const dlCopyFile = formContainer.querySelector('input[name="dlCopy"]').files[0];
+            const prescriptionFile = formContainer.querySelector('input[name="prescription"]').files[0];
+
             if (isNewDoctor) {
                 // Create new doctor first
                 const addressInput = formContainer.querySelector('#address');
@@ -549,8 +582,8 @@ async function setupDoctorsListForm() {
                 if (!doctorResponse.success || !doctorResponse.insertId) {
                     const errorMessage = doctorResponse.message || 'Failed to create new doctor.';
                     showNotification(errorMessage, 'error');
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                    isSubmitting = false;
+                    toggleAllSubmitButtons(false);
                     return;
                 }
 
@@ -576,21 +609,12 @@ async function setupDoctorsListForm() {
             if (!activityResponse.success) {
                 const errorMessage = activityResponse.message || 'Doctor activity submission failed.';
                 showNotification(errorMessage, 'error');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
                 return;
             }
 
             // Step 1: Upload Images
-            const dlCopyFile = formContainer.querySelector('input[name="dlCopy"]').files[0];
-            const prescriptionFile = formContainer.querySelector('input[name="prescription"]').files[0];
-
-            if (!dlCopyFile || !prescriptionFile) {
-                showNotification('Both DL Copy and Prescription images are required.', 'error');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
-                return;
-            }
 
             showNotification('Uploading DL Copy...', 'info');
             const dlCopyBase64 = await fileToBase64(dlCopyFile);
@@ -598,8 +622,8 @@ async function setupDoctorsListForm() {
 
             if (!dlCopyResponse.url) {
                 showNotification('DL Copy upload failed.', 'error');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
                 return;
             }
 
@@ -609,8 +633,8 @@ async function setupDoctorsListForm() {
 
             if (!prescriptionResponse.url) {
                 showNotification('Prescription upload failed.', 'error');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
                 return;
             }
 
@@ -636,8 +660,8 @@ async function setupDoctorsListForm() {
             if (!orderResponse.success || !orderResponse.insertId) {
                 const errorMessage = orderResponse.message || 'Order submission failed.';
                 showNotification(errorMessage, 'error');
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
                 return;
             }
 
@@ -656,15 +680,8 @@ async function setupDoctorsListForm() {
 
                 const pId = parseInt(selectElement.getAttribute('data-p-id'));
                 const productName = selectElement.value;
-                const strips = parseInt(stripsInput.value) || 0;
-                const freeStrips = parseInt(freeStripsInput.value) || 0;
-
-                if (!pId || strips <= 0) {
-                    showNotification('Please select a product and enter valid quantity.', 'error');
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
-                    return;
-                }
+                const strips = parseInt(stripsInput.value);
+                const freeStrips = parseInt(freeStripsInput.value);
 
                 const orderedProductData = {
                     orderId: orderId,
@@ -678,8 +695,8 @@ async function setupDoctorsListForm() {
 
                 if (!productResponse.success) {
                     showNotification(`Failed to submit product: ${productName}`, 'error');
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                    isSubmitting = false;
+                    toggleAllSubmitButtons(false);
                     return;
                 }
 
@@ -830,8 +847,8 @@ Citrix Ltd Team.`;
         } else {
             const errorMessage = response.message || 'Doctor activity submission failed.';
             showNotification(errorMessage, 'error');
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
         }
     };
 
@@ -856,8 +873,8 @@ Citrix Ltd Team.`;
         if (!doctorResponse.success || !doctorResponse.insertId) {
             const errorMessage = doctorResponse.message || 'Failed to create new doctor.';
             showNotification(errorMessage, 'error');
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
             return;
         }
 
@@ -884,8 +901,8 @@ Citrix Ltd Team.`;
         } else {
             const errorMessage = activityResponse.message || 'Doctor activity submission failed.';
             showNotification(errorMessage, 'error');
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
         }
     };
 
