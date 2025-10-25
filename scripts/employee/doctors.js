@@ -63,6 +63,7 @@ async function setupDoctorsListForm() {
                 exId: parseInt(exId)
             });
             formArea.innerHTML = '';
+            console.log(response);
             if (response.success && response.data && Array.isArray(response.data.doctorsList)) {
                 response.data.doctorsList.forEach(doctor => createDoctorForm(doctor, false));
                 if (response.data.doctorsList.length === 0) {
@@ -130,6 +131,14 @@ async function setupDoctorsListForm() {
         return { valid: true };
     };
 
+    const validateStage = (stage) => {
+        const validStages = ['None', 'Targeted', 'Converted'];
+        if (!stage || !validStages.includes(stage)) {
+            return { valid: false, message: 'Please select a valid stage.' };
+        }
+        return { valid: true };
+    };
+
     const validateOrderFields = (formContainer, formId) => {
         const dlCopyFile = formContainer.querySelector('input[name="dlCopy"]').files[0];
         const prescriptionFile = formContainer.querySelector('input[name="prescription"]').files[0];
@@ -169,13 +178,26 @@ async function setupDoctorsListForm() {
         formContainer.classList.add('doctor-form-container');
         formContainer.setAttribute('id', formId);
 
+        applyStageStyles(formContainer, doctorData?.Stage || 'None');
+
         const formTitle = document.createElement('h3');
         formTitle.textContent = isNewDoctor ? '➕ New Doctor' : `👨‍⚕️ ${doctorData.doctorName}`;
         formTitle.style.cssText = 'margin-top: 0; color: #333; font-size: 18px;';
         formContainer.appendChild(formTitle);
 
+        const stageValue = doctorData?.Stage || 'None';
+        const stageOptions = [
+            { value: 'None', label: 'None' },
+            { value: 'Targeted', label: 'Targeted' },
+            { value: 'Converted', label: 'Converted' }
+        ].map(option => ({
+            ...option,
+            selected: option.value === stageValue
+        }));
+
         const fields = [
             { name: 'doctorName', type: 'text', label: 'Doctor Name', required: true, value: doctorData?.doctorName || '', readOnly: !isNewDoctor },
+            { name: 'stage', type: 'select', label: 'Stage', required: true, options: stageOptions },
             { name: 'address', type: 'text', label: 'Address', required: true, value: doctorData?.address || '', readOnly: !isNewDoctor },
             { name: 'phone', type: 'tel', label: 'Phone Number', required: true, value: doctorData?.phone || '', readOnly: !isNewDoctor },
             { name: 'feedback', type: 'textarea', label: 'Feedback', required: true, value: '' },
@@ -224,6 +246,17 @@ async function setupDoctorsListForm() {
         formContainer.appendChild(submitButton);
 
         formArea.appendChild(formContainer);
+
+        // Manually set the selected value for the stage dropdown after creation
+        const stageSelectElement = formContainer.querySelector('select[name="stage"]');
+        if (stageSelectElement) {
+            stageSelectElement.value = doctorData?.Stage || 'None';
+
+            // Add event listener for stage change to update border color
+            stageSelectElement.addEventListener('change', (event) => {
+                applyStageStyles(formContainer, event.target.value);
+            });
+        }
     };
 
     // --- Populate Order-Specific Fields ---
@@ -419,6 +452,29 @@ async function setupDoctorsListForm() {
         }
     };
 
+    // --- Apply Stage Styles ---
+    const applyStageStyles = (container, stage) => {
+        let borderColor = '';
+        let backgroundColor = ''; // New variable
+
+        switch (stage) {
+            case 'Converted':
+                borderColor = '#00535d';
+                backgroundColor = 'rgba(0, 84, 93, 0.25)'; // Light Blue
+                break;
+            case 'Targeted':
+                borderColor = '#ff9009';
+                backgroundColor = 'rgba(255, 144, 9, 0.1)'; // Light Orange
+                break;
+            default:
+                borderColor = '#ddd';
+                backgroundColor = '#f9f9f9'; // No specific background color for unhandled cases (including 'None')
+                break;
+        }
+        container.style.border = borderColor ? `2px solid ${borderColor}` : 'none';
+        container.style.backgroundColor = backgroundColor; // Apply background color
+    };
+
     // --- Add Floating "+" Button ---
     const addFloatingNewDoctorButton = () => {
 
@@ -482,6 +538,14 @@ async function setupDoctorsListForm() {
         if (!feedbackValidation.valid) {
             showNotification(feedbackValidation.message, 'error');
             feedbackInput.focus();
+            return;
+        }
+
+        const stageInput = formContainer.querySelector('#stage');
+        const stageValidation = validateStage(stageInput.value);
+        if (!stageValidation.valid) {
+            showNotification(stageValidation.message, 'error');
+            stageInput.focus();
             return;
         }
 
@@ -569,11 +633,14 @@ async function setupDoctorsListForm() {
                 const addressInput = formContainer.querySelector('#address');
                 const phoneInput = formContainer.querySelector('#phone');
 
+                const stageInput = formContainer.querySelector('#stage');
+
                 const newDoctorData = {
                     doctorName: doctorName,
                     phone: parseInt(phoneInput.value.trim()),
                     address: addressInput.value.trim(),
-                    exId: parseInt(exId)
+                    exId: parseInt(exId),
+                    stage: stageInput.value
                 };
 
                 const doctorApiBody = { form: 'doctors', data: newDoctorData };
@@ -591,6 +658,12 @@ async function setupDoctorsListForm() {
             } else {
                 // Use existing doctor ID
                 docId = parseInt(submitButton.getAttribute('data-doc-id'));
+                const stageInput = formContainer.querySelector('#stage');
+                if (stageInput && stageInput.value) {
+                    const stageUpdateData = { docId: docId, stage: stageInput.value };
+                    const stageUpdateApiBody = { form: 'doctors', data: stageUpdateData };
+                    await apiFetch('employee/forms-submit', 'POST', stageUpdateApiBody);
+                }
             }
 
             // Submit doctor activity first
@@ -826,6 +899,13 @@ Citrix Pvt Ltd Team.`;
         const docId = parseInt(submitButton.getAttribute('data-doc-id'));
         const feedbackInput = formContainer.querySelector('#feedback');
         const orderStatusInput = formContainer.querySelector('#orderStatus');
+        const stageInput = formContainer.querySelector('#stage');
+
+        if (stageInput && stageInput.value) {
+            const stageUpdateData = { docId: docId, stage: stageInput.value };
+            const stageUpdateApiBody = { form: 'doctors', data: stageUpdateData };
+            await apiFetch('employee/forms-submit', 'POST', stageUpdateApiBody);
+        }
 
         const submissionData = {
             docId: docId,
@@ -860,11 +940,14 @@ Citrix Pvt Ltd Team.`;
         const feedbackInput = formContainer.querySelector('#feedback');
         const orderStatusInput = formContainer.querySelector('#orderStatus');
 
+        const stageInput = formContainer.querySelector('#stage');
+
         const newDoctorData = {
             doctorName: doctorNameInput.value.trim(),
             phone: parseInt(phoneInput.value.trim()),
             address: addressInput.value.trim(),
-            exId: parseInt(exId)
+            exId: parseInt(exId),
+            stage: stageInput.value
         };
 
         const doctorApiBody = { form: 'doctors', data: newDoctorData };

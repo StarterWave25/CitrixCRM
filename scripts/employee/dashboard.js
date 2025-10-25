@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Existing DOM Elements ---
     const greetingElement = document.getElementById('employee-greeting');
+    const headquarterElement = document.querySelector('.hero-subtext');
     const logoutBtn = document.getElementById('logout-btn');
     const viewDataBtn = document.getElementById('view-data-btn');
     const joinMeetingBtn = document.getElementById('join-meeting-btn');
@@ -80,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (userDetails.name) {
             greetingElement.innerHTML = `Hello <span class="placeholder-name">${userDetails.name}!</span>`;
+            headquarterElement.textContent = `You are operating from the ${userDetails.hqName} Headquarters.`;
         } else {
             greetingElement.innerHTML = `Welcome! <span class="placeholder-name">Employee</span>`;
         }
@@ -278,7 +280,40 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             });
 
-            return `<div class="data-card">${rowsHtml}</div>`;
+            let cardBackgroundColor = '';
+            let cardBorderColor = '';
+
+            let stageValue = '';
+            if (item.Stage && typeof item.Stage === 'object' && item.Stage.value) {
+                stageValue = item.Stage.value;
+            } else if (typeof item.Stage === 'string') {
+                stageValue = item.Stage;
+            }
+
+            if (stageValue) {
+                switch (stageValue) {
+                    case 'Converted':
+                        cardBackgroundColor = 'rgba(0, 84, 93, 0.25)';
+                        cardBorderColor = '#00535d';
+                        break;
+                    case 'Targeted':
+                        cardBackgroundColor = 'rgba(255, 144, 9, 0.1)';
+                        cardBorderColor = '#ff9009';
+                        break;
+                    case 'None':
+                        cardBackgroundColor = 'var(--llblue)'; // Assuming these CSS variables are defined
+                        cardBorderColor = 'var(--lblue)';
+                        break;
+                    default:
+                        // No specific styling for other stages
+                        break;
+                }
+            }
+
+            const cardStyle = `background-color: ${cardBackgroundColor}; border: 2px solid ${cardBorderColor};`;
+            const finalCardStyle = cardBackgroundColor || cardBorderColor ? cardStyle : '';
+
+            return `<div class="data-card" style="${finalCardStyle}">${rowsHtml}</div>`;
         }).join('');
 
         // Combine cards (Expense total footer is removed from here)

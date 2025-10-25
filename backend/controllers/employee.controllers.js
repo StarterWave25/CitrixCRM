@@ -269,6 +269,7 @@ export const fetchFormDependencies = async (req, res) => {
                     d.\`docId\`,
                     d.\`Doctor Name\` AS doctorName,
                     d.\`Address\` AS address,
+                    d.\`Stage\`,
                     d.\`Phone\` AS phone
                 FROM 
                     \`doctors\` d

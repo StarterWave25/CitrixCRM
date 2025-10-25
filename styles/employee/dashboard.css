@@ -528,7 +528,7 @@
     background-color: var(--llblue);
     padding: 24px;
     border-radius: var(--border-radius-base);
-    border: 1px solid var(--lblue);
+    border: 2px solid var(--lblue);
     /* Lighter, more modern shadow than the default subtle */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s;
@@ -783,8 +783,8 @@ body.modal-open {
 }
 
 .btn-icon-round:hover,
-.btn-icon-round:focus,  
-.btn-icon-round:active{
+.btn-icon-round:focus,
+.btn-icon-round:active {
     /* Subtle hover background using tertiary color */
     background-color: var(--blue);
     color: var(--white);
@@ -793,7 +793,7 @@ body.modal-open {
 /* Style for the dropdown menu */
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 120%;
     /* Position right below the button */
     right: 0;
     /* Align to the right edge of the container for a natural flow */
@@ -875,14 +875,6 @@ body.modal-open {
     background-color: rgba(217, 83, 79, 0.08);
     /* A very light red tint on hover for psychological safety */
     color: var(--error-red);
-}
-
-/* Mobile Adjustments (Ensure the new structure remains compact) */
-@media (max-width: 600px) {
-    .header-main-nav-slot {
-        /* Prevents the single menu button from wrapping onto a new line */
-        flex-wrap: nowrap;
-    }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -985,6 +977,14 @@ body.modal-open {
 
 /* Mobile Adjustments for Fixed Button */
 @media (max-width: 600px) {
+    /* Mobile Adjustments (Ensure the new structure remains compact) */
+    @media (max-width: 600px) {
+        .header-main-nav-slot {
+            /* Prevents the single menu button from wrapping onto a new line */
+            flex-wrap: nowrap;
+        }
+    }
+
     .fixed-action-btn--bottom-right {
         bottom: 16px;
         right: 16px;

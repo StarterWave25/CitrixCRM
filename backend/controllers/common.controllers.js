@@ -393,7 +393,8 @@ ORDER BY \`Date\` ASC`).trim(),
 \`doctor activities\`.\`Order Status\` AS \`Order Status\`,
 \`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
 \`doctors\`.\`Phone\` AS \`Phone\`,
-\`doctors\`.\`Address\` AS \`Address\`
+\`doctors\`.\`Address\` AS \`Address\`,
+\`doctors\`.\`Stage\`
 FROM \`doctor activities\`
 LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
 ${whereClause}

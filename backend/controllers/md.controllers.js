@@ -301,7 +301,7 @@ export const viewEntity = async (req, res) => {
                 }
                 tableName = 'doctors';
                 idName = 'docId';
-                columnsToEncrypt = ['Doctor Name', 'Phone', 'Address', 'Status'];
+                columnsToEncrypt = ['Doctor Name', 'Phone', 'Address', 'Stage', 'Status'];
                 params.push(Number(exId));
                 resultKey = 'doctorsList';
 
@@ -311,6 +311,7 @@ export const viewEntity = async (req, res) => {
                         \`Doctor Name\`,
                         \`Phone\`,
                         \`Address\`,
+                        \`Stage\`,
                         \`Status\`
                     FROM \`doctors\`
                     WHERE \`exId\` = ?
