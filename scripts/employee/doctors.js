@@ -752,11 +752,11 @@ ${messageData.products}
 
 💰 Total Amount: ₹${messageData.grandTotal}
 
-⏰ Kindly prioritize this delivery and ensure it reaches Dr. Suresh Kumar as soon as possible today.
+⏰ Kindly prioritize this delivery and ensure it reaches DR.${messageData.doctorName} as soon as possible today.
 Every minute counts, let’s make it quick! ⚡💨
 
 Thank you 🙏
-Citrix Ltd Team.`;
+Citrix Pvt Ltd Team.`;
 
             console.log(message);
 

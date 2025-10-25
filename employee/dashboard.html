@@ -23,16 +23,30 @@
             </a>
 
             <div class="header-main-nav-slot">
-                <button class="btn-primary btn-header-view-data" id="view-data-btn">
-                    <i class="fa-solid fa-square-poll-horizontal"></i>
-                </button>
-                <a href="expenses.html">
-                    <button class="btn-primary btn-header-view-data">
-                        <i class="fa-solid fa-money-bill"></i> </button>
-                </a>
-                <button class="btn-primary btn-header-logout" id="logout-btn">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
+                <div class="menu-options-container">
+                    <button id="header-menu-trigger" class="btn-icon-round" aria-expanded="false"
+                        aria-controls="header-dropdown-menu" title="Menu Options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+
+                    <div id="header-dropdown-menu" class="dropdown-menu hidden">
+                        <button class="menu-item" id="join-meeting-btn">
+                            <i class="fa-solid fa-video"></i> Join Meeting
+                        </button>
+                        <button class="menu-item" title="View Data" id="view-data-btn">
+                            <i class="fa-solid fa-book-medical"></i>
+                            <span>View Data</span>
+                        </button>
+                        <a href="./expenses.html" class="menu-item" title="Expenses">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <span>Expenses</span>
+                        </a>
+                        <button id="logout-btn" class="menu-item menu-item--logout" title="Logout">
+                            <i class="fa-solid fa-power-off"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -66,10 +80,6 @@
 
         </div>
     </main>
-
-    <button class="btn-primary fixed-action-btn--bottom-right" id="join-meeting-btn">
-        <i class="fa-solid fa-video"></i> Join Meeting
-    </button>
 
     <footer class="login-footer">
         <span class="footer-text">Built by</span>

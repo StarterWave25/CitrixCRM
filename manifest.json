@@ -1,0 +1,20 @@
+{
+  "name": "Citrix CRM",
+  "short_name": "Citrix",
+  "icons": [
+    {
+      "src": "/img/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf2e5",
+  "theme_color": "#00535d"
+}

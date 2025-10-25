@@ -837,6 +837,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const menuTrigger = document.getElementById('header-menu-trigger');
+    const menu = document.getElementById('header-dropdown-menu');
+
+    if (menuTrigger && menu) {
+        // Function to toggle the menu state
+        const toggleMenu = (e) => {
+            // Stop propagation to prevent immediate document click listener from firing
+            if (e) e.stopPropagation();
+            const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
+
+            menuTrigger.setAttribute('aria-expanded', !isExpanded);
+            menu.classList.toggle('hidden', isExpanded); // Toggle 'hidden' class to show/hide
+
+            // Accessibility focus management: focus on the first item when opening
+            if (!isExpanded) {
+                // Find the first focusable element (first link/button)
+                const firstMenuItem = menu.querySelector('.menu-item');
+                if (firstMenuItem) {
+                    firstMenuItem.focus();
+                }
+            }
+        };
+
+        // 1. Toggle the menu visibility on button click
+        menuTrigger.addEventListener('click', toggleMenu);
+
+        // 2. Close menu when clicking anywhere else on the document (Outside Click)
+        document.addEventListener('click', (e) => {
+            // Check if menu is open AND the click target is NOT the menu AND NOT the trigger button
+            if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== menuTrigger) {
+                // If true, close the menu
+                menu.classList.add('hidden');
+                menuTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 
     // Initialize the dashboard on load
     loadUserDetails();

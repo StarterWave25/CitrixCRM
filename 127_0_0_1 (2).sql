@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 23, 2025 at 04:32 PM
+-- Generation Time: Oct 25, 2025 at 09:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,20 +53,6 @@ CREATE TABLE `doctor activities` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `doctor activities`
---
-
-INSERT INTO `doctor activities` (`recordId`, `docId`, `empId`, `Employee Name`, `Feedback`, `Order Status`, `date`) VALUES
-(12, 7, 8, 'Prudvi', 'No response', 'No', '2025-10-22'),
-(13, 8, 8, 'Prudvi', 'Ordered dolo 500 strips 10 strips free', 'Yes', '2025-10-22'),
-(14, 11, 8, 'Prudvi', 'Ordered', 'Yes', '2025-10-22'),
-(15, 12, 8, 'Prudvi', 'No response', 'No', '2025-10-22'),
-(19, 7, 8, 'Prudvi', 'Ordered', 'Yes', '2025-10-23'),
-(20, 8, 8, 'Prudvi', 'Ordered 3 products', 'Yes', '2025-10-23'),
-(21, 11, 8, 'Prudvi', 'ordered', 'Yes', '2025-10-23'),
-(22, 12, 8, 'Prudvi', 'Ordered slkfsalkdfjslkafjdsalkfjslak;fjaslkdfjlksdfjslkfjdsl;kfjdslkfjskld;fjsdlkfnds;lkfndsflksdnfsdklfnasdlkfnasd;lfksdmnflkas;dfnaslkfnasdlkf;a', 'Yes', '2025-10-23');
-
 -- --------------------------------------------------------
 
 --
@@ -89,9 +75,7 @@ CREATE TABLE `doctors` (
 
 INSERT INTO `doctors` (`docId`, `Doctor Name`, `Phone`, `Address`, `exId`, `Status`, `Date`) VALUES
 (7, 'Harsha', 9014709040, 'KT ROAD Tirupati', 4, 'Active', '2025-10-21'),
-(8, 'SHerrr', 9828918921, 'Bhavani Nagar, tirupati', 4, 'Active', '2025-10-21'),
-(11, 'Satheesh', 9019201929, 'Teacher \'s colony', 4, 'Active', '2025-10-22'),
-(12, 'Reddy', 8928031010, 'Bhavani Nagar', 4, 'Active', '2025-10-22');
+(8, 'SHerrr', 9828918921, 'Bhavani Nagar, tirupati', 4, 'Active', '2025-10-21');
 
 -- --------------------------------------------------------
 
@@ -135,16 +119,17 @@ CREATE TABLE `expenses` (
   `Paid Status` text NOT NULL,
   `Travel Bill` varchar(100) NOT NULL,
   `Stay Bill` varchar(100) NOT NULL,
-  `Date` date NOT NULL DEFAULT current_timestamp()
+  `Date` date NOT NULL DEFAULT current_timestamp(),
+  `Paid on` date DEFAULT NULL,
+  `Method` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `expenses`
 --
 
-INSERT INTO `expenses` (`expId`, `empId`, `exId`, `Normal Expense`, `Extension Expense`, `Total Expense`, `Paid Status`, `Travel Bill`, `Stay Bill`, `Date`) VALUES
-(13, 8, 4, 200, 0, 200, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761112148/vliyeeftggjzh7wyqzlj.jpg', '', '2025-10-22'),
-(14, 8, 4, 200, 0, 200, 'Not Paid', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761210835/qbcjhouoyljcvhufxobq.png', '', '2025-10-23');
+INSERT INTO `expenses` (`expId`, `empId`, `exId`, `Normal Expense`, `Extension Expense`, `Total Expense`, `Paid Status`, `Travel Bill`, `Stay Bill`, `Date`, `Paid on`, `Method`) VALUES
+(19, 8, 4, 200, 0, 200, 'Paid', '', '', '2025-10-25', '2025-10-25', 'UPI');
 
 -- --------------------------------------------------------
 
@@ -226,7 +211,7 @@ INSERT INTO `meetings` (`metId`, `Meeting Link`, `Count`, `Date`) VALUES
 (2, 'sdfsafasfas', 2, '2025-10-13'),
 (3, 'https://meet.google.com/ona-gjkd-kpy', 1, '2025-10-14'),
 (4, 'https://meet.google.com/vmq-vqpk-efy', 2, '2025-10-14'),
-(5, 'https://meet.google.com/vmq-vqpk-efy', 1, '2025-10-22');
+(5, 'https://meet.google.com/vmq-vqpk-efy', 1, '2025-10-24');
 
 -- --------------------------------------------------------
 
@@ -241,21 +226,6 @@ CREATE TABLE `ordered products` (
   `Strips` int(11) NOT NULL,
   `Free Strips` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `ordered products`
---
-
-INSERT INTO `ordered products` (`opId`, `orderId`, `pId`, `Strips`, `Free Strips`) VALUES
-(12, 5, 3, 120, 0),
-(13, 5, 2, 40, 0),
-(14, 6, 3, 20, 2),
-(15, 6, 2, 50, 5),
-(16, 6, 1, 100, 10),
-(17, 7, 2, 2, 0),
-(18, 7, 3, 2, 0),
-(19, 8, 3, 20, 2),
-(20, 8, 1, 20, 3);
 
 -- --------------------------------------------------------
 
@@ -276,16 +246,6 @@ CREATE TABLE `orders` (
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`orderId`, `empId`, `Employee Name`, `docId`, `Doctor Name`, `exId`, `DL Copy`, `Prescription`, `Total`, `Date`) VALUES
-(5, 8, 'Prudvi', 7, 'Harsha', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761197051/t420m0691xelexv2tt6d.jpg', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761197058/z0xi3avg5wlb81mafqyo.jpg', 6240, '2025-10-23'),
-(6, 8, 'Prudvi', 8, 'SHerrr', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200585/imlzfjiwt3bc68tkz0qn.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200588/mehs3cllak6mwmuywprq.png', 8900, '2025-10-23'),
-(7, 8, 'Prudvi', 11, 'Satheesh', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200798/ynlsnep4cvxpkzfobuks.gif', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200800/ay0n51ymfd0ioayctayd.png', 192, '2025-10-23'),
-(8, 8, 'Prudvi', 12, 'Reddy', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200977/winzzesofno5lq1jvt1f.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761200979/hzjdhqwolcsyu4gci149.png', 1600, '2025-10-23');
-
 -- --------------------------------------------------------
 
 --
@@ -295,8 +255,8 @@ INSERT INTO `orders` (`orderId`, `empId`, `Employee Name`, `docId`, `Doctor Name
 CREATE TABLE `products` (
   `pId` int(11) NOT NULL,
   `Product Name` varchar(110) NOT NULL,
-  `Price` int(11) NOT NULL,
-  `Date` int(11) NOT NULL DEFAULT current_timestamp()
+  `Price` float NOT NULL,
+  `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -304,9 +264,15 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`pId`, `Product Name`, `Price`, `Date`) VALUES
-(1, 'Para', 50, 0),
-(2, 'DOLO', 66, 0),
-(3, 'Anti', 30, 0);
+(4, 'AMOX-CLAV-625', 155.43, '2025-10-25'),
+(5, 'CFX-LIFE-200 DT', 84.57, '2025-10-25'),
+(6, 'CITRAGESIC-SP', 75.43, '2025-10-25'),
+(7, 'CITRAGESIC-MR', 72.38, '2025-10-25'),
+(8, 'NAPROCIT-D', 98.29, '2025-10-25'),
+(9, 'PIROCIT-20', 41.9, '2025-10-25'),
+(10, 'LEVOCITRIMONT-C', 91.43, '2025-10-25'),
+(11, 'ESODOLIFE D', 156.18, '2025-10-25'),
+(12, 'REBEDOLIFE-DSR', 87.62, '2025-10-25');
 
 -- --------------------------------------------------------
 
@@ -360,9 +326,8 @@ INSERT INTO `tourplan` (`tId`, `empId`, `hqId`, `exId`, `Extension Name`, `Out S
 (32, 8, 3, 4, 'Tirupati', '', '', '2025-09-28'),
 (33, 8, 3, 4, 'Tirupati', '', '', '2025-10-06'),
 (34, 8, 3, 4, 'Tirupati', '', '', '2025-10-16'),
-(35, 8, 3, 4, 'Tirupati', 'No', '', '2025-10-22'),
-(36, 8, 3, 4, 'Tirupati', 'No', '', '2025-10-23'),
-(37, 8, 3, 4, 'Tirupati', 'Yes', 'No', '2025-10-23');
+(42, 8, 3, 3, 'Pileru', 'Yes', '', '2025-10-24'),
+(43, 8, 3, 4, 'Tirupati', 'No', 'no', '2025-10-25');
 
 --
 -- Indexes for dumped tables
@@ -494,7 +459,7 @@ ALTER TABLE `boss`
 -- AUTO_INCREMENT for table `doctor activities`
 --
 ALTER TABLE `doctor activities`
-  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `doctors`
@@ -512,7 +477,7 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `expId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `extensions`
@@ -542,19 +507,19 @@ ALTER TABLE `meetings`
 -- AUTO_INCREMENT for table `ordered products`
 --
 ALTER TABLE `ordered products`
-  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `pId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `pId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `stockists`
@@ -566,7 +531,7 @@ ALTER TABLE `stockists`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- Constraints for dumped tables

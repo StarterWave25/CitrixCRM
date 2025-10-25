@@ -107,15 +107,13 @@ function createExpenseCard(expense) {
                 <span class="data-value">${formatCurrency(expense['Extension Expense'])}</span>
             </div>
             
+            ${expense['Travel Bill'] ? `
             <div class="data-row">
                 <span class="data-label">Travel Bill:</span>
                 <span class="data-value">
-                    ${expense['Travel Bill'] ?
-            `<a href="${expense['Travel Bill']}" target="_blank" class="bill-link">Click to View</i></a>` :
-            `N/A`
-        }
+                    <a href="${expense['Travel Bill']}" target="_blank" class="bill-link">Click to View</a>
                 </span>
-            </div>
+            </div>` : ''}
 
             ${expense['Stay Bill'] ? `
             <div class="data-row">
@@ -123,8 +121,22 @@ function createExpenseCard(expense) {
                 <span class="data-value">
                     <a href="${expense['Stay Bill']}" target="_blank" class="bill-link">Click to View</a>
                 </span>
+            </div>` : ''}
+
+            ${expense['Paid on'] ? `
+            <div class="data-row">
+                <span class="data-label">Paid on:</span>
+                <span class="data-value">${formatDateForDisplay(expense['Paid on'])}</span>
             </div>
             ` : ''}
+
+            ${expense['Method'] ? `
+            <div class="data-row">
+                <span class="data-label">Method:</span>
+                <span class="data-value">${expense['Method']}</span>
+            </div>
+            ` : ''}
+
             
             <div class="data-row data-row--total">
                 <span class="data-label">TOTAL:</span>

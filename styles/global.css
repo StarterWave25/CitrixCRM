@@ -206,7 +206,7 @@ a {
 .header-content-wrapper {
     max-width: 1440px;
     /* Large Desktop max width [cite: 239] */
-    width: 90%;
+    width: 95%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;

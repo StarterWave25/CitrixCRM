@@ -551,7 +551,9 @@ export const getExpenses = async (req, res) => {
                 expenses.\`Total Expense\`,
                 expenses.\`Paid Status\`,
                 expenses.\`Travel Bill\`,
-                expenses.\`Stay Bill\`
+                expenses.\`Stay Bill\`,
+                expenses.\`Paid on\`,
+                expenses.\`Method\`
             FROM
                 \`expenses\`
             INNER JOIN
@@ -559,9 +561,9 @@ export const getExpenses = async (req, res) => {
             ON
                 expenses.exId = extensions.exId
             WHERE
-                expenses.empId = ? AND expenses.\`Paid Status\` = ?
+                expenses.empId = ? LIMIT 90
         `;
-    const values = [empId, 'Not Paid'];
+    const values = [empId];
 
     // 3. Execute the query securely
     const [rows] = await pool.execute(sql, values);

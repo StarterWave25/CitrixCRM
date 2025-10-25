@@ -380,9 +380,14 @@ export const viewEntity = async (req, res) => {
 export const payExpenses = async (req, res) => {
     // 1. Extract and validate empId from the request body
     const empId = parseInt(req.body.empId, 10);
+    const method = req.body.method;
 
     if (isNaN(empId) || empId <= 0) {
         return res.status(400).json({ success: false, message: 'Invalid employee ID format provided in request body.' });
+    }
+
+    if (!method && method != 'UPI' && method != 'BANK') {
+        return res.status(400).json({ success: false, message: 'Invalid Payment method' });
     }
 
     try {
@@ -392,12 +397,12 @@ export const payExpenses = async (req, res) => {
         // 2. Construct the parameterized SQL UPDATE query
         const sql = `
             UPDATE \`${tableName}\`
-            SET \`${paidStatusColumn}\` = 'Paid' 
+            SET \`${paidStatusColumn}\` = 'Paid', \`Paid on\` = CURDATE(), \`Method\` = ?
             WHERE 
                 empId = ? 
                 AND \`${paidStatusColumn}\` = 'Not Paid'
         `;
-        const values = [empId];
+        const values = [method, empId];
 
         // 3. Execute the query
         const [result] = await pool.execute(sql, values);
@@ -427,7 +432,7 @@ export const payExpenses = async (req, res) => {
         }
 
         // 4. Return success message and the number of rows updated
-return res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: `Successfully updated ${affectedRows} expense record(s) to 'Paid' for empId ${empId}.`,
             data: { affectedRows: affectedRows }

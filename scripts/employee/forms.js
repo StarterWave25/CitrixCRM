@@ -36,7 +36,7 @@ const formSchemas = {
             { name: 'normalExpense', type: 'number', label: 'Normal Expense (₹)', required: true, defaultValue: 200, isExpense: true },
             { name: 'extensionExpense', type: 'number', label: 'Extra Expense (₹)', required: true, isExpense: true },
             { name: 'totalExpense', type: 'number', label: 'Total Expense (₹)', readOnly: true },
-            { name: 'travelBill', type: 'file', label: 'Travel Bill (Image)', required: true, accept: 'image/*' },
+            { name: 'travelBill', type: 'file', label: 'Travel Bill (Image)', required: false, accept: 'image/*' },
             { name: 'stayBill', type: 'file', label: 'Stay Bill (Image)', required: false, accept: 'image/*' }
         ]
     }
@@ -596,22 +596,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const travelBillFile = document.getElementById('travelBill').files[0];
         const stayBillFile = document.getElementById('stayBill').files[0];
 
-        if (!travelBillFile) {
-            showNotification('Travel Bill is required.', 'error');
-            return;
-        }
-
         try {
-            // 1. Upload Travel Bill
-            showNotification('Uploading Travel Bill...', 'info');
-            const travelBase64 = await fileToBase64(travelBillFile);
-            const travelUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: travelBase64 });
+            let travelBillLink = '';
+            if (travelBillFile) {
+                // 1. Upload Travel Bill
+                showNotification('Uploading Travel Bill...', 'info');
+                const travelBase64 = await fileToBase64(travelBillFile);
+                const travelUploadResponse = await apiFetch('employee/upload-image', 'POST', { image: travelBase64 });
 
-            if (!travelUploadResponse.url) {
-                showNotification('Travel Bill upload failed.', 'error');
-                return;
+                if (!travelUploadResponse.url) {
+                    showNotification('Travel Bill upload failed. Submitting without travel bill.', 'warning');
+                } else {
+                    travelBillLink = travelUploadResponse.url;
+                }
             }
-            const travelBillLink = travelUploadResponse.url;
 
             // 2. Upload Stay Bill (Optional)
             let stayBillLink = '';

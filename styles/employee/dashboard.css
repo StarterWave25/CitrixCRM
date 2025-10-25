@@ -756,6 +756,135 @@ body.modal-open {
     border-bottom: none;
 }
 
+.menu-options-container {
+    position: relative;
+    /* Anchor for the absolute dropdown */
+    display: flex;
+    align-items: center;
+    /* Use a high z-index to ensure it sits above all dashboard content */
+    z-index: 100;
+}
+
+/* Base style for a clean, round icon button (The 3-dots trigger) */
+.btn-icon-round {
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--blue);
+    /* Use primary brand color */
+    font-size: 1.5rem;
+    /* Good size for an icon trigger */
+    padding: 8px;
+    /* 8-point system spacing */
+    border-radius: 50%;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.btn-icon-round:hover,
+.btn-icon-round:focus,  
+.btn-icon-round:active{
+    /* Subtle hover background using tertiary color */
+    background-color: var(--blue);
+    color: var(--white);
+}
+
+/* Style for the dropdown menu */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    /* Position right below the button */
+    right: 0;
+    /* Align to the right edge of the container for a natural flow */
+    margin-top: 10px;
+    /* Small space below the button */
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    /* Soft shadow for depth and focus */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    /* Conversion Strategy: Soft, smooth animation for appearance */
+    opacity: 0;
+    transform: translateY(-10px);
+    /* Initial state for slide-down effect */
+    pointer-events: none;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+/* State when the menu is active */
+.dropdown-menu:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Individual menu item style (Link or Button) */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    /* Generous padding for optimal touch targets */
+    text-decoration: none;
+    color: var(--black);
+    font-size: 1rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: var(--lblue);
+    /* Secondary background color for hover state */
+    color: var(--blue);
+}
+
+.menu-item .menu-icon {
+    width: 20px;
+    /* Fixed width for visual alignment */
+    text-align: center;
+    color: var(--gray-text);
+}
+
+.menu-item:hover .menu-icon {
+    color: var(--blue);
+    /* Highlight icon on hover */
+}
+
+/* Specific style for the Logout item (Conversion Psychology: using the error-red for visual distinction) */
+.menu-item--logout {
+    color: var(--error-red);
+    border-top: 1px solid var(--border-color);
+    margin-top: 8px;
+    padding-top: 16px;
+}
+
+.menu-item--logout .menu-icon {
+    color: var(--error-red);
+}
+
+.menu-item--logout:hover {
+    background-color: rgba(217, 83, 79, 0.08);
+    /* A very light red tint on hover for psychological safety */
+    color: var(--error-red);
+}
+
+/* Mobile Adjustments (Ensure the new structure remains compact) */
+@media (max-width: 600px) {
+    .header-main-nav-slot {
+        /* Prevents the single menu button from wrapping onto a new line */
+        flex-wrap: nowrap;
+    }
+}
+
 /* ------------------------------------------------------------------------- */
 /* 4. RESPONSIVENESS (Final Scroll Fix Applied Here) */
 /* ------------------------------------------------------------------------- */
