@@ -580,6 +580,31 @@ async function setupDoctorsListForm() {
         submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
         try {
+            // --- STAGE UPDATE LOGIC ---
+            // If it's an existing doctor, update the stage first.
+            if (!isNewDoctor) {
+                const docId = parseInt(submitButton.getAttribute('data-doc-id'));
+                const newStage = stageInput.value;
+
+                showNotification('Updating doctor stage...', 'info');
+                const stageUpdateResponse = await apiFetch('employee/update-stage', 'POST', {
+                    docId: docId,
+                    stage: newStage
+                });
+
+                if (!stageUpdateResponse.success) {
+                    showNotification(stageUpdateResponse.message || 'Failed to update stage. Aborting.', 'error');
+                    // Abort submission if stage update fails
+                    isSubmitting = false;
+                    toggleAllSubmitButtons(false);
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
+                    return;
+                }
+                showNotification('Stage updated successfully.', 'success');
+            }
+            // --- END OF STAGE UPDATE LOGIC ---
+
             const orderStatus = orderStatusInput.checked;
 
             if (orderStatus) {
