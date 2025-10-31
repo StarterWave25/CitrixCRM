@@ -65,7 +65,7 @@ export async function createGoogleMeet(req, res) {
     endTime,
     summary = 'New Employee Meeting',
     description = 'Meeting created by the application.',
-    participants // Expects an array of email strings
+    participants = ['starterwave25@gmail.com'] // Expects an array of email strings
   } = req.body;
 
   if (!startTime || !endTime) {

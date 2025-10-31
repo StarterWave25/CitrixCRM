@@ -266,10 +266,10 @@ a {
 /* Buttons & CTAs (Standard Primary Button) */
 .btn-primary {
     background-color: var(--blue);
-    color: var(--white);
+    color: var(--llblue);
     padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
     /* 12px 24px */
-    border: 1px solid var(--lblue);
+    border: 1px solid var(--llblue);
     /* 🚨 ADDED BORDER as requested */
     border-radius: var(--border-radius);
     font-size: 1rem;

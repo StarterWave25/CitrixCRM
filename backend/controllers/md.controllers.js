@@ -211,7 +211,8 @@ export const viewEntity = async (req, res) => {
                     SELECT
                         e.\`empId\`,
                         e.\`empName\`,
-                        h.\`hqName\`
+                        h.\`hqName\`,
+                        h.\`hqId\`
                     FROM \`employees\` e
                     INNER JOIN \`headquarters\` h ON e.\`hqId\` = h.\`hqId\`
                     ORDER BY e.\`empName\` ASC

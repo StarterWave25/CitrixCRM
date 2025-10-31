@@ -1,0 +1,398 @@
+/* ------------------------------------------------------------------------- */
+/* EXPENSES PAGE STYLES */
+/* ------------------------------------------------------------------------- */
+
+/* Main Container: Uses a grid system for alignment  */
+.expense-main-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding: calc(var(--spacing-unit) * 4) 0;
+    /* 32px padding top/bottom */
+}
+
+/* Page Title Style */
+.page-title {
+    margin-top: calc(var(--spacing-unit) * 6);
+    /* Extra space below header */
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    /* 32px */
+    text-align: center;
+    color: var(--blue);
+}
+
+/* Back Link Styling (Part of the Header UX) */
+.back-link {
+    color: var(--blue);
+    font-size: 1.2rem;
+    padding: var(--spacing-unit);
+    border-radius: var(--border-radius);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-link:hover {
+    background-color: var(--lblue);
+}
+
+/* --- CHANGED SNIPPET for style.css: Filter Section Styles --- */
+
+/* Filter Section Styling - Changed for a minimalist, premium look */
+.filter-controls {
+    margin-bottom: calc(var(--spacing-unit) * 8);
+    /* 64px gap before grid [cite: 3] */
+    text-align: center;
+    /* Removed card background and shadow for a cleaner look */
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Wrap the group in a card look for prominence */
+    background-color: var(--white);
+    padding: calc(var(--spacing-unit) * 3);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group--date {
+    width: 100%;
+    max-width: 300px;
+}
+
+.expenses-date-label {
+    color: var(--blue);
+    /* Subtler color */
+    font-family: 'Ivymode', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.expenses-date-box {
+    cursor: pointer;
+    /* Remove default browser arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+/* --- CHANGED SNIPPET for style.css: jQuery UI Datepicker Styling --- */
+
+/* Modernizing jQuery UI Datepicker to match Brand */
+.ui-datepicker {
+    font-family: var(--font-body), sans-serif;
+    padding: calc(var(--spacing-unit) * 2);
+    /* 16px */
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    background: var(--white);
+}
+
+.ui-widget-header {
+    background: var(--lblue) !important;
+    border: none;
+    color: var(--white) !important;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
+}
+
+.ui-datepicker-prev,
+.ui-datepicker-next {
+    color: var(--white) !important;
+    border: none;
+    cursor: pointer;
+    top: 5px;
+    padding: 0;
+}
+
+.ui-datepicker-title {
+    color: var(--white) !important;
+}
+
+.ui-state-default {
+    background: none !important;
+    border: none !important;
+    color: var(--black) !important;
+    text-align: center;
+    padding: calc(var(--spacing-unit) / 2);
+    /* 4px */
+    margin: 1px;
+    font-weight: 500 !important;
+}
+
+/* Hover state for days */
+.ui-state-default.ui-state-hover {
+    background: var(--blue) !important;
+    border-radius: 3px;
+    color: var(--lblue) !important;
+}
+
+/* Active day (Selected Date) */
+.ui-state-active {
+    background: var(--blue) !important;
+    color: var(--lblue) !important;
+    border-radius: 3px;
+}
+
+/* Styling for selectable days (the crucial visual cue) */
+.ui-datepicker-calendar .ui-state-default.selectable-date {
+    /* Style for dates that are available to select */
+    font-weight: 700 !important;
+    color: var(--blue) !important;
+    border: 1px solid var(--lblue) !important;
+}
+
+.ui-datepicker-calendar .ui-state-default.selectable-date.ui-state-hover {
+    background: var(--lblue) !important;
+}
+
+/* Styling for disabled days */
+.ui-datepicker-unselectable {
+    color: var(--border-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* --- END CHANGED SNIPPET --- */
+.filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 2);
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Secondary Button Style (For Reset) - Adjusted for new palette */
+.btn-secondary {
+    background-color: var(--white);
+    color: var(--gray-text);
+    border: 1px solid var(--border-color);
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+    background-color: var(--llblue);
+    color: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 4px 8px rgba(0, 83, 93, 0.1);
+}
+
+/* --- END CHANGED SNIPPET --- */
+
+/* Expenses Grid Layout */
+.expenses-grid {
+    display: grid;
+    /* Mobile: single column  */
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing-unit) * 3);
+    /* 24px gap between cards */
+    margin-top: calc(var(--spacing-unit) * 4);
+}
+
+/* Card Styling for Individual Expense */
+.expense-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 4);
+    /* 32px padding [cite: 3] */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    /* Premium shadow */
+    /* Brand highlight */
+}
+
+/* Header within the card */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    padding-bottom: calc(var(--spacing-unit) * 2);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.extension-name {
+    font-family: 'Ivymode', serif;
+    color: var(--blue);
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.paid-status {
+    font-weight: 700;
+    padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
+    border-radius: 3px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+/* Left/Right Data Display (Two-column structure) */
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: calc(var(--spacing-unit) * 1.5) 0;
+    border-bottom: 1px solid var(--llblue);
+}
+
+.data-row:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.data-label {
+    color: var(--gray-text);
+    font-weight: 500;
+    margin-right: calc(var(--spacing-unit) * 2);
+    /* 16px space to push data right */
+    flex-shrink: 0;
+}
+
+.data-value {
+    color: var(--black);
+    font-weight: 600;
+    text-align: right;
+    /* Ensures data aligns right */
+    font-size: 1rem;
+    flex-grow: 1;
+}
+
+/* Total Expense Highlight (Conversion Psychology ) */
+.data-row--total {
+    margin-top: calc(var(--spacing-unit) * 2);
+    /* 16px spacing */
+    background-color: var(--llblue);
+    padding: calc(var(--spacing-unit) * 2);
+    border-radius: var(--border-radius);
+    border-bottom: none;
+}
+
+.data-row--total .data-label,
+.data-row--total .data-value {
+    font-size: 1.2rem;
+    color: var(--blue);
+    font-weight: 700;
+}
+
+/* Bill Link Styling */
+.bill-link {
+    color: var(--blue);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bill-link:hover {
+    color: color-mix(in srgb, var(--blue), var(--black) 30%);
+}
+
+.loading-message {
+    text-align: center;
+    grid-column: 1 / -1;
+    color: var(--gray-text);
+    padding: calc(var(--spacing-unit) * 8);
+}
+
+/* --- NEW SNIPPET for style.css: Total Not Paid Fixed Card --- */
+
+.total-not-paid-fixed {
+    position: fixed;
+    bottom: calc(var(--spacing-unit) * 4);
+    right: calc(var(--spacing-unit) * 4);
+    z-index: 100;
+    background: var(--cards-bg-color);
+    color: var(--white);
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 1);
+    letter-spacing: 0.5px;
+}
+
+.total-not-paid-fixed .label {
+    font-size: 1.2rem;
+    font-family: 'Ivymode', sans-serif;
+    font-weight: 500;
+}
+
+.total-not-paid-fixed .value {
+    font-family: 'Ivymode', serif;
+    font-size: 1.4rem;
+}
+
+.login-footer {
+    padding-bottom: calc(var(--spacing-unit) * 10);
+}
+
+/* Mobile Responsiveness: Full-width bottom bar */
+@media (max-width: 767px) {
+    .total-not-paid-fixed {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        border-radius: 0;
+        padding: calc(var(--spacing-unit) * 2);
+        justify-content: space-between;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+/* RESPONSIVENESS (Desktop: 12-column grid system ) */
+/* ------------------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+
+    /* Tablet/Desktop: Two-column grid for cards */
+    .expenses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc(var(--spacing-unit) * 4);
+        /* 32px */
+    }
+
+    .filter-group {
+        flex-direction: row;
+        justify-content: center;
+        gap: calc(var(--spacing-unit) * 3);
+        max-width: 800px;
+    }
+
+    .form-group--date {
+        /* Allow date input to align centrally with buttons */
+        max-width: 250px;
+    }
+
+    .filter-actions {
+        /* Allow buttons to take necessary width */
+        max-width: 250px;
+    }
+}
+
+@media (min-width: 1024px) {
+
+    /* Large Desktop: Three-column grid */
+    .expenses-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

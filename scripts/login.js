@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(response)
             if (response.success) {
                 // Store data in localStorage (Instruction 2)
+                
                 localStorage.setItem('userDetails', JSON.stringify(response.data));
 
                 // Display success notification (UX Principle)
