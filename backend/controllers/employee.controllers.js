@@ -477,3 +477,53 @@ export const getProducts = async (req, res) => {
         });
     }
 };
+
+/**
+ * Updates the 'Status' (stage) column for a specific doctor in the 'doctors' table.
+ * * Expected body: { docId: number, stage: string }
+ */
+export const updateStage = async (req, res) => {
+  try {
+    if (!pool) return res.status(500).json({ error: 'Database error!' });
+
+    const { docId, stage } = req.body || {};
+
+    // 1. Basic Validation
+    if (docId === undefined || stage === undefined) {
+      return res.status(400).json({ error: 'Missing required fields: docId and stage' });
+    }
+
+    const docIdNum = Number(docId);
+    if (!Number.isInteger(docIdNum) || docIdNum <= 0) {
+      return res.status(400).json({ error: 'Invalid docId provided' });
+    }
+
+    if (typeof stage !== 'string' || stage.trim() === '') {
+      return res.status(400).json({ error: 'Invalid or empty stage/status value provided' });
+    }
+    
+    const newStatus = stage.trim();
+
+    // 2. SQL Query Execution
+    const sql = `UPDATE \`doctors\` SET \`Stage\` = ? WHERE \`docId\` = ?`;
+    const params = [newStatus, docIdNum];
+
+    const [result] = await pool.execute(sql, params);
+
+    // 3. Response Handling
+    if (result.affectedRows === 0) {
+      // Could mean the docId doesn't exist or the status was already the new value
+      return res.status(404).json({ success: false, message: `No doctor found with docId ${docIdNum} or status is already set to ${newStatus}` });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: `Doctor status updated successfully for docId ${docIdNum}`,
+      newStatus: newStatus
+    });
+
+  } catch (err) {
+    console.error('updateStage error:', err);
+    return res.status(500).json({ error: 'Internal server error during status update' });
+  }
+};

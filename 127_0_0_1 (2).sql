@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 25, 2025 at 09:52 AM
+-- Generation Time: Oct 31, 2025 at 06:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,6 +53,13 @@ CREATE TABLE `doctor activities` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `doctor activities`
+--
+
+INSERT INTO `doctor activities` (`recordId`, `docId`, `empId`, `Employee Name`, `Feedback`, `Order Status`, `date`) VALUES
+(33, 7, 8, 'Prudvi', 'Ordered', 'Yes', '2025-10-31');
+
 -- --------------------------------------------------------
 
 --
@@ -66,6 +73,7 @@ CREATE TABLE `doctors` (
   `Address` varchar(150) NOT NULL,
   `exId` int(11) NOT NULL,
   `Status` varchar(100) NOT NULL DEFAULT 'Active',
+  `Stage` varchar(100) NOT NULL,
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -73,9 +81,9 @@ CREATE TABLE `doctors` (
 -- Dumping data for table `doctors`
 --
 
-INSERT INTO `doctors` (`docId`, `Doctor Name`, `Phone`, `Address`, `exId`, `Status`, `Date`) VALUES
-(7, 'Harsha', 9014709040, 'KT ROAD Tirupati', 4, 'Active', '2025-10-21'),
-(8, 'SHerrr', 9828918921, 'Bhavani Nagar, tirupati', 4, 'Active', '2025-10-21');
+INSERT INTO `doctors` (`docId`, `Doctor Name`, `Phone`, `Address`, `exId`, `Status`, `Stage`, `Date`) VALUES
+(7, 'Harsha', 9014709040, 'KT ROAD Tirupati', 4, 'Active', 'Targeted', '2025-10-21'),
+(8, 'SHerrr', 9828918921, 'Bhavani Nagar, tirupati', 4, 'Active', 'Converted', '2025-10-21');
 
 -- --------------------------------------------------------
 
@@ -123,13 +131,6 @@ CREATE TABLE `expenses` (
   `Paid on` date DEFAULT NULL,
   `Method` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `expenses`
---
-
-INSERT INTO `expenses` (`expId`, `empId`, `exId`, `Normal Expense`, `Extension Expense`, `Total Expense`, `Paid Status`, `Travel Bill`, `Stay Bill`, `Date`, `Paid on`, `Method`) VALUES
-(19, 8, 4, 200, 0, 200, 'Paid', '', '', '2025-10-25', '2025-10-25', 'UPI');
 
 -- --------------------------------------------------------
 
@@ -189,6 +190,13 @@ CREATE TABLE `manager` (
   `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `manager`
+--
+
+INSERT INTO `manager` (`manId`, `password`, `email`, `manName`, `date`) VALUES
+(2, '$2b$10$pHdqzl6dBQ70mtMYXwdXqe2lPy92sVG/913n.M.73UvSrilKT3RTm', 'harsha@gmail.com', 'Harsha Vardhan', '2025-10-31');
+
 -- --------------------------------------------------------
 
 --
@@ -227,6 +235,16 @@ CREATE TABLE `ordered products` (
   `Free Strips` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `ordered products`
+--
+
+INSERT INTO `ordered products` (`opId`, `orderId`, `pId`, `Strips`, `Free Strips`) VALUES
+(26, 13, 5, 12, 2),
+(27, 13, 11, 33, 2),
+(28, 14, 5, 10, 2),
+(29, 14, 6, 30, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -245,6 +263,14 @@ CREATE TABLE `orders` (
   `Total` float NOT NULL,
   `Date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`orderId`, `empId`, `Employee Name`, `docId`, `Doctor Name`, `exId`, `DL Copy`, `Prescription`, `Total`, `Date`) VALUES
+(13, 8, 'Prudvi', 7, 'Harsha', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761410072/ihddmo59kzymule52biq.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761410077/cr71vhkxit2woff2bi6o.png', 6168.78, '2025-10-25'),
+(14, 8, 'Prudvi', 7, 'Harsha', 4, 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761884286/dosqpwkqobspbhkprek4.png', 'https://res.cloudinary.com/dikzz3qtt/image/upload/v1761884289/vzbbzloiegzfrtb10i7d.png', 3108.6, '2025-10-31');
 
 -- --------------------------------------------------------
 
@@ -322,12 +348,7 @@ CREATE TABLE `tourplan` (
 --
 
 INSERT INTO `tourplan` (`tId`, `empId`, `hqId`, `exId`, `Extension Name`, `Out Station`, `Joint Work`, `Date`) VALUES
-(31, 8, 3, 4, 'Tirupati', 'No', 'http://localhost/phpmyadmin/index.php?route=/sql&db=citrix&table=tourplan&pos=0', '2025-10-10'),
-(32, 8, 3, 4, 'Tirupati', '', '', '2025-09-28'),
-(33, 8, 3, 4, 'Tirupati', '', '', '2025-10-06'),
-(34, 8, 3, 4, 'Tirupati', '', '', '2025-10-16'),
-(42, 8, 3, 3, 'Pileru', 'Yes', '', '2025-10-24'),
-(43, 8, 3, 4, 'Tirupati', 'No', 'no', '2025-10-25');
+(44, 8, 3, 4, 'Tirupati', 'No', 'No', '2025-10-31');
 
 --
 -- Indexes for dumped tables
@@ -459,7 +480,7 @@ ALTER TABLE `boss`
 -- AUTO_INCREMENT for table `doctor activities`
 --
 ALTER TABLE `doctor activities`
-  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `recordId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `doctors`
@@ -495,7 +516,7 @@ ALTER TABLE `headquarters`
 -- AUTO_INCREMENT for table `manager`
 --
 ALTER TABLE `manager`
-  MODIFY `manId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `manId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `meetings`
@@ -507,13 +528,13 @@ ALTER TABLE `meetings`
 -- AUTO_INCREMENT for table `ordered products`
 --
 ALTER TABLE `ordered products`
-  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `opId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `orderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -531,7 +552,7 @@ ALTER TABLE `stockists`
 -- AUTO_INCREMENT for table `tourplan`
 --
 ALTER TABLE `tourplan`
-  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `tId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- Constraints for dumped tables
