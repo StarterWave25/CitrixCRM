@@ -1059,9 +1059,6 @@ body.modal-open {
 }
 
 .btn-secondary {
-    background-color: var(--llblue);
-    color: var(--blue);
-    border: 1px solid var(--blue);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -1069,16 +1066,19 @@ body.modal-open {
     transition: all var(--transition-speed) ease-in-out;
 }
 
-.btn-secondary:hover {
-    background-color: var(--lblue);
-    box-shadow: 0 4px 10px rgba(0, 83, 93, 0.3);
-}
-
 .btn-primary.view-data-btn,
 .btn-secondary {
+    background-color: var(--llblue);
+    color: var(--blue);
+    border: 1px solid var(--llblue);
     padding: 8px 16px;
     font-size: 0.95rem;
     border-radius: var(--border-radius);
+}
+
+.btn-secondary:hover, .btn-primary.view-data-btn:hover {
+    background-color: var(--lblue);
+    box-shadow: 0 4px 10px rgba(0, 83, 93, 0.3);
 }
 
 /* RESPONSIVENESS */

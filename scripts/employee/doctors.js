@@ -581,28 +581,7 @@ async function setupDoctorsListForm() {
 
         try {
             // --- STAGE UPDATE LOGIC ---
-            // If it's an existing doctor, update the stage first.
-            if (!isNewDoctor) {
-                const docId = parseInt(submitButton.getAttribute('data-doc-id'));
-                const newStage = stageInput.value;
 
-                showNotification('Updating doctor stage...', 'info');
-                const stageUpdateResponse = await apiFetch('employee/update-stage', 'POST', {
-                    docId: docId,
-                    stage: newStage
-                });
-
-                if (!stageUpdateResponse.success) {
-                    showNotification(stageUpdateResponse.message || 'Failed to update stage. Aborting.', 'error');
-                    // Abort submission if stage update fails
-                    isSubmitting = false;
-                    toggleAllSubmitButtons(false);
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
-                    return;
-                }
-                showNotification('Stage updated successfully.', 'success');
-            }
             // --- END OF STAGE UPDATE LOGIC ---
 
             const orderStatus = orderStatusInput.checked;
@@ -885,6 +864,8 @@ Citrix Pvt Ltd Team.`;
         } catch (error) {
             console.error('Order submission error:', error);
             showNotification('An error occurred during order submission.', 'error');
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fa-solid fa-save"></i> Submit';
         }
@@ -912,10 +893,17 @@ Citrix Pvt Ltd Team.`;
             } else {
                 const errorMessage = response.message || 'Failed to send message.';
                 showNotification(errorMessage, 'error');
+
+                // ✅ Reset flag and enable other buttons
+                isSubmitting = false;
+                toggleAllSubmitButtons(false);
             }
         } catch (error) {
             console.error('Send message error:', error);
             showNotification('An error occurred while sending message.', 'error');
+            // ✅ Reset flag and enable other buttons
+            isSubmitting = false;
+            toggleAllSubmitButtons(false);
         }
     };
 
