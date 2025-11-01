@@ -20,7 +20,7 @@ server.use(cookieParser());
 server.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 server.use(cors({
-    origin: 'http://127.0.0.1:5500', //Keep Citrix domain here
+    origin: ['http://127.0.0.1:5500', 'https://citrixltd.com'], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     preflightContinue: false,
