@@ -18,7 +18,13 @@ let availableDates = [];
      * 1. Authentication and Personalization Check
      */
 const loadUserDetails = () => {
-    // For manager, empId comes from URL, so no userDetails check here.
+    const userDetails = localStorage.getItem('userDetails');
+
+    if (!userDetails) {
+        console.warn('User details not found. Redirecting to login.');
+        window.location.href = './manager-login.html';
+        return;
+    }
     return;
 };
 
