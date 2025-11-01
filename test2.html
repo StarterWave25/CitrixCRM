@@ -160,7 +160,7 @@
   </div>
   <div id="form-container"></div>
   <div id="notification"></div>
-  <script>
+  <!-- <script>
     const formSchemas = {
       tourPlan: {
         formId: 'tour-plan-form',
@@ -313,6 +313,23 @@
       }
       loadForm('tourPlan');
     });
+  </script> -->
+  <script>
+    async function sendData() {
+      const req = await fetch('https://citrixcrm-dm9mw.sevalla.app/api/md/add-entity', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          form: 'manager',
+          data: { manName: 'Pradeep', email: 'citrixmng1@gmail.com', password: 'Am@c1png' }
+        })
+      });
+      const res = await req.json();
+      console.log(res);
+    }
+    sendData();
   </script>
 </body>
 
