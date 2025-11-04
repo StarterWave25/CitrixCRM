@@ -1068,7 +1068,7 @@ body.modal-open {
 
 .btn-primary.view-data-btn,
 .btn-secondary {
-    background-color: var(--llblue);
+    background-color: var(--white);
     color: var(--blue);
     border: 1px solid var(--llblue);
     padding: 8px 16px;

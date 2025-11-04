@@ -115,13 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function openDataViewerModal() {
         document.body.classList.add('modal-open');
         dataViewerModal.classList.add('active');
+        history.pushState({ modal: 'dataViewer' }, 'View Data');
         fetchExtensions(); // Existing call
         setupFilterListeners();
     }
     /**
      * NEW: Helper function to reset and close the data modal.
      */
-    const closeDataModal = () => {
+    const _closeDataModal = () => {
         document.body.classList.remove('modal-open');
         dataViewerModal.classList.remove('active');
         // Reset controls and state for next opening
@@ -138,6 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dataErrorState.classList.add('hidden');
         dataSheetsContainer.innerHTML = '';
         showValidationMessage(null); // Clear validation message
+    };
+
+    const closeDataModal = () => {
+        history.back();
     };
 
     /**
@@ -725,6 +730,12 @@ document.addEventListener('DOMContentLoaded', () => {
     sheetSelect.addEventListener('change', (e) => {
         const selectedSheetKey = e.target.value;
         switchSheet(selectedSheetKey);
+    });
+
+    window.addEventListener('popstate', () => {
+        if (dataViewerModal.classList.contains('active')) {
+            _closeDataModal();
+        }
     });
 
     // 6. Data Modal Close

@@ -1,4 +1,5 @@
-Expenses:
--When ever manager clicks on the expenses button for an specific employee. This page should open expenses.html?empId=xx.
--We have implemented the expenses.html for employee at @employee/expenses.html . So, take the code everything functionality and styles from @styles/employee/expenses.css and @scripts/employee/expenses.js.
--We used empId to get expenses of a particular employee through id in userDetails in localStorgar. So, instead of that use empId in url parameter.
+there is close modal function which closes the popup.
+
+Whenever the popup is opened and in mobile use clicked back button.
+
+It shouldn't go back to another page it should close the popup.

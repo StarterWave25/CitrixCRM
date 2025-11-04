@@ -418,11 +418,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentEmpId = empId;
         document.body.classList.add('modal-open');
         dataViewerModal.classList.add('active');
+        history.pushState({ modal: 'dataViewer' }, 'View Data');
         fetchExtensions(hqId);
         setupFilterListeners();
     }
 
-    const closeDataModal = () => {
+    const _closeDataModal = () => {
         document.body.classList.remove('modal-open');
         dataViewerModal.classList.remove('active');
         extensionSelect.innerHTML = '<option value="" disabled selected>Loading Extensions...</option>';
@@ -437,6 +438,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dataSheetsContainer.innerHTML = '';
         showValidationMessage(null);
         currentEmpId = null;
+    };
+
+    const closeDataModal = () => {
+        history.back();
     };
 
     const showDataModalState = (stateId) => {
@@ -828,6 +833,12 @@ document.addEventListener('DOMContentLoaded', () => {
             switchSheet(selectedSheetKey);
         });
     }
+
+    window.addEventListener('popstate', () => {
+        if (dataViewerModal.classList.contains('active')) {
+            _closeDataModal();
+        }
+    });
 
     loadUserDetails();
     fetchEmployees();
