@@ -165,14 +165,14 @@ export async function createGoogleMeet(req, res) {
 
     // Step 2 & 3: Log to DB - daily incremental count (assumes `meetings` table)
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
       const countSql = 'SELECT MAX(count) AS maxCount FROM `meetings` WHERE DATE(date) = ?';
       const [countRows] = await pool.execute(countSql, [today]); // mysql2/promise style
       const newCount = (countRows[0].maxCount || 0) + 1;
 
       // Inserts the successfully generated meeting link
-      const insertSql = 'INSERT INTO `meetings` (\`Meeting Link\`, count) VALUES (?, ?)';
-      await pool.execute(insertSql, [meetingLink, newCount]);
+      const insertSql = 'INSERT INTO `meetings` (`Meeting Link`, count, `Date`) VALUES (?, ?, ?)';
+      await pool.execute(insertSql, [meetingLink, newCount, today]);
 
       return res.status(200).json({
         success: true,
@@ -388,13 +388,13 @@ ORDER BY \`Date\` ASC`).trim(),
             sql: (`SELECT
 \`doctors\`.\`docId\`,
 \`doctor activities\`.\`date\` AS \`Date\`,
-\`doctor activities\`.\`Employee Name\` AS \`Employee Name\`,
-\`doctor activities\`.\`Feedback\` AS \`Feedback\`,
-\`doctor activities\`.\`Order Status\` AS \`Order Status\`,
 \`doctors\`.\`Doctor Name\` AS \`Doctor Name\`,
+\`doctors\`.\`Stage\`,
 \`doctors\`.\`Phone\` AS \`Phone\`,
 \`doctors\`.\`Address\` AS \`Address\`,
-\`doctors\`.\`Stage\`
+\`doctor activities\`.\`Order Status\` AS \`Order Status\`,
+\`doctor activities\`.\`Feedback\` AS \`Feedback\`,
+\`doctor activities\`.\`Employee Name\` AS \`Employee Name\`
 FROM \`doctor activities\`
 LEFT JOIN \`doctors\` ON \`doctor activities\`.\`docId\` = \`doctors\`.\`docId\`
 ${whereClause}
@@ -431,16 +431,16 @@ ORDER BY \`doctor activities\`.\`date\` ASC`).trim(),
 
           return {
             sql: (`SELECT
-o.\`orderId\` AS \`Order ID\`, 
-o.\`Date\` AS \`Date\`,
-o.\`Employee Name\` AS \`Employee Name\`,
-o.\`Doctor Name\` AS \`Doctor Name\`,
-o.\`DL Copy\` AS \`DL Copy\`,
-o.\`Prescription\` AS \`Prescription\`,
-p.\`Product Name\` AS \`Product Name\`,
-op.\`Strips\` AS \`Strips\`,
-op.\`Free Strips\` AS \`Free Strips\`,
-o.\`Total\` AS \`Total\`
+              o.\`Date\` AS \`Date\`,
+              o.\`Doctor Name\` AS \`Doctor Name\`,
+              o.\`orderId\` AS \`Order ID\`,
+              o.\`DL Copy\` AS \`DL Copy\`,
+              o.\`Prescription\` AS \`Prescription\`,
+              p.\`Product Name\` AS \`Product Name\`,
+              op.\`Strips\` AS \`Strips\`,
+              op.\`Free Strips\` AS \`Free Strips\`,
+              o.\`Employee Name\` AS \`Employee Name\`,
+              o.\`Total\` AS \`Total\`
 FROM \`orders\` o
 LEFT JOIN \`ordered products\` op ON op.\`orderId\` = o.\`orderId\`
 LEFT JOIN \`products\` p ON p.\`pId\` = op.\`pId\`
@@ -489,7 +489,7 @@ ORDER BY o.\`Date\` ASC`).trim(),
             // Initialize the main order object if it's the first time we see this orderId
             groupedOrders[orderId] = {
               ...row,
-              'Product Details': [], // New array to hold all products for this order
+              'Order Details': [], // New array to hold all products for this order
             };
             // Clean up product-specific keys from the main object
             delete groupedOrders[orderId]['Product Name'];
@@ -500,7 +500,7 @@ ORDER BY o.\`Date\` ASC`).trim(),
           // Push the product details from the current row into the array
           // Only push if there are actual product details (handles orders with no products/null joins)
           if (row['Product Name'] !== null) {
-            groupedOrders[orderId]['Product Details'].push({
+            groupedOrders[orderId]['Order Details'].push({
               'Product Name': row['Product Name'],
               'Strips': row['Strips'],
               'Free Strips': row['Free Strips']
@@ -594,7 +594,7 @@ export const joinMeeting = async (req, res) => {
 
     // 1. Get today's date in YYYY-MM-DD format for database comparison.
     // Assuming the 'date' column in the meetings table stores only the date part.
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
     // 2. Construct the SQL query.
     // - Filters meetings for today's date.

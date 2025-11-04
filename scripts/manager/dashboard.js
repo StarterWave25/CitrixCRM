@@ -523,6 +523,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         finalDisplayValue = displayValue;
                     }
                 }
+
+                if (key === 'Total' && typeof value === 'number') {
+                    finalDisplayValue = `₹ ${value.toFixed(2)}`;
+                }
+
                 rowsHtml += `
                 <div class="data-row">
                     <span class="data-label">${formattedKey}:</span>

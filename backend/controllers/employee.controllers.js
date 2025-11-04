@@ -62,6 +62,14 @@ export const submitForm = async (req, res) => {
             }
         }
 
+        const dateColumnName = ['doctors', 'expenses', 'meetings', 'orders', 'products', 'stockists', 'stocks', 'tourplan'].includes(entry.table) ? 'Date' : 'date';
+        const tablesWithDate = ['boss', 'doctor activities', 'doctors', 'employees', 'expenses', 'extensions', 'headquarters', 'manager', 'meetings', 'orders', 'products', 'stockists', 'stocks', 'tourplan'];
+
+        if (tablesWithDate.includes(entry.table) && !toInsert.includes(dateColumnName)) {
+            toInsert.push(dateColumnName);
+            values.push(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
+        }
+
         if (toInsert.length === 0) {
             return res.status(400).json({ success: false, message: 'No insertable fields provided' });
         }
@@ -337,7 +345,7 @@ export const fetchFormDependencies = async (req, res) => {
 
 export const editTourPlan = async (req, res) => {
     const { empId, hqId, extensionName, outStation, jointWork } = req.body;
-    const date = new Date().toISOString().split('T')[0];
+    const date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     // 1. Input Validation
     if (!empId || !date || !hqId || !extensionName || outStation === undefined || jointWork === undefined) {
         return res.status(400).json({
@@ -483,47 +491,47 @@ export const getProducts = async (req, res) => {
  * * Expected body: { docId: number, stage: string }
  */
 export const updateStage = async (req, res) => {
-  try {
-    if (!pool) return res.status(500).json({ error: 'Database error!' });
+    try {
+        if (!pool) return res.status(500).json({ error: 'Database error!' });
 
-    const { docId, stage } = req.body || {};
+        const { docId, stage } = req.body || {};
 
-    // 1. Basic Validation
-    if (docId === undefined || stage === undefined) {
-      return res.status(400).json({ error: 'Missing required fields: docId and stage' });
+        // 1. Basic Validation
+        if (docId === undefined || stage === undefined) {
+            return res.status(400).json({ error: 'Missing required fields: docId and stage' });
+        }
+
+        const docIdNum = Number(docId);
+        if (!Number.isInteger(docIdNum) || docIdNum <= 0) {
+            return res.status(400).json({ error: 'Invalid docId provided' });
+        }
+
+        if (typeof stage !== 'string' || stage.trim() === '') {
+            return res.status(400).json({ error: 'Invalid or empty stage/status value provided' });
+        }
+
+        const newStatus = stage.trim();
+
+        // 2. SQL Query Execution
+        const sql = `UPDATE \`doctors\` SET \`Stage\` = ? WHERE \`docId\` = ?`;
+        const params = [newStatus, docIdNum];
+
+        const [result] = await pool.execute(sql, params);
+
+        // 3. Response Handling
+        if (result.affectedRows === 0) {
+            // Could mean the docId doesn't exist or the status was already the new value
+            return res.status(404).json({ success: false, message: `No doctor found with docId ${docIdNum} or status is already set to ${newStatus}` });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Doctor status updated successfully for docId ${docIdNum}`,
+            newStatus: newStatus
+        });
+
+    } catch (err) {
+        console.error('updateStage error:', err);
+        return res.status(500).json({ error: 'Internal server error during status update' });
     }
-
-    const docIdNum = Number(docId);
-    if (!Number.isInteger(docIdNum) || docIdNum <= 0) {
-      return res.status(400).json({ error: 'Invalid docId provided' });
-    }
-
-    if (typeof stage !== 'string' || stage.trim() === '') {
-      return res.status(400).json({ error: 'Invalid or empty stage/status value provided' });
-    }
-    
-    const newStatus = stage.trim();
-
-    // 2. SQL Query Execution
-    const sql = `UPDATE \`doctors\` SET \`Stage\` = ? WHERE \`docId\` = ?`;
-    const params = [newStatus, docIdNum];
-
-    const [result] = await pool.execute(sql, params);
-
-    // 3. Response Handling
-    if (result.affectedRows === 0) {
-      // Could mean the docId doesn't exist or the status was already the new value
-      return res.status(404).json({ success: false, message: `No doctor found with docId ${docIdNum} or status is already set to ${newStatus}` });
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: `Doctor status updated successfully for docId ${docIdNum}`,
-      newStatus: newStatus
-    });
-
-  } catch (err) {
-    console.error('updateStage error:', err);
-    return res.status(500).json({ error: 'Internal server error during status update' });
-  }
 };

@@ -811,12 +811,13 @@ async function setupDoctorsListForm() {
                 dlCopy: dlCopyResponse.url,
                 prescription: prescriptionResponse.url
             };
-
+            
             // Convert to string for message variable
             const message = `Please arrange immediate delivery of the following order to Dr. ${messageData.doctorName} 👨‍⚕️
 
 👤 Representative: ${messageData.employeeName}
 
+📅 Date: ${new Date().toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }).replaceAll('/','-')}
 📋 Order Details:
 👨‍⚕️ Doctor: ${messageData.doctorName}
 📞 Phone: ${messageData.doctorPhone},
@@ -833,7 +834,7 @@ ${messageData.products}
 Every minute counts, let’s make it quick! ⚡💨
 
 Thank you 🙏
-Citrix Pvt Ltd Team.`;
+Citrix Life Science Pvt Ltd Team.`;
 
             console.log(message);
 

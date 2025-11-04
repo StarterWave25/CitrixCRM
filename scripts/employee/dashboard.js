@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (userDetails.name) {
             greetingElement.innerHTML = `Hello <span class="placeholder-name">${userDetails.name}!</span>`;
-            headquarterElement.textContent = `You are operating from the ${userDetails.hqName} Headquarters.`;
+            headquarterElement.textContent = `You are operating ${userDetails.hqName} Headquarters.`;
         } else {
             greetingElement.innerHTML = `Welcome! <span class="placeholder-name">Employee</span>`;
         }
@@ -269,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (e) {
                         finalDisplayValue = displayValue; // Fallback
                     }
+                }
+
+                if (key === 'Total' && typeof value === 'number') {
+                    finalDisplayValue = `₹ ${value.toFixed(2)}`;
                 }
 
                 // Append the standard row HTML

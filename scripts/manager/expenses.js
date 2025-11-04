@@ -98,12 +98,12 @@ function createExpenseCard(expense) {
             </div>
 
             <div class="data-row">
-                <span class="data-label">Normal Expense:</span>
+                <span class="data-label">Daily Allowance:</span>
                 <span class="data-value">${formatCurrency(expense['Normal Expense'])}</span>
             </div>
 
             <div class="data-row">
-                <span class="data-label">Extension Expense:</span>
+                <span class="data-label">Travel Allowance:</span>
                 <span class="data-value">${formatCurrency(expense['Extension Expense'])}</span>
             </div>
             

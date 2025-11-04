@@ -1150,4 +1150,8 @@ body.modal-open {
         padding: 8px 4px;
         font-size: 0.85rem;
     }
+
+    .product-details-table th:nth-child(1) {
+        width: 55%;
+    }
 }

@@ -101,6 +101,15 @@ export const addEntity = async (req, res) => {
             values.push(payload[col.name]);
         }
 
+        const dateColumnName = ['doctors', 'expenses', 'meetings', 'orders', 'products', 'stockists', 'stocks', 'tourplan'].includes(tableName) ? 'Date' : 'date';
+        const tablesWithDate = ['boss', 'doctor activities', 'doctors', 'employees', 'expenses', 'extensions', 'headquarters', 'manager', 'meetings', 'orders', 'products', 'stockists', 'stocks', 'tourplan'];
+
+        if (tablesWithDate.includes(tableName) && !dbColumns.includes(`\`${dateColumnName}\``)) {
+            dbColumns.push(`\`${dateColumnName}\``);
+            placeholders.push('?');
+            values.push(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
+        }
+
         const query = `INSERT INTO \`${tableName}\` (${dbColumns.join(', ')}) VALUES (${placeholders.join(', ')})`;
 
         // 5. Execute Query
@@ -396,15 +405,17 @@ export const payExpenses = async (req, res) => {
         const tableName = 'expenses';
         const paidStatusColumn = 'Paid Status';
 
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
         // 2. Construct the parameterized SQL UPDATE query
         const sql = `
             UPDATE \`${tableName}\`
-            SET \`${paidStatusColumn}\` = 'Paid', \`Paid on\` = CURDATE(), \`Method\` = ?
+            SET \`${paidStatusColumn}\` = 'Paid', \`Paid on\` = ?, \`Method\` = ?
             WHERE 
                 empId = ? 
                 AND \`${paidStatusColumn}\` = 'Not Paid'
         `;
-        const values = [method, empId];
+        const values = [today, method, empId];
 
         // 3. Execute the query
         const [result] = await pool.execute(sql, values);

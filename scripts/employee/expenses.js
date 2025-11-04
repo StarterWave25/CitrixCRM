@@ -82,7 +82,7 @@ function updateNotPaidTotal(expenses) {
 function createExpenseCard(expense) {
     const formatCurrency = (amount) => `₹${Number(amount).toFixed(2)}`;
     const statusText = expense['Paid Status'];
-    const statusStyle = statusText === 'Paid' ? 'background-color: #5cb85c; color: white;' : 'background-color: #f0ad4e; color: white;';
+    const statusStyle = statusText === 'Paid' ? 'background-color: var(--blue); color: white;' : 'background-color: #f0ad4e; color: white;';
     const displayDate = formatDateForDisplay(expense.Date);
 
     return `
@@ -98,12 +98,12 @@ function createExpenseCard(expense) {
             </div>
 
             <div class="data-row">
-                <span class="data-label">Normal Expense:</span>
+                <span class="data-label">Daily Allowance:</span>
                 <span class="data-value">${formatCurrency(expense['Normal Expense'])}</span>
             </div>
 
             <div class="data-row">
-                <span class="data-label">Extension Expense:</span>
+                <span class="data-label">Travel Allowance:</span>
                 <span class="data-value">${formatCurrency(expense['Extension Expense'])}</span>
             </div>
             

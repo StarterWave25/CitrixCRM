@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkAuthStatus = async () => {
         try {
             // apiFetch is assumed to be globally available from ../api-fetch.js
-            const response = await apiFetch('auth/check', 'POST', {url: window.location.href});
+            const response = await apiFetch('auth/check', 'POST', { url: window.location.href });
 
             if (response.success) {
                 // If already logged in, redirect to the main role landing page
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(response)
             if (response.success) {
                 // Store data in localStorage (Instruction 2)
-                
+
                 localStorage.setItem('userDetails', JSON.stringify(response.data));
 
                 // Display success notification (UX Principle)
@@ -160,9 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setCookie('jwt', token, 7, { path: '/', sameSite: 'Lax', secure: false });
 
                 // Redirect to Employee Dashboard
-                setTimeout(() => {
-                    window.location.href = './dashboard.html';
-                }, 1000);
+                window.location.href = './dashboard.html';
 
             } else {
                 // Display error message from backend (Instruction 4)
