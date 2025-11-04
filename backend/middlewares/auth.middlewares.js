@@ -21,7 +21,7 @@ export const checkUser = async (req, res, next) => {
         }
 
         // Ensure URL is provided for authorization
-        const pageUrl = req.body.url;
+        const pageUrl = req.body.url || req.headers.url;
         if (!pageUrl) {
             return res.status(400).json({ message: 'Missing URL for authorization check', success: false });
         }

@@ -55,7 +55,7 @@ async function apiFetch(url, type = "GET", data = {}) {
 
         const options = {
             method: type.toUpperCase(),
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "url": window.location.href },
             credentials: "include"
         };
 

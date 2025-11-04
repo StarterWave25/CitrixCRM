@@ -1,8 +1,11 @@
 import express from 'express';
 import { payExpenses, addEntity, viewEntity, editCell } from '../controllers/md.controllers.js';
-// import { checkUser } from '../middlewares/auth.middlewares.js';
+import { checkUser } from '../middlewares/auth.middlewares.js';
 
 const router = express.Router();
+
+router.use(checkUser);
+
 router.post("/pay-expenses", payExpenses);
 router.post("/add-entity", addEntity);
 router.post("/view-entity", viewEntity);

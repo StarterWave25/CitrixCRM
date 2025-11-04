@@ -2,9 +2,11 @@
 
 import express from 'express';
 import { submitForm, sendMessage, uploadImage, fetchFormDependencies, editTourPlan, getProducts, updateStage } from '../controllers/employee.controllers.js';
-// import { checkUser } from '../middlewares/auth.middlewares.js';
+import { checkUser } from '../middlewares/auth.middlewares.js';
 
 const router = express.Router();
+
+router.use(checkUser);
 
 router.post('/forms-submit', submitForm);
 router.post('/send-message', sendMessage);
