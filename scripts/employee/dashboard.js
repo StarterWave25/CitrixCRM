@@ -368,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.success) {
                 allSheetData = response.data;
-                console.log(allSheetData);
                 sheetSelect.innerHTML = '';
                 dataSheetsContainer.innerHTML = '';
                 let firstSheetKey = null;

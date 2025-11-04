@@ -33,9 +33,9 @@ const formSchemas = {
             { name: 'extension', type: 'text', label: 'Extension', readOnly: true },
             { name: 'outStation', type: 'checkbox', label: 'Out Station', required: false },
             { name: 'kilometers', type: 'number', label: 'Kilometers (Total Distance)', required: false, conditional: { field: 'outStation', value: false } },
-            { name: 'normalExpense', type: 'number', label: 'Normal Expense (₹)', required: true, defaultValue: 200, isExpense: true },
-            { name: 'extensionExpense', type: 'number', label: 'Extra Expense (₹)', required: true, isExpense: true },
-            { name: 'totalExpense', type: 'number', label: 'Total Expense (₹)', readOnly: true },
+            { name: 'normalExpense', type: 'number', label: 'Daily Allowance (₹)', required: true, defaultValue: 200, isExpense: true },
+            { name: 'extensionExpense', type: 'number', label: 'Travel Allowance (₹)', required: true, isExpense: true },
+            { name: 'totalExpense', type: 'number', label: 'Total Expenses (₹)', readOnly: true },
             { name: 'travelBill', type: 'file', label: 'Travel Bill (Image)', required: false, accept: 'image/*' },
             { name: 'stayBill', type: 'file', label: 'Stay Bill (Image)', required: false, accept: 'image/*' }
         ]

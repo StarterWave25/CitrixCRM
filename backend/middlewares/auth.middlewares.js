@@ -14,14 +14,15 @@ export const checkUser = async (req, res, next) => {
         const cookieToken = req.cookies && req.cookies.jwt;
         const authHeader = req.headers.authorization && req.headers.authorization.split(' ')[1];
         const token = cookieToken || authHeader;
-
+        console.log(req.headers.url);
         // Ensure token exists (Authentication step 1)
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized - No token provided', success: false, authorized: false });
         }
 
         // Ensure URL is provided for authorization
-        const pageUrl = req.body.url || req.headers.url;
+        const pageUrl = req.headers.url;
+
         if (!pageUrl) {
             return res.status(400).json({ message: 'Missing URL for authorization check', success: false });
         }

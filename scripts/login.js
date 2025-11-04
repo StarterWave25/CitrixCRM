@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkAuthStatus = async () => {
         try {
             // apiFetch is assumed to be globally available from ../api-fetch.js
-            const response = await apiFetch('auth/check', 'POST', { url: window.location.href });
+            const response = await apiFetch('auth/check', 'POST');
 
             if (response.success) {
                 // If already logged in, redirect to the main role landing page
