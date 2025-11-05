@@ -184,9 +184,14 @@ function initializeDatepicker() {
 
         // 3. CRITICAL function to enable/disable days
         beforeShowDay: function (date) {
-            // date is a native Date object provided by jQuery UI
-            // Format it to MM/DD/YYYY for internal comparison
-            const dateString = formatDateForDatepicker(date.toISOString());
+            // date is a native Date object (in the local timezone) provided by jQuery UI.
+            // We format it to MM/DD/YYYY to match the format in availableDates.
+            // This avoids using .toISOString(), which can cause off-by-one day errors
+            // in timezones ahead of UTC.
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const yyyy = date.getFullYear();
+            const dateString = `${mm}/${dd}/${yyyy}`;
 
             if (availableDates.includes(dateString)) {
                 return [true, "selectable-date", "Expense available on this date"];
@@ -254,14 +259,17 @@ function handleApplyFilter() {
         return;
     }
 
-    // Convert selectedDate object to the required comparison format (YYYY-MM-DD)
-    const filterDateString = selectedDate.toISOString().split('T')[0];
+    // Compare date components to avoid timezone issues from toISOString()
+    const filterYear = selectedDate.getFullYear();
+    const filterMonth = selectedDate.getMonth();
+    const filterDay = selectedDate.getDate();
 
     // Filter the global array (client-side filter)
     const filteredExpenses = allExpenses.filter(expense => {
-        // Get the date part of the expense's Date string
-        const expenseDateString = new Date(expense.Date).toISOString().split('T')[0];
-        return expenseDateString === filterDateString;
+        const expenseDate = new Date(expense.Date);
+        return expenseDate.getFullYear() === filterYear &&
+            expenseDate.getMonth() === filterMonth &&
+            expenseDate.getDate() === filterDay;
     });
 
     // RENDER: Show only the cards for the filtered date

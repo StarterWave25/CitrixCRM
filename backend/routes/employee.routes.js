@@ -13,7 +13,7 @@ router.post('/send-message', sendMessage);
 router.post('/upload-image',(req, res, next)=> {console.log('called'); next()}, uploadImage);
 router.post('/fetch-form-dependencies', fetchFormDependencies);
 router.post('/edit-tour-plan', editTourPlan);
-router.get('/get-products', getProducts)
-router.post('/update-stage', updateStage)
+router.get('/get-products', getProducts);
+router.post('/update-stage', updateStage);
 
 export default router;
