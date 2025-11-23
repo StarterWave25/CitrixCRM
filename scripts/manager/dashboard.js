@@ -603,7 +603,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Show/hide doctor filter based on selected sheet
-        if ((sheetKey === 'doctorsList' || sheetKey === 'orders') && allDoctors.length > 0) {
+        if (sheetKey === 'tourplan') {
+            doctorFilterContainer.classList.add('hidden'); // Always hide for Tour Plan
+        } else if ((sheetKey === 'doctorsList' || sheetKey === 'orders') && allDoctors.length > 0) {
             doctorFilterContainer.classList.remove('hidden');
         } else {
             doctorFilterContainer.classList.add('hidden');
