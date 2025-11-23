@@ -48,9 +48,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let allEmployees = []; // To store the original list of employees
     let currentEmpId = null; // To store the empId for the data viewer
 
+    // --- Doctor Filter Elements (NEW) ---
+    const doctorFilterContainer = document.createElement('div');
+    doctorFilterContainer.id = 'doctor-filter-container';
+    doctorFilterContainer.className = 'form-group hidden'; // Start hidden
+
+    const doctorFilterLabel = document.createElement('label');
+    doctorFilterLabel.htmlFor = 'doctor-select';
+    doctorFilterLabel.textContent = 'Filter by Doctor:';
+
+    const doctorSelect = document.createElement('select');
+    doctorSelect.id = 'doctor-select';
+    doctorSelect.className = 'form-select';
+
+    doctorFilterContainer.appendChild(doctorFilterLabel);
+    doctorFilterContainer.appendChild(doctorSelect);
+
+    // Insert it into the DOM after the sheet selector's group
+    if (sheetSelect && sheetSelect.parentElement) {
+        sheetSelect.parentElement.insertAdjacentElement('afterend', doctorFilterContainer);
+    }
+
     // --- Global State Variables ---
     let allSheetData = {}; // Stores fetched data for all sheets for the selected date range
     let validTourDates = []; // Stores dates fetched from API in YYYY-MM-DD format
+    let allDoctors = []; // NEW: Stores doctors for the selected extension
     // Map API keys to user-friendly sheet names
     const sheetNameMap = {
         'tourplan': 'Tour Plan',
@@ -438,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
         dataSheetsContainer.innerHTML = '';
         showValidationMessage(null);
         currentEmpId = null;
+        doctorFilterContainer.classList.add('hidden');
+        doctorSelect.innerHTML = '';
     };
 
     const closeDataModal = () => {
@@ -551,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stageValue) {
                 switch (stageValue) {
                     case 'Converted':
-                        cardBackgroundColor = 'rgba(0, 84, 93, 0.25)';
+                        cardBackgroundColor = 'rgba(0, 84, 93, 0.2)';
                         cardBorderColor = '#00535d';
                         break;
                     case 'Targeted':
@@ -577,7 +601,70 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetSheet) {
             targetSheet.classList.remove('hidden');
         }
-    }
+
+        // Show/hide doctor filter based on selected sheet
+        if ((sheetKey === 'doctorsList' || sheetKey === 'orders') && allDoctors.length > 0) {
+            doctorFilterContainer.classList.remove('hidden');
+        } else {
+            doctorFilterContainer.classList.add('hidden');
+        }
+
+        // When switching sheets, re-apply the current doctor filter to the new sheet.
+        handleDoctorFilterChange();
+    };
+
+    /**
+     * NEW: Filters the currently displayed sheet data based on doctor selection.
+     */
+    const handleDoctorFilterChange = () => {
+        const sheetKey = sheetSelect.value;
+        const selectedDoctorName = doctorSelect.value;
+        const sheetContentDiv = document.getElementById(`sheet-${sheetKey}`);
+
+        if (!sheetContentDiv) return;
+
+        const originalData = allSheetData[sheetKey] || [];
+
+        if (selectedDoctorName === 'all') {
+            sheetContentDiv.innerHTML = renderDataCards(sheetKey, originalData);
+            return;
+        }
+
+        // Filter data for the selected doctor
+        const filteredData = originalData.filter(item => {
+            const itemName = item['Doctor Name']?.value || item['Doctor Name'];
+            return itemName === selectedDoctorName;
+        });
+
+        if (filteredData.length > 0) {
+            sheetContentDiv.innerHTML = renderDataCards(sheetKey, filteredData);
+        } else {
+            // Handle "No Data" messages
+            const selectedOption = doctorSelect.querySelector(`option[value="${selectedDoctorName}"]`);
+            const addedDate = selectedOption.dataset.date;
+            let formattedDate = 'an unknown date';
+            if (addedDate) {
+                try {
+                    formattedDate = new Date(addedDate).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    console.error("Could not parse date for doctor:", addedDate);
+                }
+            }
+
+
+            if (sheetKey === 'doctorsList') {
+                sheetContentDiv.innerHTML = `<p class="no-data-message">Dr. ${selectedDoctorName} is added on ${formattedDate}. No Data Found!</p>`;
+            } else if (sheetKey === 'orders') {
+                sheetContentDiv.innerHTML = `<p class="no-data-message">No Orders Found!</p>`;
+            } else {
+                sheetContentDiv.innerHTML = renderDataCards(sheetKey, []);
+            }
+        }
+    };
 
     const fetchViewData = async (exId, fromDate, toDate) => {
         if (!currentEmpId) return;
@@ -593,6 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (response.success) {
                 allSheetData = response.data;
+                await fetchAndPopulateDoctorFilter(exId); // NEW: Fetch doctors for the filter
                 sheetSelect.innerHTML = '';
                 dataSheetsContainer.innerHTML = '';
                 let firstSheetKey = null;
@@ -633,6 +721,43 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('API Error during view data check:', error);
             dataErrorMessage.textContent = 'A network error occurred while fetching reports.';
             showDataModalState('data-error-state');
+        }
+    };
+
+    /**
+     * NEW: Fetches doctors for the selected extension and populates the filter dropdown.
+     */
+    const fetchAndPopulateDoctorFilter = async (exId) => {
+        if (!exId) return;
+
+        try {
+            const response = await apiFetch('md/view-entity', 'POST', {
+                entity: 'doctors',
+                exId: exId
+            });
+            if (response.success && response.data && response.data.doctorsList) {
+                allDoctors = response.data.doctorsList;
+                doctorSelect.innerHTML = '<option value="all">All Doctors</option>'; // Reset
+
+                allDoctors.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.value = doc['Doctor Name'].value;
+                    option.textContent = doc['Doctor Name'].value;
+                    option.dataset.date = doc.Date.value;
+                    doctorSelect.appendChild(option);
+                });
+
+                // Add the change listener
+                doctorSelect.removeEventListener('change', handleDoctorFilterChange);
+                doctorSelect.addEventListener('change', handleDoctorFilterChange);
+            } else {
+                allDoctors = [];
+                doctorFilterContainer.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error("Failed to fetch doctors for filter:", error);
+            allDoctors = [];
+            doctorFilterContainer.classList.add('hidden');
         }
     };
 

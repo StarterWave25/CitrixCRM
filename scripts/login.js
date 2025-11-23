@@ -105,10 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners for Dynamic Validation ---
 
-    // 1. INPUT EVENT: Only checks the form validity to toggle the Login Button state.
-    // This provides the user with visual feedback on *readiness to submit*.
-    emailInput.addEventListener('input', checkFormValidity);
-    passwordInput.addEventListener('input', checkFormValidity);
+    // 1. INPUT EVENT: Checks form validity to toggle Login Button state AND
+    //    triggers detailed validation to clear messages as user types.
+    emailInput.addEventListener('input', () => {
+        checkFormValidity();
+        validateField(emailInput, 1, 50); // Validate email field
+    });
+    passwordInput.addEventListener('input', () => {
+        checkFormValidity();
+        validateField(passwordInput, 8, 8); // Validate password field
+    });
 
     // 2. BLUR EVENT: Triggers detailed validation and displays error messages.
     // This is the standard best practice for non-intrusive validation feedback.

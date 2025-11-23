@@ -82,7 +82,7 @@ function updateNotPaidTotal(expenses) {
 function createExpenseCard(expense) {
     const formatCurrency = (amount) => `₹${Number(amount).toFixed(2)}`;
     const statusText = expense['Paid Status'];
-    const statusStyle = statusText === 'Paid' ? 'background-color: #5cb85c; color: white;' : 'background-color: #f0ad4e; color: white;';
+    const statusStyle = statusText === 'Paid' ? 'background-color: var(--blue); color: white;' : 'background-color: #f0ad4e; color: white;';
     const displayDate = formatDateForDisplay(expense.Date);
 
     return `
@@ -153,7 +153,7 @@ function renderExpenseCards(expenses) {
     expensesGrid.innerHTML = ''; // Clear existing cards
 
     if (expenses.length === 0) {
-        expensesGrid.innerHTML = `<p class="loading-message">No expenses found for this date. Try resetting the filter.</p>`;
+        expensesGrid.innerHTML = `<p class="no-expenses-message" style="text-align: center; color: #555; margin-top: 20px; font-size: 1.1em;">No Expenses found for Employee</p>`;
         return;
     }
 
@@ -217,13 +217,12 @@ async function initializePage() {
         const empIdValue = urlParams.get('empId');
 
         if (!empIdValue) {
-            expensesGrid.innerHTML = `<p class="loading-message" style="color: var(--error-red);">Error: Employee ID (empId) not found in URL. Cannot fetch data.</p>`;
+            expensesGrid.innerHTML = `<p class="loading-message" style="color: var(--error-red);">Error: Employee ID is not found in URL. Cannot fetch data.</p>`;
             return;
         }
 
         // 2. Fetch data
         const response = await apiFetch('common/get-expenses', 'POST', { empId: empIdValue });
-        
         if (response.success && response.data.expenses) {
             allExpenses = response.data.expenses;
 
@@ -234,7 +233,7 @@ async function initializePage() {
             updateNotPaidTotal(allExpenses);
 
         } else {
-            expensesGrid.innerHTML = `<p class="loading-message">Failed to load expenses: ${response.message || 'Unknown error'}</p>`;
+            expensesGrid.innerHTML = `<p class="no-expenses-message" style="text-align: center; color: #555; margin-top: 20px; font-size: 1.1em;">No Expenses found for Employee</p>`;
         }
 
     } catch (error) {

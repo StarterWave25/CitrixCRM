@@ -153,7 +153,7 @@ function renderExpenseCards(expenses) {
     expensesGrid.innerHTML = ''; // Clear existing cards
 
     if (expenses.length === 0) {
-        expensesGrid.innerHTML = `<p class="loading-message">No expenses found for this date. Try resetting the filter.</p>`;
+        expensesGrid.innerHTML = `<p class="no-expenses-message" style="text-align: center; color: #555; margin-top: 20px; font-size: 1.1em;">No Expenses found for Employee</p>`;
         return;
     }
 
@@ -223,7 +223,6 @@ async function initializePage() {
 
         // 2. Fetch data
         const response = await apiFetch('common/get-expenses', 'POST', { empId: empIdValue });
-
         if (response.success && response.data.expenses) {
             allExpenses = response.data.expenses;
 
@@ -234,7 +233,7 @@ async function initializePage() {
             updateNotPaidTotal(allExpenses);
 
         } else {
-            expensesGrid.innerHTML = `<p class="loading-message">Failed to load expenses: ${response.message || 'Unknown error'}</p>`;
+            expensesGrid.innerHTML = `<p class="no-expenses-message" style="text-align: center; color: #555; margin-top: 20px; font-size: 1.1em;">No Expenses found for Employee</p>`;
         }
 
     } catch (error) {

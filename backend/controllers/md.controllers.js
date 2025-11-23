@@ -322,7 +322,8 @@ export const viewEntity = async (req, res) => {
                         \`Phone\`,
                         \`Address\`,
                         \`Stage\`,
-                        \`Status\`
+                        \`Status\`,
+                        \`Date\`
                     FROM \`doctors\`
                     WHERE \`exId\` = ?
                     ORDER BY \`Doctor Name\` ASC

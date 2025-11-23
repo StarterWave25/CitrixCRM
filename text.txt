@@ -1,5 +1,17 @@
-there is close modal function which closes the popup.
+I want to add a feature in View Data. Whenever user selects "Doctors List" or "Orders" in 
+View Data a drop down should visible for Doctor Names of particular Extension get those 
+Doctors Name from apiFetch('md/view-entity','POST', {entity:'doctors',exId:get it from selected extension data-exId})
+You will get the response like this:{ success, message, "data":{"doctorsList":[{"docId":{"value":7},"Doctor Name":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDZFhDETpHSFUlGQYwCgRFIg4dAEY/","value":"Harsha"},"Phone":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDZFhDETpHSFUxHgoqAFQY","value":9014709040},"Address":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDZFhDETpHSFUgEgE2AAUWThI=","value":"KT ROAD Tirupati"},"Stage":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDZFhDETpHSFUyAgQjAFQY","value":"Targeted"},"Status":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDZFhDETpHSFUyAgQwEAVHEQ==","value":"Active"},"Date":{"value":"2025-10-20T18:30:00.000Z"}},{"docId":{"value":8},"Doctor Name":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDa1hDETpHSFUlGQYwCgRFIg4dAEY/","value":"SHerrr"},"Phone":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDa1hDETpHSFUxHgoqAFQY","value":9828918921},"Address":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDa1hDETpHSFUgEgE2AAUWThI=","value":"Bhavani Nagar, tirupati"},"Stage":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDa1hDETpHSFUyAgQjAFQY","value":"Converted"},"Status":{"meta":"P0cCR1ZNFAoHNhYhB0NeVgw8VVtUASsGPwFOQ1IMMmBDa1hDETpHSFUyAgQwEAVHEQ==","value":"Active"},"Date":{"value":"2025-10-20T18:30:00.000Z"}}]}}
+Use only Doctor Name 's Value and also keep the Date as data attribute for future purpose.
 
-Whenever the popup is opened and in mobile use clicked back button.
+When user selects a date range with of a particular extension all the data of doctors will come at
+once I want the both options. First when user selects the range show all the data of doctors list and
+orders.
 
-It shouldn't go back to another page it should close the popup.
+If user want the data about a particular for Doctors List or Orders then he selects a doctor in drop down
+and you should show the data of particular doctor in front-end.
+
+If there is no data of a doctor in Doctors List of a date range then show a message that says
+"Dr.{Doctor} is added on {date in data attribute}. No Data Found!"
+
+In case in Orders sheet show "No Orders Found!".

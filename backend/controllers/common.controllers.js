@@ -64,8 +64,8 @@ export async function createGoogleMeet(req, res) {
     startTime,
     endTime,
     summary = 'New Employee Meeting',
-    description = 'Meeting created by the application.',
-    participants = ['citrixey1@gmail.com', 'citrixey2@gmail.com', 'citrixey3@gmail.com', 'citrixey4@gmail.com', 'citrixmng1@gmail.com'] // Expects an array of email strings
+    description = 'Meeting created by the Citrix CRM.',
+    participants = ['citrixey1@gmail.com', 'citrixey2@gmail.com', 'citrixey3@gmail.com', 'citrixey4@gmail.com', 'citrixmng1@gmail.com', 'citrixey5@gmail.com', 'citrixey6@gmail.com', 'citrixey7@gmail.com'] // Expects an array of email strings
   } = req.body;
 
   if (!startTime || !endTime) {
@@ -562,7 +562,8 @@ export const getExpenses = async (req, res) => {
             ON
                 expenses.exId = extensions.exId
             WHERE
-                expenses.empId = ? LIMIT 90
+                expenses.empId = ? 
+            ORDER BY Date DESC LIMIT 90
         `;
     const values = [empId];
 
@@ -571,7 +572,7 @@ export const getExpenses = async (req, res) => {
 
     // 4. Handle no records found
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: `No expense records found for empId: ${empId}` });
+      return res.status(200).json({ success: false, message: `No expense records found for empId: ${empId}` });
     }
 
     // 5. Return the expense records

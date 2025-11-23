@@ -455,13 +455,21 @@ input[type="time"]::-webkit-clear-button {
     position: relative;
 }
 
-.control-group {
+.control-group,
+#doctor-filter-container {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
 .control-group label {
+    font-weight: 600;
+    color: var(--blue);
+    font-size: 1rem;
+    text-align: left;
+}
+
+#doctor-filter-container label {
     font-weight: 600;
     color: var(--blue);
     font-size: 1rem;
@@ -507,13 +515,14 @@ input[type="time"]::-webkit-clear-button {
 /* Dropdown Style: Large, touch-friendly, and modern */
 #sheet-select,
 #extension-select,
+#doctor-select,
 .custom-date-input {
     /* Remove default browser arrow */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%2300535d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E%0A");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 20px;
-    width: 300px;
+    width: 100%;
     /* Constrain width for focused reading */
     max-width: 100%;
     padding: 12px 16px;
@@ -536,6 +545,7 @@ input[type="time"]::-webkit-clear-button {
 
 #sheet-select:focus,
 #extension-select:focus,
+#doctor-select:focus,
 .custom-date-input:focus {
     border-color: var(--blue);
     outline: none;
@@ -1076,7 +1086,8 @@ body.modal-open {
     border-radius: var(--border-radius);
 }
 
-.btn-secondary:hover, .btn-primary.view-data-btn:hover {
+.btn-secondary:hover,
+.btn-primary.view-data-btn:hover {
     background-color: var(--lblue);
     box-shadow: 0 4px 10px rgba(0, 83, 93, 0.3);
 }
