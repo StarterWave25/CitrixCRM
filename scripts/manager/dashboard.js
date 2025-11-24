@@ -643,25 +643,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Handle "No Data" messages
             const selectedOption = doctorSelect.querySelector(`option[value="${selectedDoctorName}"]`);
-            const addedDate = selectedOption.dataset.date;
-            let formattedDate = 'an unknown date';
-            if (addedDate) {
-                try {
-                    formattedDate = new Date(addedDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                } catch (e) {
-                    console.error("Could not parse date for doctor:", addedDate);
-                }
+
+            if (!selectedOption) {
+                sheetContentDiv.innerHTML = renderDataCards(sheetKey, filteredData);
+                return;
             }
 
-
             if (sheetKey === 'doctorsList') {
-                sheetContentDiv.innerHTML = `<p class="no-data-message">Dr. ${selectedDoctorName} is added on ${formattedDate}. No Data Found!</p>`;
+                sheetContentDiv.innerHTML = `<p class="no-data-message">No Data Found for Dr. ${selectedDoctorName}!</p>`;
             } else if (sheetKey === 'orders') {
-                sheetContentDiv.innerHTML = `<p class="no-data-message">No Orders Found!</p>`;
+                sheetContentDiv.innerHTML = `<p class="no-data-message">No Orders Found for Dr. ${selectedDoctorName}!</p>`;
             } else {
                 sheetContentDiv.innerHTML = renderDataCards(sheetKey, []);
             }
@@ -731,7 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const populateDoctorFilterFromData = (sheetData) => {
         const doctorsFromData = new Set();
-        const doctorsWithDates = new Map(); // To store name and date for the 'no data' message
 
         // Scan relevant sheets for doctor names
         const sheetsToScan = ['doctorsList', 'orders'];
@@ -741,13 +731,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const doctorName = item['Doctor Name']?.value || item['Doctor Name'];
                     if (doctorName) {
                         doctorsFromData.add(doctorName);
-
-                        // Store the associated date if available, primarily from doctorsList
-                        // This helps the "no data for this doctor" message be more informative.
-                        const doctorDate = item['Date']?.value || item['Date'];
-                        if (doctorDate && !doctorsWithDates.has(doctorName)) {
-                            doctorsWithDates.set(doctorName, doctorDate);
-                        }
                     }
                 });
             }
@@ -762,12 +745,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const option = document.createElement('option');
                 option.value = doctorName;
                 option.textContent = doctorName;
-
-                // Add the date from doctorsList for the "no data" message functionality
-                const addedDate = doctorsWithDates.get(doctorName);
-                if (addedDate) {
-                    option.dataset.date = addedDate;
-                }
 
                 doctorSelect.appendChild(option);
             });
