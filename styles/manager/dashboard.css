@@ -391,7 +391,7 @@ input[type="time"]::-webkit-clear-button {
 /* Result State Styling (Success/Error) */
 .result-state.hidden,
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* SUCCESS STATE STYLES */

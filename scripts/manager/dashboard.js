@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (response.success) {
                 allSheetData = response.data;
-                await fetchAndPopulateDoctorFilter(exId); // NEW: Fetch doctors for the filter
+                populateDoctorFilterFromData(allSheetData); // NEW: Populate doctors from fetched data
                 sheetSelect.innerHTML = '';
                 dataSheetsContainer.innerHTML = '';
                 let firstSheetKey = null;
@@ -727,38 +727,61 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * NEW: Fetches doctors for the selected extension and populates the filter dropdown.
+     * NEW: Populates the doctor filter dropdown based on the data fetched for the selected date range.
      */
-    const fetchAndPopulateDoctorFilter = async (exId) => {
-        if (!exId) return;
+    const populateDoctorFilterFromData = (sheetData) => {
+        const doctorsFromData = new Set();
+        const doctorsWithDates = new Map(); // To store name and date for the 'no data' message
 
-        try {
-            const response = await apiFetch('md/view-entity', 'POST', {
-                entity: 'doctors',
-                exId: exId
-            });
-            if (response.success && response.data && response.data.doctorsList) {
-                allDoctors = response.data.doctorsList;
-                doctorSelect.innerHTML = '<option value="all">All Doctors</option>'; // Reset
+        // Scan relevant sheets for doctor names
+        const sheetsToScan = ['doctorsList', 'orders'];
+        sheetsToScan.forEach(sheetKey => {
+            if (sheetData[sheetKey] && Array.isArray(sheetData[sheetKey])) {
+                sheetData[sheetKey].forEach(item => {
+                    const doctorName = item['Doctor Name']?.value || item['Doctor Name'];
+                    if (doctorName) {
+                        doctorsFromData.add(doctorName);
 
-                allDoctors.forEach(doc => {
-                    const option = document.createElement('option');
-                    option.value = doc['Doctor Name'].value;
-                    option.textContent = doc['Doctor Name'].value;
-                    option.dataset.date = doc.Date.value;
-                    doctorSelect.appendChild(option);
+                        // Store the associated date if available, primarily from doctorsList
+                        // This helps the "no data for this doctor" message be more informative.
+                        const doctorDate = item['Date']?.value || item['Date'];
+                        if (doctorDate && !doctorsWithDates.has(doctorName)) {
+                            doctorsWithDates.set(doctorName, doctorDate);
+                        }
+                    }
                 });
-
-                // Add the change listener
-                doctorSelect.removeEventListener('change', handleDoctorFilterChange);
-                doctorSelect.addEventListener('change', handleDoctorFilterChange);
-            } else {
-                allDoctors = [];
-                doctorFilterContainer.classList.add('hidden');
             }
-        } catch (error) {
-            console.error("Failed to fetch doctors for filter:", error);
+        });
+        
+        allDoctors = Array.from(doctorsFromData).sort();
+
+        if (allDoctors.length > 0) {
+            doctorSelect.innerHTML = '<option value="all">All Doctors</option>'; // Reset
+
+            allDoctors.forEach(doctorName => {
+                const option = document.createElement('option');
+                option.value = doctorName;
+                option.textContent = doctorName;
+
+                // Add the date from doctorsList for the "no data" message functionality
+                const addedDate = doctorsWithDates.get(doctorName);
+                if (addedDate) {
+                    option.dataset.date = addedDate;
+                }
+
+                doctorSelect.appendChild(option);
+            });
+
+            // Re-add the change listener
+            doctorSelect.removeEventListener('change', handleDoctorFilterChange);
+            doctorSelect.addEventListener('change', handleDoctorFilterChange);
+
+            // Hide filter by default; switchSheet will unhide it for relevant sheets
+            doctorFilterContainer.classList.add('hidden');
+        } else {
+            // No doctors found in the data, so hide the filter entirely
             allDoctors = [];
+            doctorSelect.innerHTML = '';
             doctorFilterContainer.classList.add('hidden');
         }
     };
